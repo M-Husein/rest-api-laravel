@@ -1,6 +1,5 @@
 <?php
 namespace App\Http\Controllers\Api\V1;
-
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Auth\LoginRequest;
 use App\Http\Requests\Api\V1\Auth\RegisterRequest;
@@ -24,8 +23,7 @@ class AuthController extends Controller{
       $user = User::create([
         'name' => $request->name,
         'email' => $request->email,
-        'password' => bcrypt($request->password),
-        // 'password_confirmation' => 
+        'password' => bcrypt($request->password)
       ]);
 
       return $this->success($user->only('id', 'name', 'email'), 'Registered successfully', 201);
@@ -66,21 +64,14 @@ class AuthController extends Controller{
     //   'device_name' => $request->device_name,
     //   'ip_address' => $request->ip(),
     //   'user_agent' => $request->userAgent(),
-    //   // 'platform' => $request->header('X-Platform', 'unknown'),
+    //   // 'platform' => $request->header('X-Platform', 'unknown')
     // ]);
 
-    $data = [
-      'user' => $user->only('id', 'name', 'email'), // $user
+    return $this->success([
+      'user' => $user->only('id', 'name', 'email'),
       'token' => $token,
-      // 'type' => 'Bearer',
-      // 'expires_at' => $tokenExpiresAt,
-    ];
-
-    if($tokenExpiresAt){
-      $data['expires_at'] = $tokenExpiresAt;
-    }
-
-    return $this->success($data, 'Login successful');
+      'expires_at' => $tokenExpiresAt
+    ], 'Login successful');
   }
 
   // 🍪 Stateful login for SPA using Sanctum + Cookies
@@ -134,9 +125,8 @@ class AuthController extends Controller{
       'ip_address' => $token->ip_address,
       'user_agent' => $token->user_agent,
       'created_at' => $token->created_at->toDateTimeString(),
-      'last_used_at' => optional($token->last_used_at)->toDateTimeString(),
+      'last_used_at' => optional($token->last_used_at)->toDateTimeString()
     ]);
-
     return $this->success($tokens);
   }
 
@@ -166,11 +156,9 @@ class AuthController extends Controller{
 
   protected function checkRateLimit(Request $request, string $action){
     $key = Str::lower($action) . '|' . $request->ip();
-
     if(RateLimiter::tooManyAttempts($key, 5)){
       abort(429, 'Too many requests. Please try again later.');
     }
-
     RateLimiter::hit($key, 60);
   }
 }

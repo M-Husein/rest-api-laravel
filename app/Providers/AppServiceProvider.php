@@ -1,6 +1,5 @@
 <?php
 namespace App\Providers;
-
 use Illuminate\Support\ServiceProvider;
 // use Illuminate\Auth\AuthenticationException;
 use Illuminate\Routing\Router;
