@@ -1,8 +1,8 @@
 <?php
-use Illuminate\Http\Request;
+// use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AuthController;
-use App\Http\Controllers\Api\V1\SocialLoginController;
+// use App\Http\Controllers\Api\V1\SocialLoginController;
 
 Route::prefix('v1')->group(function(){
     Route::post('/register', [AuthController::class, 'register']);
