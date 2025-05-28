@@ -1,0 +1,12 @@
+{
+  "intelephense.environment.includePaths": [
+    "./vendor/laravel/framework"
+  ],
+  "intelephense.environment.documentRoot": "./public",
+  "intelephense.stubs": [
+    "laravel",
+    "phpunit",
+    "wordpress"
+  ],
+  "intelephense.diagnostics.undefinedMethods": false
+}

@@ -44,10 +44,12 @@ class User extends Authenticatable{
 		];
 	}
 
+    // ??
 	public function role(){
 		return $this->belongsTo(Role::class);
 	}
 
+    // ??
 	public function hasRole(string $role): bool{
 		return $this->role && $this->role->name === $role;
 	}
