@@ -3,8 +3,11 @@ namespace App\Http\Controllers;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Illuminate\Support\Str;
+use App\Traits\ApiResponse;
 
 class SocialLoginController extends Controller{
+    use ApiResponse;
+
     public function redirect($provider){
         return Socialite::driver($provider)->stateless()->redirect();
     }
@@ -19,7 +22,7 @@ class SocialLoginController extends Controller{
             'password' => bcrypt(Str::random(24))
         ]);
 
-        return response()->json([
+        return $this->success([
             'token' => $user->createToken($provider.'_token')->plainTextToken,
             'user' => $user
         ]);

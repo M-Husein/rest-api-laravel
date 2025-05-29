@@ -5,7 +5,6 @@ use App\Http\Requests\Api\V1\Auth\LoginRequest;
 use App\Http\Requests\Api\V1\Auth\RegisterRequest;
 use App\Http\Requests\Api\V1\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Api\V1\Auth\ResetPasswordRequest;
-// use App\Models\DeviceLog;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
@@ -26,7 +25,12 @@ class AuthController extends Controller{
         'password' => bcrypt($request->password)
       ]);
 
-      return $this->success($user->only('id', 'name', 'email'), 'Registered successfully', 201);
+      return $this->success(
+        $user->only('id', 'name', 'email'),
+        'Registered successfully',
+        '',
+        201
+      );
   }
 
   public function login(LoginRequest $request){
@@ -35,12 +39,12 @@ class AuthController extends Controller{
     $user = User::where('email', $request->email)->first();
 
     if(!$user || !Hash::check($request->password, $user->password)){
-      return $this->error(401, 'invalid.credentials', 'Invalid credentials');
+      return $this->error('Invalid credentials', 401);
     }
 
-    if($request->device_name){
-      $user->tokens()->where('name', $request->device_name)->delete();
-    }
+    // if($request->device_name){
+    //   $user->tokens()->where('name', $request->device_name)->delete();
+    // }
 
     // Token expiration: null for long-living if remember = true
     $tokenExpiresAt = $request->boolean('remember')
@@ -59,16 +63,8 @@ class AuthController extends Controller{
     $tokenModel->user_agent = $request->userAgent();
     $tokenModel->save();
 
-    // DeviceLog::create([
-    //   'user_id' => $user->id,
-    //   'device_name' => $request->device_name,
-    //   'ip_address' => $request->ip(),
-    //   'user_agent' => $request->userAgent(),
-    //   // 'platform' => $request->header('X-Platform', 'unknown')
-    // ]);
-
     return $this->success([
-      'user' => $user->only('id', 'name', 'email'),
+      'user' => $user->except('password', 'remember_token'), // $user->only('id', 'name', 'email'),
       'token' => $token,
       'expires_at' => $tokenExpiresAt
     ], 'Login successful');
@@ -77,25 +73,25 @@ class AuthController extends Controller{
   // 🍪 Stateful login for SPA using Sanctum + Cookies
   // public function loginSession(LoginRequest $request){
   //   if(!Auth::attempt($request->only('email', 'password'))){
-  //     return $this->error(401, 'invalid.credentials', 'Invalid credentials');
+  //     return $this->error('Invalid credentials', 401);
   //   }
 
   //   $user = Auth::user();
 
   //   return $this->success([
-  //     'user' => $user->only('id', 'name', 'email'),
+  //     'user' => $user->except('password', 'remember_token'),
   //   ], 'Session login successful');
   // }
 
   public function logout(Request $request){
     $request->user()->currentAccessToken()->delete();
-    return $this->success(null, 'Logged out from this device');
+    return $this->success('', 'Logged out from this device');
   }
 
   public function logoutOthers(Request $request){
     $currentTokenId = $request->user()->currentAccessToken()->id;
     $request->user()->tokens()->where('id', '!=', $currentTokenId)->delete();
-    return $this->success(null, 'Logged out from other devices');
+    return $this->success('', 'Logged out from other devices');
   }
 
   /**
@@ -107,20 +103,17 @@ class AuthController extends Controller{
   */
   public function logoutDevice(Request $request, $deviceId){
     $token = $request->user()->tokens()->where('id', $deviceId)->first();
-
-    if(!$token){
-      return $this->error(404, 'device.404', 'Device not found');
+    if($token){
+      $token->delete();
+      return $this->success('', 'Logged out from selected device');
     }
-
-    $token->delete();
-
-    return $this->success(null, 'Logged out from selected device');
+    return $this->error('Device not found');
   }
 
   public function listDevices(Request $request){
     $tokens = $request->user()->tokens->map(fn($token) => [
       'id' => $token->id,
-      'name' => $token->name, // 'device_name'
+      'name' => $token->name,
       'platform' => $token->platform,
       'ip_address' => $token->ip_address,
       'user_agent' => $token->user_agent,
@@ -136,8 +129,8 @@ class AuthController extends Controller{
     $status = Password::sendResetLink($request->only('email'));
 
     return $status === Password::RESET_LINK_SENT
-      ? $this->success(null, 'Reset link sent')
-      : $this->error(400, 'failed', 'Failed to send link');
+      ? $this->success('', 'Reset link sent')
+      : $this->error('Failed to send link');
   }
 
   public function resetPassword(ResetPasswordRequest $request){
@@ -150,8 +143,8 @@ class AuthController extends Controller{
     );
 
     return $status === Password::PASSWORD_RESET
-      ? $this->success(null, 'Password reset successful')
-      : $this->error(400, 'password.reset.failed', 'Reset failed');
+      ? $this->success('', 'Password reset successful')
+      : $this->error('Password reset failed');
   }
 
   protected function checkRateLimit(Request $request, string $action){

@@ -8,5 +8,7 @@
     "phpunit",
     "wordpress"
   ],
-  "intelephense.diagnostics.undefinedMethods": false
+  "intelephense.diagnostics.undefinedMethods": false,
+  "intelephense.diagnostics.undefinedFunctions": false,
+  "intelephense.diagnostics.undefinedTypes": false
 }

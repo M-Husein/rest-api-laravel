@@ -17,10 +17,10 @@ class Handler extends ExceptionHandler{
     $this->reportable(function(){}); // function(Throwable $e)
   }
 
-  protected function unauthenticated($request, AuthenticationException $exception){
-    if($request->expectsJson()){
-      return app('router')->customUnauthorizedResponse($exception);
+  protected function unauthenticated($req, AuthenticationException $e){
+    if($req->expectsJson()){
+      return app('router')->customUnauthorizedResponse($e);
     }
-    return parent::unauthenticated($request, $exception);
+    return parent::unauthenticated($req, $e);
   }
 }

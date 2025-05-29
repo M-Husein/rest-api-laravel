@@ -1,6 +1,6 @@
 # Rest API using Laravel
 
-# Custom CLI
+## Custom CLI
 
 To generate resource.
 

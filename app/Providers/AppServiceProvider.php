@@ -3,6 +3,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 // use Illuminate\Auth\AuthenticationException;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Response;
 
 class AppServiceProvider extends ServiceProvider{
     /**
@@ -14,7 +15,17 @@ class AppServiceProvider extends ServiceProvider{
      * Bootstrap any application services.
      */
     public function boot(): void{
-        Router::macro('customUnauthorizedResponse', fn() => // AuthenticationException $exception
+        // Performance Optimization
+        Response::macro('cachedJson', fn($data, $key, $minutes = 15) => 
+            cache()->remember($key, $minutes * 60, fn() => 
+                response()->json($data)->withHeaders([
+                    'ETag' => md5(json_encode($data)),
+                    'Cache-Control' => 'public, max-age=' . ($minutes * 60),
+                ])
+            )
+        );
+
+        Router::macro('customUnauthorizedResponse', fn() => // fn(AuthenticationException $e)
             response()->json([
                 'code' => 401,
                 'errors' => 'unauthorized'
