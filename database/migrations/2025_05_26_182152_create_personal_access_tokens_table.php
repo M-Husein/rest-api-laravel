@@ -20,10 +20,10 @@ return new class extends Migration
             $table->timestamp('last_used_at')->nullable();
             $table->timestamp('expires_at')->nullable();
             
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->index();
             $table->string('ip_address')->nullable();
             $table->text('user_agent')->nullable();
-            $table->string('platform')->nullable();
+            // $table->string('platform')->nullable();
 
             $table->timestamps();
         });

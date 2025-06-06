@@ -17,14 +17,14 @@ Route::prefix('v1')->group(function(){
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::post('/logout-others', [AuthController::class, 'logoutOthers']);
         Route::delete('/logout-device/{deviceId}', [AuthController::class, 'logoutDevice']);
-        Route::get('/devices', [AuthController::class, 'listDevices']);
+        Route::get('/devices-log', [AuthController::class, 'listDevices']);
         // /user
-        Route::get('/me', fn($r) => $r->user()); // auth()->user()
+        Route::get('/me', fn($r) => $r->user());
     });
 
     
 });
 
 // Route::get('/user', function(Request $request){
-//     return $request->user();
+//     return $request->user(); // auth()->user()
 // })->middleware('auth:sanctum');

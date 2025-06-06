@@ -2,8 +2,17 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Laravel</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="theme-color" content="#1677ff">
+	<meta name="mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no,address=no,email=no">
+	<meta name="robots" content="none,nosnippet,noarchive,noimageindex">
+	<meta name="googlebot" content="none,nosnippet,noarchive,noimageindex">
+	<meta name="AdsBot-Google" content="none,nosnippet,noarchive,noimageindex">
+	<meta name="googlebot-news" content="none,nosnippet,noarchive,noimageindex">
+	<meta name="bing" content="none,nosnippet,noarchive,noimageindex">
+	<meta name="baidu" content="none,nosnippet,noarchive,noimageindex">
+	<title>Admin {{ config('app.name', 'Restapi') }}</title>
 
 	{{-- <link rel="preconnect" href="https://fonts.bunny.net">
 	<link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" /> --}}
@@ -11,6 +20,7 @@
 	<!-- Styles / Scripts -->
 	 {{-- @if(file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot'))) --}}
 	@if(file_exists(public_path('build/manifest.json')))
+		@viteReactRefresh
 		@vite(['resources/css/app.css', 'resources/js/app.js'])
 	@else
 		<style>

@@ -1,5 +1,4 @@
 <?php
-
 use Laravel\Sanctum\Sanctum;
 
 return [
@@ -48,6 +47,8 @@ return [
     */
 
     'expiration' => null,
+    // 'expiration' => 60,
+    // 'rt_expiration' => 7 * 24 * 60, // 7 days
 
     /*
     |--------------------------------------------------------------------------

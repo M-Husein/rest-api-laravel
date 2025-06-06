@@ -1,7 +1,27 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
+Route::prefix('admin')->group(function(){
+	Route::get('{uri?}',function(){
+		$view = view('admin');
+		return response($view)->withHeaders([
+			'X-Content-Type-Options' => 'nosniff',
+			'X-Frame-Options' => 'SAMEORIGIN',
+			'X-XSS-Protection' => '1; mode=block',
+			'X-Robots-Tag' => 'none,noarchive'
+			// 'X-Powered-By' => 'Programmeria', // OPTION
+			// 'Access-Control-Allow-Origin' => '*',
+			// 'Feature-Policy' => "display-capture 'self'"
+		]);
+	})->where('uri','(.*)');
 });
+
+Route::get('/{uri?}',function(){
+	$view = view('app');
+	return response($view)->withHeaders([
+		'X-Frame-Options' => 'SAMEORIGIN',
+		'X-XSS-Protection' => '1; mode=block'
+	]);
+})->where('uri','(.*)');
+
+// Route::get('/', fn() => view('welcome'));

@@ -1,6 +1,6 @@
 # Rest API using Laravel
 
-# Custom CLI
+## Custom CLI
 
 To generate resource.
 
@@ -15,6 +15,87 @@ That generates:
 - Api/V1/ProductController
 - StoreProductRequest
 - UpdateProductRequest
+
+## Endpoint pattern
+
+### GET
+
+#### Endpoint:
+```bash
+api/v1/users
+```
+
+Description:
+Get all data.
+
+#### Endpoint:
+```bash
+api/v1/users/{id}
+```
+
+Description:
+Get detail data by id.
+
+#### Endpoint:
+```bash
+api/v1/users/lazy
+```
+
+Description:
+Get data per page, usage for infinite scroll / lazy loading.
+
+#### Endpoint:
+```bash
+api/v1/users/table
+```
+
+Description:
+Get data with features such as datatables, pagination, sort, filter.
+
+### POST
+
+#### Endpoint:
+```bash
+api/v1/users
+```
+
+Description:
+Create new data.
+
+Payload:
+```json
+{}
+```
+
+### PUT
+
+#### Endpoint:
+```bash
+api/v1/users/{id}
+```
+
+Description:
+Update specific data by id.
+
+Payload:
+```json
+{}
+```
+
+### DELETE
+
+#### Endpoint:
+```bash
+api/v1/users
+```
+
+Description:
+Delete specific data by id, single / multiple
+
+Payload:
+```json
+["id_1", "id_2"]
+```
 
 # 
 

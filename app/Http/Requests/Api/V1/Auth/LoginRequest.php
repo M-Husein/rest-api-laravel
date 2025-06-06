@@ -9,10 +9,10 @@ class LoginRequest extends FormRequest{
 
     public function rules(): array{
         return [
-            'email' => 'required|email',
-            'password' => 'required|string|min:6',
-            'device_name' => 'nullable|string|max:100',
+            'email' => 'bail|required|email',
+            'password' => 'bail|required|string|min:6',
             'remember' => 'nullable|boolean'
+            // 'device_name' => 'bail|nullable|string|max:100'
         ];
     }
 
