@@ -9,7 +9,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable{
 	/** @use HasFactory<\Database\Factories\UserFactory> */
-	use HasFactory,Notifiable,HasApiTokens,HasRoles;
+	use HasFactory, Notifiable, HasApiTokens, HasRoles;
 
 	/**
 	 * The attributes that are mass assignable.
@@ -19,7 +19,8 @@ class User extends Authenticatable{
 	protected $fillable = [
 		'name',
 		'email',
-		'password'
+		'password',
+		'username'
 	];
 
 	/**
@@ -44,13 +45,13 @@ class User extends Authenticatable{
 		];
 	}
 
-    // ??
-	public function role(){
-		return $this->belongsTo(Role::class);
-	}
+  // ??
+	// public function role(){
+	// 	return $this->belongsTo(Role::class);
+	// }
 
-    // ??
-	public function hasRole(string $role): bool{
-		return $this->role && $this->role->name === $role;
-	}
+  // // ??
+	// public function hasRole(string $role): bool{
+	// 	return $this->role && $this->role->name === $role;
+	// }
 }

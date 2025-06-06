@@ -5,48 +5,70 @@ use Illuminate\Http\JsonResponse;
 trait ApiResponse{
   /**
    * @param mixed $data
-   * @param string $message
-   * @param mixed $meta
+   * @param string $msg ($message)
    * @param int $code
    */
-  protected function success(mixed $data = '', string $message = '', mixed $meta = null, int $code = 200): JsonResponse{
+  protected function success(mixed $data = '', string $msg = '', int $code = 200): JsonResponse{
     return response()->json([
-      'ok' => !0,
       'data' => $data,
-      'message' => $message,
-      'meta' => $meta
+      'message' => $msg
     ], $code);
   }
 
   /**
-   * @param string $message
+   * @param string $msg ($message)
    * @param int $code
-   * @param mixed $errors
+   * @param mixed $err ($errors)
    */
-  protected function error(string $message, int $code = 400, mixed $errors = null): JsonResponse{
+  protected function error(string $msg, int $code = 400, mixed $err = null): JsonResponse{
     return response()->json([
-      'ok' => !1,
-      'errors' => $errors ?? ['code' => $code],
-      'message' => $message
+      'errors' => $err ?? $code, // $err ?? ['code' => $code]
+      'message' => $msg
     ], $code);
   }
 
-  protected function paginate(mixed $data, string $message = ''){
+  /**
+   * @param mixed $data
+   * @param string $msg ($message)
+   * @return 'Datatables behavior'
+   */
+  protected function paginate(mixed $data, string $msg = ''){
     return self::success(
       [
         'data' => $data->items(),
         'pagination' => [
           'total' => $data->total(),
-          'per_page' => $data->perPage(),
-          'current' => $data->currentPage(),
+          'perPage' => $data->perPage(),
+          'page' => $data->currentPage(),
           'last' => $data->lastPage(),
-          'links' => [
-            'next' => $data->nextPageUrl(),
-            'prev' => $data->previousPageUrl()
-          ]
+          // 'links' => [
+          //   'next' => $data->nextPageUrl(),
+          //   'prev' => $data->previousPageUrl()
+          // ]
         ]
       ],
-      $message
+      $msg
+    );
+  }
+
+  /**
+   * @param mixed $data
+   * @param string $msg ($message)
+   * @return 'Infinite scroll behavior'
+   */
+  protected function lazy(mixed $data, string $msg = ''){
+    return self::success(
+      [
+        'data' => $data->items(),
+        'pagination' => [
+          'page' => $data->currentPage(),
+          'perPage' => $data->perPage(),
+          'total' => $data->total(),
+          'totalPages' => $data->lastPage(),
+          'hasMore' => $data->hasMorePages()
+        ]
+      ],
+      $msg
     );
   }
 }

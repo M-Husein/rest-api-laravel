@@ -16,6 +16,87 @@ That generates:
 - StoreProductRequest
 - UpdateProductRequest
 
+## Endpoint pattern
+
+### GET
+
+#### Endpoint:
+```bash
+api/v1/users
+```
+
+Description:
+Get all data.
+
+#### Endpoint:
+```bash
+api/v1/users/{id}
+```
+
+Description:
+Get detail data by id.
+
+#### Endpoint:
+```bash
+api/v1/users/lazy
+```
+
+Description:
+Get data per page, usage for infinite scroll / lazy loading.
+
+#### Endpoint:
+```bash
+api/v1/users/table
+```
+
+Description:
+Get data with features such as datatables, pagination, sort, filter.
+
+### POST
+
+#### Endpoint:
+```bash
+api/v1/users
+```
+
+Description:
+Create new data.
+
+Payload:
+```json
+{}
+```
+
+### PUT
+
+#### Endpoint:
+```bash
+api/v1/users/{id}
+```
+
+Description:
+Update specific data by id.
+
+Payload:
+```json
+{}
+```
+
+### DELETE
+
+#### Endpoint:
+```bash
+api/v1/users
+```
+
+Description:
+Delete specific data by id, single / multiple
+
+Payload:
+```json
+["id_1", "id_2"]
+```
+
 # 
 
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>

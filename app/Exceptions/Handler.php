@@ -19,7 +19,7 @@ class Handler extends ExceptionHandler{
 
   protected function unauthenticated($req, AuthenticationException $e){
     if($req->expectsJson()){
-      return app('router')->customUnauthorizedResponse($e);
+      return app('router')->myUnauthorizedResponse(); // $e
     }
     return parent::unauthenticated($req, $e);
   }
