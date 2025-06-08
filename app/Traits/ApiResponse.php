@@ -1,6 +1,7 @@
 <?php
 namespace App\Traits;
 use Illuminate\Http\JsonResponse;
+// use Illuminate\Http\Request;
 
 trait ApiResponse{
   /**
@@ -8,7 +9,11 @@ trait ApiResponse{
    * @param string $msg ($message)
    * @param int $code
    */
-  protected function success(mixed $data = '', string $msg = '', int $code = 200): JsonResponse{
+  protected function success(
+    mixed $data = '',
+    string $msg = '',
+    int $code = 200
+  ): JsonResponse{
     return response()->json([
       'data' => $data,
       'message' => $msg
@@ -20,9 +25,13 @@ trait ApiResponse{
    * @param int $code
    * @param mixed $err ($errors)
    */
-  protected function error(string $msg, int $code = 400, mixed $err = null): JsonResponse{
+  protected function error(
+    string $msg,
+    int $code = 400,
+    mixed $err = null
+  ): JsonResponse{
     return response()->json([
-      'errors' => $err ?? $code, // $err ?? ['code' => $code]
+      'errors' => $err ?? $code,
       'message' => $msg
     ], $code);
   }
@@ -32,43 +41,38 @@ trait ApiResponse{
    * @param string $msg ($message)
    * @return 'Datatables behavior'
    */
-  protected function paginate(mixed $data, string $msg = ''){
-    return self::success(
-      [
-        'data' => $data->items(),
-        'pagination' => [
-          'total' => $data->total(),
-          'perPage' => $data->perPage(),
-          'page' => $data->currentPage(),
-          'last' => $data->lastPage(),
-          // 'links' => [
-          //   'next' => $data->nextPageUrl(),
-          //   'prev' => $data->previousPageUrl()
-          // ]
-        ]
-      ],
-      $msg
-    );
-  }
+  // protected function paginate(mixed $data, string $msg = ''){
+  //   return self::success(
+  //     [
+  //       'data' => $data->items(),
+  //       'pagination' => [
+  //         'page' => $data->currentPage(),
+  //         'perPage' => $data->perPage(),
+  //         'total' => $data->total(),
+  //         'last' => $data->lastPage(),
+  //       ]
+  //     ],
+  //     $msg
+  //   );
+  // }
 
   /**
+   * Using simplePaginate()
    * @param mixed $data
    * @param string $msg ($message)
    * @return 'Infinite scroll behavior'
    */
-  protected function lazy(mixed $data, string $msg = ''){
-    return self::success(
-      [
-        'data' => $data->items(),
-        'pagination' => [
-          'page' => $data->currentPage(),
-          'perPage' => $data->perPage(),
-          'total' => $data->total(),
-          'totalPages' => $data->lastPage(),
-          'hasMore' => $data->hasMorePages()
-        ]
-      ],
-      $msg
-    );
-  }
+  // protected function lazy(mixed $data, string $msg = ''){
+  //   return self::success(
+  //     [
+  //       'data' => $data->items(),
+  //       'page' => $data->currentPage(),
+  //       'perPage' => $data->perPage(),
+  //       'total' => $data->total(),
+  //       'totalPages' => $data->lastPage(),
+  //       'hasMore' => $data->hasMorePages()
+  //     ],
+  //     $msg
+  //   );
+  // }
 }
