@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller{
   use ApiResponse;
@@ -94,11 +93,11 @@ class AuthController extends Controller{
    * Logout from a specific device using token ID.
    *
    * @param  \Illuminate\Http\Request $request
-   * @param  string  $deviceId
+   * @param  string $id = $deviceId
    * @return \Illuminate\Http\JsonResponse
   */
-  public function logoutDevice(Request $req, $deviceId){
-    $token = $req->user()->tokens()->where('id', $deviceId)->first();
+  public function logoutDevice(Request $req, $id){
+    $token = $req->user()->tokens()->where('id', $id)->first();
     if($token){
       $token->delete();
       return $this->success('', 'Logged out from selected device');
