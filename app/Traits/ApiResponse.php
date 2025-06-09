@@ -35,44 +35,4 @@ trait ApiResponse{
       'message' => $msg
     ], $code);
   }
-
-  /**
-   * @param mixed $data
-   * @param string $msg ($message)
-   * @return 'Datatables behavior'
-   */
-  // protected function paginate(mixed $data, string $msg = ''){
-  //   return self::success(
-  //     [
-  //       'data' => $data->items(),
-  //       'pagination' => [
-  //         'page' => $data->currentPage(),
-  //         'perPage' => $data->perPage(),
-  //         'total' => $data->total(),
-  //         'last' => $data->lastPage(),
-  //       ]
-  //     ],
-  //     $msg
-  //   );
-  // }
-
-  /**
-   * Using simplePaginate()
-   * @param mixed $data
-   * @param string $msg ($message)
-   * @return 'Infinite scroll behavior'
-   */
-  // protected function lazy(mixed $data, string $msg = ''){
-  //   return self::success(
-  //     [
-  //       'data' => $data->items(),
-  //       'page' => $data->currentPage(),
-  //       'perPage' => $data->perPage(),
-  //       'total' => $data->total(),
-  //       'totalPages' => $data->lastPage(),
-  //       'hasMore' => $data->hasMorePages()
-  //     ],
-  //     $msg
-  //   );
-  // }
 }

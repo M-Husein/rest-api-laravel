@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
@@ -23,6 +22,17 @@ class UserController extends Controller{
       ],
       sorts: ['id', 'name', 'email', 'created_at'],
       includes: ['avatar', 'role_id'], // Example = ['category', 'reviews']
+    );
+  }
+
+  public function lazy(Request $request){
+    return $this->simplePaginate(
+      query: User::class, // User::query(),
+      request: $request,
+      searches: ['name'],
+      // filters: [],
+      // sorts: [],
+      // includes: []
     );
   }
 }
