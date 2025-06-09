@@ -35,4 +35,8 @@ class UserController extends Controller{
       // includes: []
     );
   }
+
+  public function show(string $id){
+    return $this->success(User::findOrFail($id));
+  }
 }
