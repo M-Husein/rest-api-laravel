@@ -2,7 +2,7 @@
 namespace App\Exceptions;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 // use Throwable;
-use Illuminate\Auth\AuthenticationException;
+// use Illuminate\Auth\AuthenticationException;
 
 class Handler extends ExceptionHandler{
   protected $levels = [];
@@ -17,10 +17,10 @@ class Handler extends ExceptionHandler{
     $this->reportable(function(){}); // function(Throwable $e)
   }
 
-  protected function unauthenticated($req, AuthenticationException $e){
-    if($req->expectsJson()){
-      return app('router')->myUnauthorizedResponse(); // $e
-    }
-    return parent::unauthenticated($req, $e);
-  }
+  // protected function unauthenticated($req, AuthenticationException $e){
+  //   if($req->expectsJson()){
+  //     return app('router')->myUnauthorizedResponse(); // $e
+  //   }
+  //   return parent::unauthenticated($req, $e);
+  // }
 }

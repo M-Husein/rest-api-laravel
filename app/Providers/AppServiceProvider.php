@@ -32,17 +32,17 @@ class AppServiceProvider extends ServiceProvider{
     //   )
     // );
 
-    Router::macro('myUnauthorizedResponse', fn() => // fn(AuthenticationException $e)
-      response()->json([
-        'errors' => 401,
-        'message' => 'Unauthorized' // $e->getMessage() ?? 'Unauthorized'
-      ], 401)
-    );
+    // Router::macro('myUnauthorizedResponse', fn() => // fn(AuthenticationException $e)
+    //   response()->json([
+    //     'errors' => 401,
+    //     'message' => 'Unauthorized' // $e->getMessage() ?? 'Unauthorized'
+    //   ], 401)
+    // );
 
-    // Apply to all routes
-    $this->app->bind(
-      \Illuminate\Contracts\Debug\ExceptionHandler::class,
-      \App\Exceptions\Handler::class
-    );
+    // // Apply to all routes
+    // $this->app->bind(
+    //   \Illuminate\Contracts\Debug\ExceptionHandler::class,
+    //   \App\Exceptions\Handler::class
+    // );
   }
 }

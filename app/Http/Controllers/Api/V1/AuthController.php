@@ -23,7 +23,7 @@ class AuthController extends Controller{
       'name' => $req->name,
       'email' => $req->email,
       'username' => $req->username ?? $req->email,
-      'password' => bcrypt($req->password)
+      'password' => Hash::make($req->password)
     ]);
 
     return $this->success($user, 'Registered successfully', 201);
@@ -133,7 +133,7 @@ class AuthController extends Controller{
     $status = Password::reset(
       $req->only('email', 'token', 'password', 'password_confirmation'),
       function($user) use ($req){
-        $user->update(['password' => bcrypt($req->password)]);
+        $user->update(['password' => Hash::make($req->password)]);
         $user->tokens()->delete();
       }
     );
