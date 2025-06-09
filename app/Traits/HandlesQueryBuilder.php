@@ -1,40 +1,37 @@
 <?php
 namespace App\Traits;
-
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\{QueryBuilder, AllowedFilter, AllowedSort};
-// use App\Traits\ApiResponse;
 
 trait HandlesQueryBuilder{
-  // use ApiResponse;
-
   /**
    * Applies query builder with filters, sorts, and includes
    */ 
   protected function buildQuery(
-    $query,
+    Builder|string $query,
+    Request $request,
     array $searches = [], // searchableFields
-    array $filters = [],
-    array $sorts = [],
-    array $includes = [],
+    ?array $filters = null,
+    ?array $sorts = null,
+    ?array $includes = null
   ){
     $qb = QueryBuilder::for($query);
 
     // Add global search when 'q' parameter exists
-    if(request()->has('q')){
-      $searchValue = request('q');
+    if($searches && $request->has('q')){
+      $searchValue = $request->q;
       $qb->where(function($query) use ($searchValue, $searches){
         foreach($searches as $field){
           $query->orWhere($field, 'LIKE', "%{$searchValue}%");
         }
       });
     }
+
+    $filters !== null && $qb->allowedFilters($this->getFilters($filters));
+    $sorts !== null && $qb->allowedSorts($this->getSorts($sorts));
+    $includes !== null && $qb->allowedIncludes($includes);
     
-    return $qb->allowedFilters($this->getFilters($filters))
-      ->allowedSorts($this->getSorts($sorts))
-      ->allowedIncludes($includes);
-      // Option: Only select from filters
-      // ->select($filters ?? '*'); // 'id', 'name'
+    return $qb;
   }
 
   protected function getFilters(array $filters): array{
@@ -56,12 +53,12 @@ trait HandlesQueryBuilder{
    * @return Spatie\QueryBuilder\QueryBuilder
    */
   protected function paginate(
-    $query,
+    Builder|string $query,
     Request $request,
     array $searches = [], // searchableFields
     array $filters = [],
     array $sorts = [],
-    array $includes = []
+    ?array $includes = null
   ){
     // Option
     // $perPage = min(
@@ -72,9 +69,37 @@ trait HandlesQueryBuilder{
     // logger($request->query());
 
     return response()->json(
-      $this->buildQuery($query, $searches, $filters, $sorts, $includes)
-        ->simplePaginate($request->perPage ?? config('api.per_page', 10))
+      $this->buildQuery($query, $request, $searches, $filters, $sorts, $includes)
+        ->paginate($request->perPage ?? config('api.per_page', 10))
         ->appends($request->query()) // ->appends($request->except('page'));
+    );
+  }
+
+  /**
+   * Datatables with pagination, search.
+   * Usage for infinite scroll/lazy loading
+   * @return Spatie\QueryBuilder\QueryBuilder
+   */
+  protected function simplePaginate(
+    Builder|string $query,
+    Request $request,
+    array $searches = [],
+    ?array $filters = null,
+    ?array $sorts = null,
+    ?array $includes = null
+  ){
+    // Option data
+    // [
+    //   'data' => $data->items(),
+    //   'page' => $data->currentPage(),
+    //   'perPage' => $data->perPage(),
+    //   'next' => $data->nextPageUrl()
+    // ]
+
+    return response()->json(
+      $this->buildQuery($query, $request, $searches, $filters, $sorts, $includes)
+        ->simplePaginate($request->perPage ?? config('api.per_page', 10))
+        ->appends($request->query())
     );
   }
 }

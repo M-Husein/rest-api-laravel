@@ -26,7 +26,7 @@ api/v1/users
 ```
 
 Description:
-Get all data.
+Get data with features such as datatables, pagination, search, sort, filter.
 
 #### Endpoint:
 ```bash
@@ -42,15 +42,7 @@ api/v1/users/lazy
 ```
 
 Description:
-Get data per page, usage for infinite scroll / lazy loading.
-
-#### Endpoint:
-```bash
-api/v1/users/table
-```
-
-Description:
-Get data with features such as datatables, pagination, sort, filter.
+Get data per page, search, usage for infinite scroll / lazy loading.
 
 ### POST
 

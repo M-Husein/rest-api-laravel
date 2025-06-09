@@ -22,7 +22,10 @@ Route::prefix('v1')->group(function(){
     // /user
     Route::get('/me', fn($r) => $r->user());
 
-    Route::apiResource('users', UserController::class); // ->except(['destroy'])
+    // ->except(['destroy'])
+    // ->add('GET', '/users/lazy', 'lazy')
+    Route::get('/users/lazy', [UserController::class, 'lazy']);
+    Route::apiResource('users', UserController::class);
   });
 
   /** @Example : Apply the Rate Limiter to API Routes */
