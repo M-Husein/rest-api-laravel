@@ -16,38 +16,46 @@ That generates:
 - StoreProductRequest
 - UpdateProductRequest
 
+---
+
 ## Endpoint pattern
 
 ### GET
 
 #### Endpoint:
-```bash
+```sh
 api/v1/users
 ```
 
 Description:
 Get data with features such as datatables, pagination, search, sort, filter.
 
+---
+
 #### Endpoint:
-```bash
+```sh
 api/v1/users/{id}
 ```
 
 Description:
 Get detail data by id.
 
+---
+
 #### Endpoint:
-```bash
+```sh
 api/v1/users/lazy
 ```
 
 Description:
 Get data per page, search, usage for infinite scroll / lazy loading.
 
+---
+
 ### POST
 
 #### Endpoint:
-```bash
+```sh
 api/v1/users
 ```
 
@@ -58,6 +66,8 @@ Payload:
 ```json
 {}
 ```
+
+---
 
 ### PUT
 
@@ -74,20 +84,50 @@ Payload:
 {}
 ```
 
+---
+
 ### DELETE
 
 #### Endpoint:
 ```bash
-api/v1/users
+api/v1/users/{id}
 ```
 
 Description:
-Delete specific data by id, single / multiple
+Delete specific data by id.
+
+Optional For hard deletion (permanent):
+```json
+{
+  "hard": true
+}
+```
+---
+
+#### Endpoint:
+```bash
+api/v1/users/deletes
+```
+
+Description:
+Delete specific data by id, single / multiple.
 
 Payload:
 ```json
-["id_1", "id_2"]
+{
+  "ids": ["id_1", "id_2"]
+}
 ```
+
+Optional For hard deletion (permanent):
+```json
+{
+  "ids": ["id_1", "id_2"],
+  "hard": true
+}
+```
+
+---
 
 # 
 

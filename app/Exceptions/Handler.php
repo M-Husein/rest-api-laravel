@@ -1,8 +1,13 @@
 <?php
 namespace App\Exceptions;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-// use Throwable;
-// use Illuminate\Auth\AuthenticationException;
+use Throwable;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Spatie\QueryBuilder\Exceptions\InvalidQuery;
+use Illuminate\Validation\ValidationException;
+// use Illuminate\Http\Response;
 
 class Handler extends ExceptionHandler{
   protected $levels = [];
@@ -14,7 +19,7 @@ class Handler extends ExceptionHandler{
   ];
 
   public function register(): void{
-    $this->reportable(function(){}); // function(Throwable $e)
+    $this->reportable(function(Throwable $e){}); // 
   }
 
   // protected function unauthenticated($req, AuthenticationException $e){
@@ -23,4 +28,60 @@ class Handler extends ExceptionHandler{
   //   }
   //   return parent::unauthenticated($req, $e);
   // }
+
+  public function render($request, Throwable $e){
+    if($request->is('api/*') || $request->wantsJson()){
+      return $this->handleApiException($request, $e);
+    }
+    return parent::render($request, $e);
+  }
+
+  protected function handleApiException($request, Throwable $e){
+    $code = $e->getCode();
+    $err = $code > 0 ? $code : 500; // Response::HTTP_INTERNAL_SERVER_ERROR
+    $msg = 'Something went wrong'; // An error occurred
+    
+    if($e instanceof ModelNotFoundException){
+      $code = 404;
+      $err = $code;
+      $msg = 'Not found'; // Resource not found
+    } 
+    elseif($e instanceof NotFoundHttpException){
+      $code = 404;
+      $err = $code;
+      $msg = 'Endpoint not found';
+    }
+    elseif($e instanceof InvalidQuery){
+      $code = 400;
+      $err = $code;
+      $msg = 'Invalid query parameters';
+    }
+    elseif($e instanceof ValidationException){
+      $code = 422;
+      $err = $e->errors();
+    }
+    elseif($e instanceof AuthenticationException){
+      $code = 401; // Response::HTTP_UNAUTHORIZED
+      $err = $code;
+      $msg = 'Unauthorized'; // $e->getMessage() ?? 'Unauthorized' // Default $e->getMessage() = "Unauthenticated."
+    }
+    elseif(method_exists($e, 'getStatusCode')){
+      $code = $e->getStatusCode();
+    }
+
+    $result = [
+      'errors' => $err,
+      'message' => $msg,
+      'url' => $request->fullUrl() // OPTIONS
+    ];
+
+    // Debug info (local/dev only)
+    if(config('app.debug')){
+      $result['error_message'] = $e->getMessage();
+      $result['exception'] = get_class($e);
+      $result['trace'] = $e->getTrace();
+    }
+
+    return response()->json($result, $code);
+  }
 }

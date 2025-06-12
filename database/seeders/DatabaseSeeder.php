@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
+// use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
@@ -25,8 +25,8 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
 
-        $roleAdmin = Role::firstOrCreate(['name' => 'Super Admin']);
-        $admin->assignRole($roleAdmin);
+        // $roleAdmin = Role::firstOrCreate(['name' => 'Super Admin']);
+        // $admin->assignRole($roleAdmin);
 
         //
 
@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
 
-        $roleMember = Role::firstOrCreate(['name' => 'Member']);
-        $user->assignRole($roleMember);
+        // $roleMember = Role::firstOrCreate(['name' => 'Member']);
+        // $user->assignRole($roleMember);
     }
 }
