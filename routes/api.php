@@ -25,6 +25,7 @@ Route::prefix('v1')->group(function(){
     // ->except(['destroy'])
     // ->add('GET', '/users/lazy', 'lazy')
     Route::get('/users/lazy', [UserController::class, 'lazy']);
+    Route::delete('/users/deletes', [UserController::class, 'deletes']);
     Route::apiResource('users', UserController::class);
   });
 

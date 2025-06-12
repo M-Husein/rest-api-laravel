@@ -2,7 +2,7 @@
 namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 // use Illuminate\Auth\AuthenticationException;
-use Illuminate\Routing\Router;
+// use Illuminate\Routing\Router;
 // use Illuminate\Support\Facades\Response;
 // use Illuminate\Cache\RateLimiting\Limit;
 // use Illuminate\Support\Facades\RateLimiter;
@@ -39,10 +39,10 @@ class AppServiceProvider extends ServiceProvider{
     //   ], 401)
     // );
 
-    // // Apply to all routes
-    // $this->app->bind(
-    //   \Illuminate\Contracts\Debug\ExceptionHandler::class,
-    //   \App\Exceptions\Handler::class
-    // );
+    // Apply to all routes
+    $this->app->bind(
+      \Illuminate\Contracts\Debug\ExceptionHandler::class,
+      \App\Exceptions\Handler::class
+    );
   }
 }

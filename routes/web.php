@@ -1,7 +1,13 @@
 <?php
 use Illuminate\Support\Facades\Route;
+// use Illuminate\Support\Facades\Artisan;
 
 Route::prefix('admin')->group(function(){
+  // Route::get('/clear-cache',function(){
+  //   Artisan::call('cache:clear');
+  //   return "Cache cleared successfully!";
+  // });
+
 	Route::get('{uri?}',function(){
 		$view = view('admin');
 		return response($view)->withHeaders([

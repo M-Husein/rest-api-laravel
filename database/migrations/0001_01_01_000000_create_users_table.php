@@ -20,6 +20,7 @@ return new class extends Migration
 
             $table->string('username')->unique(); // ->default('Guest')
             $table->string('avatar')->nullable();
+            $table->softDeletes(); // Added for soft delete support
 
             $table->rememberToken();
             $table->timestamps();
