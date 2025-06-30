@@ -8,6 +8,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Spatie\QueryBuilder\Exceptions\InvalidQuery;
 use Illuminate\Validation\ValidationException;
 // use Illuminate\Http\Response;
+use Illuminate\Auth\Access\AuthorizationException;
+use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class Handler extends ExceptionHandler{
   protected $levels = [];
@@ -19,9 +21,12 @@ class Handler extends ExceptionHandler{
   ];
 
   public function register(): void{
-    $this->reportable(function(Throwable $e){}); // 
+    $this->reportable(function(Throwable $e){});
   }
 
+  /**
+   * Options: Only handle unauthenticated, need `Route::macro` in `app\Providers\AppServiceProvider.php`
+   */
   // protected function unauthenticated($req, AuthenticationException $e){
   //   if($req->expectsJson()){
   //     return app('router')->myUnauthorizedResponse(); // $e
@@ -45,7 +50,7 @@ class Handler extends ExceptionHandler{
       $code = 404;
       $err = $code;
       $msg = 'Not found'; // Resource not found
-    } 
+    }
     elseif($e instanceof NotFoundHttpException){
       $code = 404;
       $err = $code;
@@ -60,6 +65,13 @@ class Handler extends ExceptionHandler{
       $code = 422;
       $err = $e->errors();
     }
+
+    elseif($e instanceof UnauthorizedException || $e instanceof AuthorizationException){
+      $code = 403;
+      $err = $code;
+      $msg = $e->getMessage(); // 'You do not have permission to perform this action.',
+    }
+
     elseif($e instanceof AuthenticationException){
       $code = 401; // Response::HTTP_UNAUTHORIZED
       $err = $code;
@@ -77,7 +89,7 @@ class Handler extends ExceptionHandler{
 
     // Debug info (local/dev only)
     if(config('app.debug')){
-      $result['error_message'] = $e->getMessage();
+      $result['info'] = $e->getMessage();
       $result['exception'] = get_class($e);
       $result['trace'] = $e->getTrace();
     }
