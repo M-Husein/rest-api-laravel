@@ -5,11 +5,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-// use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable{
-	use HasFactory, Notifiable, HasApiTokens, SoftDeletes; // , HasRoles
+	use HasFactory, Notifiable, HasApiTokens, SoftDeletes, HasRoles;
 
 	/**
 	 * The attributes that are mass assignable.
@@ -44,14 +44,4 @@ class User extends Authenticatable{
 			'password' => 'hashed'
 		];
 	}
-
-  // ??
-	// public function role(){
-	// 	return $this->belongsTo(Role::class);
-	// }
-
-  // // ??
-	// public function hasRole(string $role): bool{
-	// 	return $this->role && $this->role->name === $role;
-	// }
 }

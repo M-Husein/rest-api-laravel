@@ -3,7 +3,7 @@ use Illuminate\Support\Facades\Route;
 // use Illuminate\Support\Facades\Artisan;
 
 Route::prefix('admin')->group(function(){
-  // Route::get('/clear-cache',function(){
+  // Route::get('clear-cache',function(){
   //   Artisan::call('cache:clear');
   //   return "Cache cleared successfully!";
   // });
@@ -15,19 +15,23 @@ Route::prefix('admin')->group(function(){
 			'X-Frame-Options' => 'SAMEORIGIN',
 			'X-XSS-Protection' => '1; mode=block',
 			'X-Robots-Tag' => 'none,noarchive'
-			// 'X-Powered-By' => 'Programmeria', // OPTION
+			// 'X-Powered-By' => 'Programmeria', // Option
 			// 'Access-Control-Allow-Origin' => '*',
 			// 'Feature-Policy' => "display-capture 'self'"
 		]);
 	})->where('uri','(.*)');
 });
 
-Route::get('/{uri?}',function(){
-	$view = view('app');
-	return response($view)->withHeaders([
-		'X-Frame-Options' => 'SAMEORIGIN',
-		'X-XSS-Protection' => '1; mode=block'
-	]);
-})->where('uri','(.*)');
+/**
+ * All route
+ * @return 
+ */
+// Route::get('{uri?}',function(){
+// 	$view = view('app');
+// 	return response($view)->withHeaders([
+// 		'X-Frame-Options' => 'SAMEORIGIN',
+// 		'X-XSS-Protection' => '1; mode=block'
+// 	]);
+// })->where('uri','(.*)');
 
 // Route::get('/', fn() => view('welcome'));

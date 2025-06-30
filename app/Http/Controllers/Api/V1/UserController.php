@@ -6,28 +6,40 @@ use Illuminate\Http\Request; // {Request, Response}
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Spatie\QueryBuilder\AllowedFilter;
-use App\Traits\{ApiResponse, HandlesQueryBuilder};
+use App\Traits\HandlesQueryBuilder;
 
 class UserController extends Controller{
-  use ApiResponse, HandlesQueryBuilder;
+  use HandlesQueryBuilder;
 
   public function index(Request $req){
     // return $this->handleApiExceptions(function() use ($req){
     //   // return paginate here
     // });
 
-    return $this->paginate(
-      query: User::class,
-      request: $req,
-      searches: ['name'],
-      filters: [
-        'name',
-        AllowedFilter::exact('id'),
-        AllowedFilter::scope('email_verified_at')
-      ],
-      sorts: ['id', 'name', 'email', 'created_at'],
-      includes: ['avatar', 'role_id'], // Example = ['category', 'reviews']
-    );
+    if($req->perPage){
+      return $this->paginate(
+        query: User::class,
+        request: $req,
+        searches: ['name'],
+        filters: [
+          'name',
+          AllowedFilter::exact('id'),
+          AllowedFilter::scope('email_verified_at')
+        ],
+        sorts: ['id', 'name', 'email', 'created_at'],
+        includes: ['avatar', 'role_id'], // Example = ['category', 'reviews']
+      );
+    }
+
+    $data = [];
+
+    User::chunk(1000, function($chunk) use (&$data){
+      foreach($chunk as $user){
+        $data[] = $user;
+      }
+    });
+
+    return jsonSuccess($data); // User::all()
   }
 
   public function lazy(Request $req){
@@ -41,7 +53,7 @@ class UserController extends Controller{
 
   public function show(string $id){
     $data = User::findOrFail($id);
-    return $this->success($data);
+    return jsonSuccess($data);
   }
 
   public function store(Request $req){
@@ -65,7 +77,7 @@ class UserController extends Controller{
     
     $user = User::create($validated);
     
-    return $this->success(
+    return jsonSuccess(
       $user,
       'User created successfully',
       201 // Response::HTTP_CREATED
@@ -88,7 +100,7 @@ class UserController extends Controller{
 
     $user->update($validated);
     
-    return $this->success($user);
+    return jsonSuccess($user);
   }
 
   /**
@@ -101,7 +113,7 @@ class UserController extends Controller{
   //   return response()->noContent();
 
   //   // Options: With return data.
-  //   // return $this->success(
+  //   // return jsonSuccess(
   //   //   '',
   //   //   '',
   //   //   204 // Consider 200 with data or 404/202 if use case requires it
