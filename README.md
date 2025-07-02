@@ -1,5 +1,10 @@
 # Rest API using Laravel
 
+This repository has several branches with special features. Here is the list of branches:
+1. `main` - complex RBAC
+2. `feat/static-RBAC`
+3. `feat/dynamic-RBAC`
+
 ## Custom CLI
 
 To generate resource.
