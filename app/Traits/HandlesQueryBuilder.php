@@ -70,7 +70,7 @@ trait HandlesQueryBuilder{
 
     return response()->json(
       $this->buildQuery($query, $request, $searches, $filters, $sorts, $includes)
-        ->paginate($request->perPage ?? config('api.per_page', 10))
+        ->paginate($request->perPage) //  ?? config('api.per_page', 10)
         ->appends($request->query()) // ->appends($request->except('page'));
     );
   }

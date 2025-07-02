@@ -1,36 +1,47 @@
 <?php
 namespace App\Http\Controllers\Api\V1;
-
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request; // {Request, Response}
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Spatie\QueryBuilder\AllowedFilter;
-use App\Traits\{ApiResponse, HandlesQueryBuilder};
+use App\Traits\HandlesQueryBuilder;
 
 class UserController extends Controller{
-  use ApiResponse, HandlesQueryBuilder;
+  use HandlesQueryBuilder;
 
   public function index(Request $req){
-    // return $this->handleApiExceptions(function() use ($req){
-    //   // return paginate here
-    // });
+    $this->authorize('manage-users'); // Gate check: only admins can manage users
 
-    return $this->paginate(
-      query: User::class,
-      request: $req,
-      searches: ['name'],
-      filters: [
-        'name',
-        AllowedFilter::exact('id'),
-        AllowedFilter::scope('email_verified_at')
-      ],
-      sorts: ['id', 'name', 'email', 'created_at'],
-      includes: ['avatar', 'role_id'], // Example = ['category', 'reviews']
-    );
+    if($req->perPage){
+      return $this->paginate(
+        query: User::class,
+        request: $req,
+        searches: ['name'],
+        filters: [
+          'name',
+          AllowedFilter::exact('id'),
+          AllowedFilter::scope('email_verified_at')
+        ],
+        sorts: ['id', 'name', 'email', 'created_at'],
+        includes: ['avatar', 'role'], // Example = ['category', 'reviews']
+      );
+    }
+
+    $data = [];
+
+    User::chunk(1000, function($chunk) use (&$data){
+      foreach($chunk as $user){
+        $data[] = $user;
+      }
+    });
+
+    return jsonSuccess($data); // User::all()
   }
 
   public function lazy(Request $req){
+    $this->authorize('manage-users');
+
     return $this->simplePaginate(
       query: User::class, // User::query(),
       request: $req,
@@ -40,16 +51,22 @@ class UserController extends Controller{
   }
 
   public function show(string $id){
+    $this->authorize('manage-users'); // Only admins can view specific user details
+
     $data = User::findOrFail($id);
-    return $this->success($data);
+    return jsonSuccess($data);
   }
 
   public function store(Request $req){
+    $this->authorize('manage-users');
+
     $validated = $req->validate([
       'name' => 'bail|required|string|max:100',
       'email' => 'bail|required|email|unique:users,email',
       'username' => 'bail|nullable|string|max:50|unique:users,username',
-      'password' => 'bail|required|string|min:6|confirmed'
+      'password' => 'bail|required|string|min:6|confirmed',
+      // Validate against the keys of your roles config
+      'role' => 'required|string|in:'.implode(',', array_keys(config('roles'))),
     ]);
 
     /**
@@ -65,7 +82,7 @@ class UserController extends Controller{
     
     $user = User::create($validated);
     
-    return $this->success(
+    return jsonSuccess(
       $user,
       'User created successfully',
       201 // Response::HTTP_CREATED
@@ -73,13 +90,16 @@ class UserController extends Controller{
   }
 
   public function update(Request $req, string $id){
+    $this->authorize('manage-users');
+
     $user = User::findOrFail($id);
 
     $validated = $req->validate([
       'name' => 'sometimes|string|max:255',
       'email' => 'sometimes|email|unique:users,email,'.$user->id,
       'username' => 'sometimes|string|max:50|unique:users,username,'.$user->username,
-      'password' => 'sometimes|string|min:6'
+      'password' => 'sometimes|string|min:6',
+      'role' => 'sometimes|required|string|in:'.implode(',', array_keys(config('roles')))
     ]);
 
     if(isset($validated['password'])){
@@ -88,7 +108,7 @@ class UserController extends Controller{
 
     $user->update($validated);
     
-    return $this->success($user);
+    return jsonSuccess($user);
   }
 
   /**
@@ -101,7 +121,7 @@ class UserController extends Controller{
   //   return response()->noContent();
 
   //   // Options: With return data.
-  //   // return $this->success(
+  //   // return jsonSuccess(
   //   //   '',
   //   //   '',
   //   //   204 // Consider 200 with data or 404/202 if use case requires it
@@ -109,6 +129,8 @@ class UserController extends Controller{
   // }
 
   public function destroy(Request $req, string $id){
+    $this->authorize('manage-users');
+
     $user = User::findOrFail($id);
 
     if($req->hard ?? false){ // $req->boolean('hard', false)
@@ -131,6 +153,8 @@ class UserController extends Controller{
   }
 
   public function deletes(Request $req){
+    $this->authorize('manage-users');
+
     $validated = $req->validate([
       'ids' => 'required|array',
       'ids.*' => 'exists:users,id',
