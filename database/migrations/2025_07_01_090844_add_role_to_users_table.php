@@ -6,11 +6,13 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration{
   public function up(): void{
     Schema::table('users', function (Blueprint $table) {
-      // Using string for role, storing the programmatic key (e.g., 'admin')
-      $table->string('role')->default(config('roles.viewer'))->after('email');
+      // Get the ID for 'viewer' from the 'keys' mapping for the default value
+      // Use array_search to find the ID for 'viewer'
+      $viewerId = array_search('viewer', config('roles.keys'));
 
-      // Optional: Using enum for stricter types (Laravel 10+ recommended)
-      // $table->enum('role', array_keys(config('roles')))->default(config('roles.viewer'))->after('email');
+      $table->unsignedTinyInteger('role') // Use unsignedTinyInteger for roles 0-255
+        ->default($viewerId)
+        ->after('email');
     });
   }
 

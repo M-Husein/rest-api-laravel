@@ -4,10 +4,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Auth\LoginRequest;
 use App\Http\Requests\Api\V1\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Api\V1\Auth\ResetPasswordRequest;
-use App\Models\User;
+// use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\{Auth, Hash, Password};
 use App\Traits\RateLimit;
 
 class AuthController extends Controller{
@@ -16,11 +15,11 @@ class AuthController extends Controller{
   public function login(LoginRequest $req){
     $this->limitRequest($req, 'login');
 
-    $user = User::where('email', $req->email)->first();
-
-    if(!$user || !Hash::check($req->password, $user->password)){
+    if(!Auth::attempt($req->only('email', 'password'))){
       return jsonError('Invalid credentials', 401);
     }
+
+    $user = $req->user(); // Get the authenticated user
 
     // Optional: delete previous token
     // $user->tokens()->where('user_id', $user->id)->where('name', $req->type)->delete();
@@ -30,20 +29,28 @@ class AuthController extends Controller{
     $expiresAt = $req->boolean('remember') ? null : now()->addHours(2);
 
     $token = $user->createToken(
-      $req->type ?? 'unknown', // $req->device_name ?? 'unknown',
+      $req->type ?? 'unknown',
       ['*'], // Optional scopes
       $expiresAt
     )->plainTextToken;
 
     $tokenModel = $user->tokens()->latest()->first();
-    $tokenModel->user_id = $user->id;
-    $tokenModel->ip_address = $req->ip();
-    $tokenModel->user_agent = $req->userAgent();
-    // $tokenModel->platform = $req->platform; // $req->input('platform') ?? '';
-    $tokenModel->save();
+
+    if($tokenModel){
+      $tokenModel->user_id = $user->id; // This might be redundant as it's usually set by relation
+      $tokenModel->ip_address = $req->ip();
+      $tokenModel->user_agent = $req->userAgent();
+      // $tokenModel->platform = $req->platform; // $req->input('platform') ?? '';
+      $tokenModel->save();
+    }
+
+    // Look up the programmatic key and display name using the numeric role ID
+    // $roleKey = config('roles.keys.' . $user->role);
+    // $roleDisplayName = config('roles.names.' . $user->role);
 
     return jsonSuccess([
-      'user' => $user, // ->only('id', 'name', 'email'), // $user->except('password', 'remember_token'),
+      // ->only('id', 'name', 'email'), // $user->except('password', 'remember_token'),
+      'user' => $user,
       'token' => $token,
       'expires_at' => $expiresAt
     ], 'Login successful');
@@ -64,13 +71,15 @@ class AuthController extends Controller{
 
   public function logout(Request $req){
     $req->user()->currentAccessToken()->delete();
-    return jsonSuccess('', 'Logged out from this device');
+    // return jsonSuccess('', 'Logged out from this device');
+    return response()->noContent();
   }
 
   public function logoutOthers(Request $req){
     $currentTokenId = $req->user()->currentAccessToken()->id;
     $req->user()->tokens()->where('id', '!=', $currentTokenId)->delete();
-    return jsonSuccess('', 'Logged out from other devices');
+    // return jsonSuccess('', 'Logged out from other devices');
+    return response()->noContent();
   }
 
   /**
@@ -87,22 +96,6 @@ class AuthController extends Controller{
       return jsonSuccess('', 'Logged out from selected device');
     }
     return jsonError('Device not found');
-  }
-
-  public function listDevices(Request $req){
-    $tokens = $req->user()->tokens->map(fn($item) => [
-      'id' => $item->id,
-      'name' => $item->name,
-      // 'abilities' => $item->abilities,
-      'user_id' => $item->user_id,
-      // 'platform' => $item->platform,
-      'ip_address' => $item->ip_address,
-      'user_agent' => $item->user_agent,
-      'created_at' => $item->created_at, // $item->created_at->toDateTimeString()
-      'last_used_at' => $item->last_used_at, // optional($item->last_used_at)->toDateTimeString()
-      'expires_at' => $item->expires_at
-    ]);
-    return jsonSuccess($tokens);
   }
 
   public function forgotPassword(ForgotPasswordRequest $req){

@@ -13,7 +13,7 @@ use App\Exceptions\BaseAppException;
 
 class HandlesException{
   public static function handle($exceptions): void{
-    $exceptions->render(function(Throwable $e, Request $req){
+    $exceptions->render(function($e, Request $req){
       // Optional: log unexpected exceptions
       // \Log::error($e); // 'Caught: ' . get_class($e)
 
@@ -26,12 +26,12 @@ class HandlesException{
       return null; // Let Laravel handle non-API exceptions (default)
     });
 
-    $exceptions->render(function(AuthenticationException $e, Request $req){
-      if($req->is('api/*') || $req->wantsJson()){
-        return jsonError('Unauthorized.', 401, $e->getMessage());
-      }
-      return null;
-    });
+    // $exceptions->render(function(AuthenticationException $e, Request $req){
+    //   if($req->is('api/*') || $req->wantsJson()){
+    //     return jsonError('Unauthorized.', 401, $e->getMessage());
+    //   }
+    //   return null;
+    // });
   }
 
   private static function handleApiExceptions(Throwable $e){

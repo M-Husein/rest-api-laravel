@@ -24,18 +24,21 @@ Route::prefix('v1')->group(function(){
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('logout-others', [AuthController::class, 'logoutOthers']);
     Route::delete('logout-device/{id}', [AuthController::class, 'logoutDevice']);
-    Route::get('devices-log', [AuthController::class, 'listDevices']);
+    Route::get('device-logs', [UserController::class, 'listDevices']);
     // /user
     Route::get('me', fn($r) => $r->user());
 
-    Route::get('users/lazy', [UserController::class, 'lazy']);
-    Route::delete('users/deletes', [UserController::class, 'deletes']);
-    Route::apiResource('users', UserController::class);
+    // Route::get('users/lazy', [UserController::class, 'lazy']);
+    // Route::delete('users/deletes', [UserController::class, 'deletes']);
+    // Route::apiResource('users', UserController::class);
 
     // Admin-only routes
     Route::middleware('role:'.ROLE_ADMIN)->group(function(){
-      Route::apiResource('users', UserController::class);
+      Route::get('users/lazy', [UserController::class, 'lazy']);
+      Route::delete('users/deletes', [UserController::class, 'deletes']);
     });
+
+    Route::apiResource('users', UserController::class);
 
     // Admin or Editor routes
     Route::middleware('role:'.ROLE_ADMIN.','.ROLE_EDITOR)->group(function(){

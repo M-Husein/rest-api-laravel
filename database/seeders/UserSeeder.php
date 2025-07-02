@@ -8,14 +8,18 @@ use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder{
   public function run(): void{
+    // Get role IDs from config using array_search
+    $adminId = array_search('admin', config('roles.keys'));
+    $editorId = array_search('editor', config('roles.keys'));
+    $viewerId = array_search('viewer', config('roles.keys'));
+    
     User::create([
       'name' => 'Admin User',
       'username' => 'SuperAdmin',
       'email' => 'admin@example.com',
       'password' => Hash::make('password'),
       'email_verified_at' => now(),
-      // Use config value
-      'role' => 'admin' // Config::get('roles.roles.admin'),
+      'role' => $adminId,
     ]);
 
     User::create([
@@ -23,8 +27,7 @@ class UserSeeder extends Seeder{
       'username' => 'EditorUser',
       'email' => 'editor@example.com',
       'password' => Hash::make('password'),
-      // Use config value
-      'role' => 'editor' // Config::get('roles.roles.editor'),
+      'role' => $editorId,
     ]);
 
     User::create([
@@ -32,8 +35,7 @@ class UserSeeder extends Seeder{
       'username' => 'ViewerUser',
       'email' => 'viewer@example.com',
       'password' => Hash::make('password'),
-      // Use config value
-      'role' => 'viewer' // Config::get('roles.roles.viewer'),
+      'role' => $viewerId,
     ]);
   }
 }

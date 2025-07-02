@@ -20,7 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
     // Middleware aliases (for use in routes)
     $middleware->alias([
-      'role' => RoleMiddleware::class, // Register your custom RoleMiddleware here
+      'role' => RoleMiddleware::class, // Register custom RoleMiddleware here
       // 'auth' is already aliased by Laravel by default to Illuminate\Auth\Middleware\Authenticate
       // 'auth.sanctum' is also aliased by default to Laravel\Sanctum\Http\Middleware\AuthenticateSanctum
     ]);

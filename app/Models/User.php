@@ -41,21 +41,35 @@ class User extends Authenticatable{
 	protected function casts(): array{
 		return [
 			'email_verified_at' => 'datetime',
-			'password' => 'hashed'
+			'password' => 'hashed',
+      'role' => 'integer' // Cast role to integer
 		];
 	}
 
   /**
-   * Check if the user has a specific role.
+   * Check if the user has a specific role by its programmatic key.
+   * @param string $roleKey The programmatic key (e.g., 'admin', 'editor').
+   * @return bool
    */
-  public function hasRole(string $role): bool{
-    return $this->role === $role;
+  public function hasRole(string $roleKey): bool{
+    // Find the numeric ID associated with the given roleKey from config
+    $roleId = array_search($roleKey, config('roles.keys'));
+    return $roleId === false ? false : $this->role === $roleId;
   }
 
   /**
-   * Check if the user has any of the given roles.
+   * Check if the user has any of the given roles by their programmatic keys.
+   * @param array $roleKeys An array of programmatic keys (e.g., ['admin', 'editor']).
+   * @return bool
    */
-  public function hasAnyRole(array $roles): bool{
-    return in_array($this->role, $roles);
+  public function hasAnyRole(array $roleKeys): bool{
+    $allowedRoleIds = [];
+    foreach ($roleKeys as $key){
+      $id = array_search($key, config('roles.keys'));
+      if($id !== false){
+        $allowedRoleIds[] = $id;
+      }
+    }
+    return in_array($this->role, $allowedRoleIds);
   }
 }

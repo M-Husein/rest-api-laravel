@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers\Api\V1;
+use App\Http\Requests\Api\V1\User\StoreUserRequest;
+use App\Http\Requests\Api\V1\User\UpdateUserRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request; // {Request, Response}
 use Illuminate\Support\Facades\Hash;
@@ -40,7 +42,7 @@ class UserController extends Controller{
   }
 
   public function lazy(Request $req){
-    $this->authorize('manage-users');
+    $this->authorize('manage-users'); // Only admin
 
     return $this->simplePaginate(
       query: User::class, // User::query(),
@@ -50,24 +52,24 @@ class UserController extends Controller{
     );
   }
 
-  public function show(string $id){
-    $this->authorize('manage-users'); // Only admins can view specific user details
-
-    $data = User::findOrFail($id);
-    return jsonSuccess($data);
+  public function show(User $user){
+    // $this->authorize('manage-users'); // Only admins can view specific user details
+    return jsonSuccess($user);
   }
 
-  public function store(Request $req){
-    $this->authorize('manage-users');
+  public function store(StoreUserRequest $req){
+    $this->authorize('manage-users'); // Only admin
 
-    $validated = $req->validate([
-      'name' => 'bail|required|string|max:100',
-      'email' => 'bail|required|email|unique:users,email',
-      'username' => 'bail|nullable|string|max:50|unique:users,username',
-      'password' => 'bail|required|string|min:6|confirmed',
-      // Validate against the keys of your roles config
-      'role' => 'required|string|in:'.implode(',', array_keys(config('roles'))),
-    ]);
+    // Validation is now handled by StoreUserRequest, get the validated data
+    $validated = $req->validated();
+
+    // If 'role' is not provided (and it's 'sometimes' in the request), default to 'viewer'.
+    $validated['role'] = $validated['role'] ?? array_search('viewer', config('roles.keys'));
+
+    // If username is not provided, use email as username
+    if(!isset($validated['username']) || empty($validated['username'])){
+      $validated['username'] = $validated['email'];
+    }
 
     /**
      * Consider enforcing at least one number/symbol:
@@ -89,25 +91,32 @@ class UserController extends Controller{
     );
   }
 
-  public function update(Request $req, string $id){
-    $this->authorize('manage-users');
+  public function update(UpdateUserRequest $req, User $user){
+    $this->authorize('update', $user);
 
-    $user = User::findOrFail($id);
+    // Validation is now handled by UpdateUserRequest, get the validated data
+    $validated = $req->validated();
 
-    $validated = $req->validate([
-      'name' => 'sometimes|string|max:255',
-      'email' => 'sometimes|email|unique:users,email,'.$user->id,
-      'username' => 'sometimes|string|max:50|unique:users,username,'.$user->username,
-      'password' => 'sometimes|string|min:6',
-      'role' => 'sometimes|required|string|in:'.implode(',', array_keys(config('roles')))
-    ]);
-
-    if(isset($validated['password'])){
-      $validated['password'] = Hash::make($validated['password']);
+    // It's validated by the Form Request's 'in' rule.
+    if(isset($validated['role'])){
+      $user->role = $validated['role'];
     }
 
-    $user->update($validated);
-    
+    // Handle password update
+    if(isset($validated['password'])){
+      $user->password = Hash::make($validated['password']);
+    }
+
+    // Fill other attributes from the validated request data.
+    // `fill()` is safer than `update()` with `$validated` if not all fields are fillable.
+    // `only()` ensures only specified fields are considered from the request.
+    $user->fill($req->only(['name', 'email', 'username']));
+    $user->save(); // Save all changes to the user model.
+
+    // Prepare the response user object for frontend consistency
+    // $roleKey = config('roles.keys.' . $user->role);
+    // $roleDisplayName = config('roles.names.' . $user->role);
+
     return jsonSuccess($user);
   }
 
@@ -128,10 +137,9 @@ class UserController extends Controller{
   //   // );
   // }
 
-  public function destroy(Request $req, string $id){
-    $this->authorize('manage-users');
-
-    $user = User::findOrFail($id);
+  public function destroy(User $user){
+    // $this->authorize('manage-users'); // Only admin
+    $this->authorize('delete', $user); // admin and the user himself
 
     if($req->hard ?? false){ // $req->boolean('hard', false)
       $user->forceDelete();
@@ -153,13 +161,48 @@ class UserController extends Controller{
   }
 
   public function deletes(Request $req){
-    $this->authorize('manage-users');
+    $this->authorize('manage-users'); // Only admin
 
     $validated = $req->validate([
-      'ids' => 'required|array',
+      'ids' => 'bail|required|array',
       'ids.*' => 'exists:users,id',
       'hard' => 'sometimes|boolean'
     ]);
+
+    // Prevent deleting self from the bulk list
+    $userId = $req->user()->id;
+    if(in_array($userId, $validated['ids'])){
+      return jsonError(
+        'You cannot include your own account in a bulk deletion request.',
+        403
+      );
+    }
+
+    // // Prevent deleting self from the bulk list if not admin
+    // $user = $req->user();
+    // $currentUserId = $user->id; // Auth::id();
+    // $adminRoleId = config('roles.keys.admin');
+    // $currentUserIsAdmin = $user->hasRole($adminRoleId); // Auth::user()->hasRole($adminRoleId);
+
+    // if(!$currentUserIsAdmin && in_array($currentUserId, $validated['ids'])){
+    //   return jsonError(
+    //     'You cannot delete your own account from a bulk operation unless you are an administrator.',
+    //     403
+    //   );
+    // }
+
+    // // Fetch users to apply individual policy checks for each deletion.
+    // // This is crucial if your UserPolicy::delete has more complex logic than just admin/self.
+    // $usersToDelete = User::whereIn('id', $ids)->get();
+
+    // foreach ($usersToDelete as $user) {
+    //   // This will throw AccessDeniedHttpException if policy denies.
+    //   // The 'delete' policy already handles admin bypass and self-deletion.
+    //   // Note: The policy's 'before' method for admin bypass will still apply here.
+    //   // If an admin tries to delete another admin, this will pass.
+    //   // The above check specifically prevents self-deletion.
+    //   $this->authorize('delete', $user);
+    // }
 
     $q = User::whereIn('id', $validated['ids']);
 
@@ -171,5 +214,21 @@ class UserController extends Controller{
     }
 
     return response()->noContent();
+  }
+
+  public function listDevices(Request $req){
+    $tokens = $req->user()->tokens->map(fn($item) => [
+      'id' => $item->id,
+      'name' => $item->name,
+      // 'abilities' => $item->abilities,
+      'user_id' => $item->user_id,
+      // 'platform' => $item->platform,
+      'ip_address' => $item->ip_address,
+      'user_agent' => $item->user_agent,
+      'created_at' => $item->created_at, // $item->created_at->toDateTimeString()
+      'last_used_at' => $item->last_used_at,
+      'expires_at' => $item->expires_at
+    ]);
+    return jsonSuccess($tokens);
   }
 }
