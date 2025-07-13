@@ -11,8 +11,9 @@ class LoginRequest extends FormRequest{
     return [
       'email' => 'bail|required|email',
       'password' => 'bail|required|string|min:6',
-      'remember' => 'nullable|boolean',
-      'type' => 'nullable|string'
+      'remember' => 'sometimes|boolean', // 'nullable|boolean'
+      // Explicit client type
+      'type' => 'bail|required|in:spa,mobile' //  | nullable|string
     ];
   }
 

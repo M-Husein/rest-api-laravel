@@ -12,5 +12,6 @@
   ],
   "intelephense.diagnostics.undefinedMethods": false,
   "intelephense.diagnostics.undefinedFunctions": false,
-  "intelephense.diagnostics.undefinedTypes": false
+  "intelephense.diagnostics.undefinedTypes": false,
+  "intelephense.diagnostics.undefinedConstants": false
 }

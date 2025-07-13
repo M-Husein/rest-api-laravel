@@ -10,8 +10,8 @@ use Illuminate\Auth\Access\Response;
 
 class AuthServiceProvider extends ServiceProvider{
   protected $policies = [
+    User::class => UserPolicy::class,
     Article::class => ArticlePolicy::class,
-    User::class => UserPolicy::class
   ];
 
   public function boot(): void{
@@ -46,10 +46,7 @@ class AuthServiceProvider extends ServiceProvider{
     // Super Admin bypass for all Gates
     Gate::before(function (User $user, string $ability) {
       // if ($user->hasRole(config('roles.admin'))) {
-      if ($user->hasRole('admin')) {
-        return true;
-      }
-      return null;
+      return $user->hasRole('admin') ? true : null;
     });
   }
 }

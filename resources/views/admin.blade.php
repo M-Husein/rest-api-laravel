@@ -13,6 +13,7 @@
 	<meta name="bing" content="none,nosnippet,noarchive,noimageindex">
 	<meta name="baidu" content="none,nosnippet,noarchive,noimageindex">
 	<title>Admin {{ config('app.name', 'Restapi') }}</title>
+  {{-- <meta name="csrf-token" content="{{ csrf_token() }}"> --}}
 
 	{{-- <link rel="preconnect" href="https://fonts.bunny.net">
 	<link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" /> --}}
@@ -29,7 +30,13 @@
 	@endif
 </head>
 <body class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col">
-	<header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6 not-has-[nav]:hidden">
+	<form id="formLogin">
+    <input value="admin@example.com" type="email" name="email" id="email" required />
+    <input value="password" type="password" name="password" id="password" required />
+    <button>Login</button>
+  </form>
+  
+  <header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6 not-has-[nav]:hidden">
 			@if (Route::has('login'))
 					<nav class="flex items-center justify-end gap-4">
 							@auth
@@ -282,4 +289,44 @@
 	@if(Route::has('login'))
 		<div class="h-14.5 hidden lg:block"></div>
 	@endif
+
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+<script>
+let formLogin = document.getElementById('formLogin');
+formLogin.addEventListener('submit', e => {
+  e.preventDefault();
+
+  let csrfToken = Cookies.get('XSRF-TOKEN');
+  // const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+  console.log('csrfToken: ', csrfToken);
+
+  if(csrfToken){
+    let email = document.getElementById('email');
+    let password = document.getElementById('password');
+
+    fetch('/api/v1/login', {
+      method: 'POST',
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": csrfToken, // decodeURIComponent(csrfToken),
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        email: email.value,
+        password: password.value,
+        type: "spa",
+        // remember: true
+      }),
+    }).then((response) => {
+      if(!response?.ok){
+        console.log('Response was not OK');
+      }
+      return response.json();
+    })
+    .then((res) => console.log('res:', res))
+    .catch((err) => console.log('err:', err));
+  }
+});
+</script>
 </body></html>

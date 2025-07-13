@@ -9,7 +9,22 @@ class AppServiceProvider extends ServiceProvider{
   /**
    * Register any application services.
    */
-  public function register(): void{}
+  public function register(): void{
+    // $this->app->extend('translator', function($translator, $app){
+    //   $translator->addLoader('mixed', new MixedLoader(
+    //     $app['translation.loader'],
+    //     $app['translation-manager']
+    //   ));
+    //   return $translator;
+    // });
+
+    // $this->app->bind('translation.loader', function($app){
+    //   return new \App\Services\HybridTranslationLoader(
+    //     $app['files'],
+    //     $app['path.lang']
+    //   );
+    // });
+  }
 
   /**
    * Bootstrap any application services.
@@ -29,5 +44,29 @@ class AppServiceProvider extends ServiceProvider{
     //     ])
     //   )
     // );
+
+    /**
+     * With Default json_encode()
+     * {
+     *    "id": 1,
+     *    "name": "\u062d\u0633\u064a\u0646",
+     *    "avatar": "https:\/\/example.com\/avatars\/husein.jpg"
+     * }
+     * 
+     * With JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+     * {
+     *    "id": 1,
+     *    "name": "حسين",
+     *    "avatar": "https://example.com/avatars/husein.jpg"
+     * }
+     */
+    // Response::macro('prettyJson', function($data, $status = 200, array $headers = []){
+    //   $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+    //   return response($json, $status, array_merge(
+    //     ['Content-Type' => 'application/json'],
+    //     $headers
+    //   ));
+    // });
   }
 }

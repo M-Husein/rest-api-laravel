@@ -3,12 +3,12 @@ namespace App\Traits;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\{QueryBuilder, AllowedFilter, AllowedSort};
 
-trait HandlesQueryBuilder{
+trait QueryTools{
   /**
    * Applies query builder with filters, sorts, and includes
    */ 
   protected function buildQuery(
-    Builder|string $query,
+    Builder | QueryBuilder | string $query,
     Request $request,
     array $searches = [], // searchableFields
     ?array $filters = null,
@@ -49,31 +49,43 @@ trait HandlesQueryBuilder{
   }
 
   /**
+   * @param \Illuminate\Database\Eloquent\Builder|\Spatie\QueryBuilder\QueryBuilder $query
    * Datatables with pagination, search, filter, sort
    * @return Spatie\QueryBuilder\QueryBuilder
    */
   protected function paginate(
-    Builder|string $query,
-    Request $request,
-    array $searches = [], // searchableFields
-    array $filters = [],
-    array $sorts = [],
-    ?array $includes = null
+    Builder | QueryBuilder $query,
+    Request $request
   ){
-    // Option
-    // $perPage = min(
-    //   $request->perPage ?? config('api.per_page', 10),
-    //   config('api.max_per_page') // Prevent excessively large pages
-    // );
-
-    // logger($request->query());
-
     return response()->json(
-      $this->buildQuery($query, $request, $searches, $filters, $sorts, $includes)
-        ->paginate($request->perPage) //  ?? config('api.per_page', 10)
-        ->appends($request->query()) // ->appends($request->except('page'));
+      $query
+        ->paginate($request->perPage ?? config('api.per_page', 10))
+        ->appends($request->query())
     );
   }
+  
+  // protected function paginate(
+  //   Builder|string $query,
+  //   Request $request,
+  //   array $searches = [], // searchableFields
+  //   array $filters = [],
+  //   array $sorts = [],
+  //   ?array $includes = null
+  // ){
+  //   // Option
+  //   // $perPage = min(
+  //   //   $request->perPage ?? config('api.per_page', 10),
+  //   //   config('api.max_per_page') // Prevent excessively large pages
+  //   // );
+
+  //   // logger($request->query());
+
+  //   return response()->json(
+  //     $this->buildQuery($query, $request, $searches, $filters, $sorts, $includes)
+  //       ->paginate($request->perPage) //  ?? config('api.per_page', 10)
+  //       ->appends($request->query()) // ->appends($request->except('page'));
+  //   );
+  // }
 
   /**
    * Datatables with pagination, search.
@@ -101,5 +113,18 @@ trait HandlesQueryBuilder{
         ->simplePaginate($request->perPage ?? config('api.per_page', 10))
         ->appends($request->query())
     );
+  }
+
+  protected function streamJson($query){
+    return response()->stream(function() use ($query){
+      echo '[';
+      foreach($query->lazy() as $index => $model){
+        if($index > 0){
+          echo ',';
+        }
+        echo json_encode($model, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+      }
+      echo ']';
+    }, 200, ['Content-Type' => 'application/json']);
   }
 }

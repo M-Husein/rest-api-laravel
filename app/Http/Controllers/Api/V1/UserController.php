@@ -7,38 +7,42 @@ use Illuminate\Http\Request; // {Request, Response}
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Spatie\QueryBuilder\AllowedFilter;
-use App\Traits\HandlesQueryBuilder;
+use App\Traits\QueryTools;
 
 class UserController extends Controller{
-  use HandlesQueryBuilder;
+  use QueryTools;
 
   public function index(Request $req){
     $this->authorize('manage-users'); // Gate check: only admins can manage users
 
-    if($req->perPage){
-      return $this->paginate(
-        query: User::class,
-        request: $req,
-        searches: ['name'],
-        filters: [
-          'name',
-          AllowedFilter::exact('id'),
-          AllowedFilter::scope('email_verified_at')
-        ],
-        sorts: ['id', 'name', 'email', 'created_at'],
-        includes: ['avatar', 'role'], // Example = ['category', 'reviews']
-      );
+    $query = $this->buildQuery(
+      query: User::class,
+      request: $req,
+      searches: ['name'],
+      filters: [
+        'name',
+        AllowedFilter::exact('id'),
+        AllowedFilter::scope('email_verified_at')
+      ],
+      sorts: ['id', 'name', 'email', 'created_at'],
+      includes: ['avatar', 'role'], // Example = ['category', 'reviews']
+    );
+
+    if($req->filled('perPage')){ // $req->perPage
+      return $this->paginate($query, $req);
     }
 
-    $data = [];
+    return $this->streamJson($query);
 
-    User::chunk(1000, function($chunk) use (&$data){
-      foreach($chunk as $user){
-        $data[] = $user;
-      }
-    });
+    // $data = [];
 
-    return jsonSuccess($data); // User::all()
+    // User::chunk(1000, function($chunk) use (&$data){
+    //   foreach($chunk as $user){
+    //     $data[] = $user;
+    //   }
+    // });
+
+    // return jsonSuccess(User::all()); // User::lazy() | $data
   }
 
   public function lazy(Request $req){
@@ -64,7 +68,10 @@ class UserController extends Controller{
     $validated = $req->validated();
 
     // If 'role' is not provided (and it's 'sometimes' in the request), default to 'viewer'.
-    $validated['role'] = $validated['role'] ?? array_search('viewer', config('roles.keys'));
+    // $validated['role'] = $validated['role'] ?? array_search('viewer', config('roles.keys'));
+    if(isset($validated['role'])){
+      $validated['role'] = array_search('viewer', config('roles.keys'));
+    }
 
     // If username is not provided, use email as username
     if(!isset($validated['username']) || empty($validated['username'])){

@@ -6,6 +6,7 @@ use App\Http\Requests\Api\V1\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Api\V1\Auth\ResetPasswordRequest;
 // use App\Models\User;
 use Illuminate\Http\Request;
+use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Support\Facades\{Auth, Hash, Password};
 use App\Traits\RateLimit;
 
@@ -13,73 +14,63 @@ class AuthController extends Controller{
   use RateLimit;
 
   public function login(LoginRequest $req){
-    $this->limitRequest($req, 'login');
+    $remember = $req->boolean('remember');
 
-    if(!Auth::attempt($req->only('email', 'password'))){
-      return jsonError('Invalid credentials', 401);
+    if(Auth::attempt($req->only('email', 'password'), $remember)){
+      $user = $req->user(); // Get the authenticated user
+      $expiresAt = $remember ? now()->addWeeks(4) : now()->addHours(2);
+
+      // ✅ Create token
+      $token = $user->createToken(
+        $req->type.'-token',
+        ['*'],
+        $expiresAt
+      )->plainTextToken;
+
+      $tokenModel = PersonalAccessToken::findToken($token) ?? $user->tokens()->latest()->first();
+
+      if($tokenModel){
+        $tokenModel->ip_address = $req->ip();
+        $tokenModel->user_agent = $req->userAgent();
+        $tokenModel->save();
+      }
+      
+      if($req->type === 'spa' && $req->hasSession() && $req->session()){
+        $req->session()->regenerate();
+      }
+
+      return jsonSuccess([
+        'user' => $user,
+        'token' => $token,
+        'expiresAt' => $expiresAt // expires_at
+      ]);
     }
 
-    $user = $req->user(); // Get the authenticated user
-
-    // Optional: delete previous token
-    // $user->tokens()->where('user_id', $user->id)->where('name', $req->type)->delete();
-
-    // Token expiration: null for long-living if remember = true
-    // else 2 hours default
-    $expiresAt = $req->boolean('remember') ? null : now()->addHours(2);
-
-    $token = $user->createToken(
-      $req->type ?? 'unknown',
-      ['*'], // Optional scopes
-      $expiresAt
-    )->plainTextToken;
-
-    $tokenModel = $user->tokens()->latest()->first();
-
-    if($tokenModel){
-      $tokenModel->user_id = $user->id; // This might be redundant as it's usually set by relation
-      $tokenModel->ip_address = $req->ip();
-      $tokenModel->user_agent = $req->userAgent();
-      // $tokenModel->platform = $req->platform; // $req->input('platform') ?? '';
-      $tokenModel->save();
-    }
-
-    // Look up the programmatic key and display name using the numeric role ID
-    // $roleKey = config('roles.keys.' . $user->role);
-    // $roleDisplayName = config('roles.names.' . $user->role);
-
-    return jsonSuccess([
-      // ->only('id', 'name', 'email'), // $user->except('password', 'remember_token'),
-      'user' => $user,
-      'token' => $token,
-      'expires_at' => $expiresAt
-    ], 'Login successful');
+    return jsonError(__('auth.failed'), 401);
   }
 
-  // 🍪 Stateful login for SPA using Sanctum + Cookies
-  // public function loginSession(LoginRequest $req){
-  //   if(!Auth::attempt($req->only('email', 'password'))){
-  //     return jsonError('Invalid credentials', 401);
-  //   }
-
-  //   $user = Auth::user();
-
-  //   return jsonSuccess([
-  //     'user' => $user,
-  //   ], 'Session login successful');
-  // }
-
   public function logout(Request $req){
+    // ✅ Revoke current token (for token-based clients)
     $req->user()->currentAccessToken()->delete();
-    // return jsonSuccess('', 'Logged out from this device');
+
+    // ✅ Invalidate session (for SPA clients)
+    if($req->hasSession()){
+      Auth::guard('web')->logout();
+      $req->session()->invalidate();
+      $req->session()->regenerateToken();
+    }
+
     return response()->noContent();
   }
 
   public function logoutOthers(Request $req){
-    $currentTokenId = $req->user()->currentAccessToken()->id;
-    $req->user()->tokens()->where('id', '!=', $currentTokenId)->delete();
-    // return jsonSuccess('', 'Logged out from other devices');
-    return response()->noContent();
+    $user = $req->user();
+    $token = $user->currentAccessToken();
+    if($token){
+      $user->tokens()->where('id', '!=', $token->id)->delete();
+      return response()->noContent();
+    }
+    return jsonError("Not Found"); // No active token found
   }
 
   /**
@@ -89,21 +80,26 @@ class AuthController extends Controller{
    * @param  string $id = $deviceId
    * @return \Illuminate\Http\JsonResponse
   */
-  public function logoutDevice(Request $req, $id){
+  public function logoutDevice(Request $req, int|string $id){
     $token = $req->user()->tokens()->where('id', $id)->first();
     if($token){
       $token->delete();
       return jsonSuccess('', 'Logged out from selected device');
     }
-    return jsonError('Device not found');
+    return jsonError(__("Not Found")); // 'Device not found'
   }
+
+  // Revoke All Tokens for a User
+  // PersonalAccessToken::where('tokenable_id', $userId)->delete();
 
   public function forgotPassword(ForgotPasswordRequest $req){
     $this->limitRequest($req, 'forgot-password');
 
     $status = Password::sendResetLink($req->only('email'));
 
-    return $status === Password::RESET_LINK_SENT ? jsonSuccess('', 'Reset link sent') : jsonError('Failed to send link');
+    return $status === Password::RESET_LINK_SENT 
+      ? jsonSuccess('', __("passwords.sent")) 
+      : jsonError(__("Expectation Failed"));
   }
 
   public function resetPassword(ResetPasswordRequest $req){
@@ -115,6 +111,8 @@ class AuthController extends Controller{
       }
     );
 
-    return $status === Password::PASSWORD_RESET ? jsonSuccess('', 'Password reset successful') : jsonError('Password reset failed');
+    return $status === Password::PASSWORD_RESET 
+      ? jsonSuccess('', __("passwords.reset")) 
+      : jsonError(__("passwords.token"));
   }
 }

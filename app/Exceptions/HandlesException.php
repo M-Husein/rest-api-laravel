@@ -10,6 +10,7 @@ use Symfony\Component\HttpKernel\Exception\{AccessDeniedHttpException,NotFoundHt
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\QueryBuilder\Exceptions\InvalidQuery;
 use App\Exceptions\BaseAppException;
+// use Symfony\Component\HttpFoundation\Response;
 
 class HandlesException{
   public static function handle($exceptions): void{
@@ -21,17 +22,33 @@ class HandlesException{
       // dd(get_class($e), $e->getMessage());
 
       if($req->is('api/*') || $req->wantsJson()){
-        return self::handleApiExceptions($e); //  ?? null
+        return self::handleApiExceptions($e);
       }
-      return null; // Let Laravel handle non-API exceptions (default)
+      return null;
     });
 
-    // $exceptions->render(function(AuthenticationException $e, Request $req){
-    //   if($req->is('api/*') || $req->wantsJson()){
-    //     return jsonError('Unauthorized.', 401, $e->getMessage());
-    //   }
-    //   return null;
-    // });
+    $exceptions->render(fn(NotFoundHttpException $e, Request $req) => self::handleError(
+      $req,
+      "Not Found",
+      404
+      // $e->getMessage()
+    ));
+  }
+
+  private static function handleError(
+    Request $req,
+    string $msg,
+    int $code = 400,
+    mixed $err = null
+  ){
+    if($req->is('api/*') || $req->wantsJson()){
+      return jsonError(
+        __($msg, [], $req->lang ?? $req->header('Accept-Language')), // app()->getLocale()
+        $code,
+        $err
+      );
+    }
+    return null;// Let Laravel handle non-API exceptions (default)
   }
 
   private static function handleApiExceptions(Throwable $e){

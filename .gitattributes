@@ -9,3 +9,14 @@
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+
+# CUSTOM
+# Exclude Markdown files in specific folders
+app/**.md export-ignore
+bootstrap/**.md export-ignore
+config/**.md export-ignore
+database/**.md export-ignore
+lang/**.md export-ignore
+routes/**.md export-ignore
+tests/**.md export-ignore
+resources/views/**.md export-ignore

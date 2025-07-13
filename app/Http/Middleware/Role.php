@@ -4,7 +4,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class RoleMiddleware{
+class Role{
   public function handle(Request $req, Closure $next, string ...$roleKeys): Response{
     $user = $req->user();
 
