@@ -3,10 +3,12 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Spatie\TranslationLoader\LanguageLine;
+// use App\Models\LanguageLine;
 // use Illuminate\Validation\ValidationException;
 // use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Arr;
 use App\Traits\QueryTools;
 
 class AppTranslationController extends Controller{
@@ -16,9 +18,9 @@ class AppTranslationController extends Controller{
     $query = $this->buildQuery(
       query: LanguageLine::class,
       request: $req,
-      searches: ['name'],
+      searches: ['group','key'],
       filters: ['group','key'],
-      sorts: ['group', 'key'],
+      sorts: ['group','key','created_at','updated_at'],
       includes: ['is_custom'],
     );
 
@@ -153,7 +155,7 @@ class AppTranslationController extends Controller{
    */
   public function show(LanguageLine $app_translation){
     // Option to change type
-    $app_translation->is_custom = (bool) $app_translation->is_custom;
+    // $app_translation->is_custom = (bool) $app_translation->is_custom;
     return jsonSuccess($app_translation);
   }
 
@@ -161,64 +163,75 @@ class AppTranslationController extends Controller{
    * Update the specified resource in storage.
    * Can only change 'text' for file-based entries. Can change all for custom entries.
    */
-  public function update(Request $request, string $id){
-    $languageLine = LanguageLine::findOrFail($id);
-    if(!$languageLine){
-      return jsonError(__('api_messages.resource_not_found'), 404);
-    }
-
+  public function update(Request $request, LanguageLine $app_translation){
     $rules = [];
-    $dataToUpdate = [];
+    // $dataToUpdate = []; // This variable might become less necessary with improved handling of 'text'
     $responseMessage = 'Translation line updated successfully.';
 
-    if ($languageLine->is_custom) {
+    if($app_translation->is_custom){
       // For custom entries, allow changing group, key, and text
       $rules = [
         'group' => 'bail|sometimes|required|string|max:255',
         'key' => 'bail|sometimes|required|string|max:255',
         'text' => 'bail|sometimes|required|array',
-        'text.*' => 'bail|sometimes|required|string',
+        'text.*' => 'bail|sometimes|nullable|string', // Changed to nullable string for empty translations
       ];
-      $dataToUpdate = $request->only(['group', 'key', 'text']);
 
       // If group or key are being changed, check for conflicts with other custom entries
-      if ($request->has('group') || $request->has('key')) {
-        $newGroup = $request->input('group', $languageLine->group);
-        $newKey = $request->input('key', $languageLine->key);
+      if($request->has('group') || $request->has('key')){
+        $newGroup = $request->input('group', $app_translation->group);
+        $newKey = $request->input('key', $app_translation->key);
 
         $conflict = LanguageLine::where('group', $newGroup)
           ->where('key', $newKey)
           ->where('is_custom', true)
-          ->where('id', '!=', $languageLine->id)
+          ->where('id', '!=', $app_translation->id)
           ->first();
+
         if ($conflict) {
           return jsonError(
             'Conflict: Another custom translation with this group and key already exists.',
-            409,
-            [
-              'group_key' => ['Another custom translation with this group and key already exists.']
-            ]
+            409
           );
         }
       }
-
-    } else {
+    }else{
       // For file-based entries, only allow changing 'text'
       $rules = [
         'text' => 'bail|required|array',
-        'text.*' => 'bail|required|string',
+        'text.*' => 'bail|sometimes|nullable|string', // Changed to nullable string for empty translations
       ];
-      $dataToUpdate = $request->only('text');
-      $responseMessage = 'Translation line text updated in database. Note: This change will only take effect if the corresponding file-based translation is removed or loader priority is changed.';
+      // $responseMessage = 'Translation line text updated in database. Note: This change will only take effect if the corresponding file-based translation is removed or loader priority is changed.';
+      // The above message is not fully accurate if Db loader is prioritized over File loader,
+      // as the DB change *will* take effect immediately. So, removed or rephrased.
     }
 
     $validated = $request->validate($rules);
-    $languageLine->update($dataToUpdate);
+
+    // --- Improved way to handle 'text' column update ---
+    // Get existing text array or initialize if null
+    $currentText = $app_translation->text ?? [];
+
+    // Merge new translations from the request with existing ones
+    // New values for specific locales will overwrite old ones
+    // This is key for the front-end sending all locales but only some might have changed
+    if(isset($validated['text'])){
+      $newText = array_merge($currentText, $validated['text']);
+      $app_translation->text = $newText;
+    }
+
+    // Fill other attributes from validated data, excluding 'text' as it's handled above
+    $app_translation->fill(Arr::except($validated, ['text']));
+
+    $app_translation->save(); // Use save() instead of update() if you're manually setting attributes
 
     // Clear translation cache
     Cache::forget(config('translation-loader.cache_key', 'spatie.translation-loader.translations'));
 
-    return jsonSuccess($languageLine, $responseMessage);
+    // Re-cast is_custom for response consistency if not using model casting (though better to use model casting)
+    // $app_translation->is_custom = (bool) $app_translation->is_custom;
+
+    return jsonSuccess($app_translation, $responseMessage);
   }
 
   /**

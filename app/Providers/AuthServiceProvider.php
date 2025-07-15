@@ -16,27 +16,27 @@ class AuthServiceProvider extends ServiceProvider{
 
   public function boot(): void{
     // Define Gates for specific permissions
-    Gate::define('manage-users', function (User $user) {
+    Gate::define('manage-users', function(User $user){
       return $user->hasRole('admin') // 'admin' | config('roles.keys.1')
         ? Response::allow()
         : Response::deny('You must be an administrator to manage users.');
     });
 
-    Gate::define('edit-articles', function (User $user) {
+    Gate::define('edit-articles', function(User $user){
       // return $user->hasRole(config('roles.admin')) || $user->hasRole(config('roles.editor'))
       return $user->hasRole('admin') || $user->hasRole('editor')
         ? Response::allow()
         : Response::deny('You do not have permission to edit articles.', 403);
     });
 
-    Gate::define('publish-articles', function (User $user) {
+    Gate::define('publish-articles', function(User $user){
       // return $user->hasRole(config('roles.admin')) || $user->hasRole(config('roles.editor'))
       return $user->hasRole('admin') || $user->hasRole('editor')
         ? Response::allow()
         : Response::deny('You do not have permission to publish articles.');
     });
 
-    Gate::define('view-articles', function (User $user) {
+    Gate::define('view-articles', function(User $user){
       // return $user->hasRole(config('roles.admin')) || $user->hasRole(config('roles.editor')) || $user->hasRole(config('roles.viewer'))
       return $user->hasRole('admin') || $user->hasRole('editor') || $user->hasRole('viewer')
         ? Response::allow()
@@ -44,7 +44,7 @@ class AuthServiceProvider extends ServiceProvider{
     });
 
     // Super Admin bypass for all Gates
-    Gate::before(function (User $user, string $ability) {
+    Gate::before(function(User $user, string $ability){
       // if ($user->hasRole(config('roles.admin'))) {
       return $user->hasRole('admin') ? true : null;
     });

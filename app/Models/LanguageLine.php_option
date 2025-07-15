@@ -1,0 +1,10 @@
+<?php
+namespace App\Models;
+use Spatie\TranslationLoader\LanguageLine as SpatieLanguageLine;
+
+class LanguageLine extends SpatieLanguageLine{
+  protected $casts = [
+    'text' => 'array', // Spatie's model already casts 'text' to array (JSON)
+    'is_custom' => 'boolean'
+  ];
+}

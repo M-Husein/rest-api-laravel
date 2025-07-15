@@ -1,0 +1,82 @@
+@tailwind utilities;
+
+// $main_color: #dbebff;
+
+@layer utilities {
+  // :root {
+  //   --q-bg-main: #{$main_color}; // --q-color-main
+  // }
+
+  // .bg-theme {
+  //   background-color: #eee; // f5f5f5
+  // }
+
+  .dark .bg-theme {
+    background-color: #001529; // 001529 | 141414
+  }
+
+  .bg-main {
+    // rgba(3,31,31,.7)
+    background-color: var(--q-bg-main); // $main_color;
+  }
+  // :root.dark {
+  //   --q-bg-main: #1f1f1f;
+  // }
+
+  // Navbar main
+  .bg-nav {
+    background-color: var(--q-bg-nav);
+  }
+  :root.dark {
+    --q-bg-main: #1f1f1f;
+    --q-bg-nav: #1f1f1f;
+  }
+
+  .txt-main {
+    color: #212529;
+  }
+  .dark .txt-main {
+    color: #fff;
+  }
+
+  // NOTE: Used fa svg icon compoonent (react-icons)
+  .align--1px {
+    vertical-align: -1px;
+  }
+
+  // .pe-none-parent, // <- Prevent interaction in parent but not children
+  // [aria-disabled=true],
+  // .disabled,
+  // .pie:disabled,
+  .pe-none {
+    pointer-events: none;
+  }
+
+  // // Prevent interaction in parent but not children
+  // .pe-none-parent .pe-auto,
+  .pe-auto {
+    pointer-events: auto;
+  }
+
+  .after-no::after {
+    content: none !important;
+  }
+
+  .no-shadow {
+    box-shadow: none !important;
+  }
+
+  .min-h-fullscreen {
+    @apply min-h-screen min-h-dvh;
+  }
+
+  .mirror {
+    transform: scaleX(-1); // rotateY(180deg)
+  }
+
+  .txt-pre-wrap {
+    @apply whitespace-pre-wrap;
+  }
+}
+
+// Always compile Here

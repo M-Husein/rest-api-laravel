@@ -17,8 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ]);
 
     $middleware->api(prepend: [
-      \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class, // Keep this if your React SPA uses Sanctum's session-based authentication
-      SetLocale::class
+      SetLocale::class,
+      \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class // Keep this if your React SPA uses Sanctum's session-based authentication
     ]);
 
     // If your React SPA uses Sanctum's session-based authentication (which is common),
@@ -32,6 +32,10 @@ return Application::configure(basePath: dirname(__DIR__))
       'role' => Role::class,
       'hybrid.csrf' => HybridCsrf::class
     ]);
+
+    // $middleware->redirectUsersTo(function(Request $request){
+    //   return $request->user()->isAdmin() ? '/admin' : '/';
+    // });
   })
   ->withExceptions(function(Exceptions $exceptions): void{
     \App\Exceptions\HandlesException::handle($exceptions);

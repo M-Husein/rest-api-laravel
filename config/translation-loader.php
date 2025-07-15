@@ -6,9 +6,7 @@ return [
   * The first loader will be used first, then the second, and so on.
   */
   'loaders' => [
-    // 1. Check the database first. If a translation exists here, it will be used.
     Db::class,
-    // 2. If not found in the database, fall back to file-based translations.
     File::class,
   ],
 
@@ -18,6 +16,7 @@ return [
   * `Spatie\TranslationLoader\LanguageLine` model.
   */
   'model' => Spatie\TranslationLoader\LanguageLine::class,
+  // 'model' => App\Models\LanguageLine::class,
 
   /*
   * This is the translation manager which will be used to retrieve and store translations.

@@ -1,0 +1,249 @@
+@tailwind components;
+
+@layer components {
+  // === SCROLL ===
+  .q-scroll {
+    // FOR Firefox
+    --q-scrollbar-width: thin;
+    scrollbar-width: var(--q-scrollbar-width);
+    scrollbar-color: #aaa transparent;
+    // -webkit-overflow-scrolling: touch; // OPTION: From Bootstrap .table-responsive
+  }
+
+  .scrollbar-auto {
+    scrollbar-width: auto;
+  }
+
+  .q-scroll::-webkit-scrollbar {
+    --q-scroll-size: 7px; // 9px
+    // DEV: use !important
+    width: var(--q-scroll-size); // 9px is same size with firefox scrollbar-width: thin;
+    height: var(--q-scroll-size);
+  }
+
+  .q-scroll::-webkit-scrollbar-thumb {
+    background-color: #ccc; // rgba(0, 0, 0, 0.2)
+  }
+
+  .q-scroll::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+  }
+
+  .q-scroll::-webkit-scrollbar-thumb:active {
+    background-color: #777;
+  }
+
+  .q-scroll::-webkit-scrollbar-track {
+    background-color: rgba(255, 255, 255, 0.08); //  !important
+  }
+
+  // FOR Firefox
+  .q-scroll.scroll-hover:not(:hover) { // :not(:active)
+    scrollbar-color: transparent transparent;
+  }
+
+  .q-scroll.scroll-hide::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  .q-scroll.scroll-hide {
+    scrollbar-width: none;
+  }
+
+  .q-scroll.scroll-hover::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  .q-scroll.scroll-hover:hover::-webkit-scrollbar-track {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .q-scroll.scroll-hover::-webkit-scrollbar-thumb {
+    background-color: transparent;
+  }
+
+  .q-scroll.scroll-hover:hover::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+  }
+
+  .q-scroll.scroll-hover::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa; // bbb
+  }
+
+  // .q-scroll.scroll-hover:active::-webkit-scrollbar-thumb,
+  .q-scroll.scroll-hover::-webkit-scrollbar-thumb:active {
+    background-color: #777;
+  }
+
+  // Symbols:
+  // ROLE ACCESS
+  .pie {
+    display: inline-flex;
+    outline: 0;
+  }
+
+  // .pie:empty {
+  //   user-select: none;
+  // }
+
+  // .pie.spinner-border,
+  // .pie:before {
+  //   width: 18px;
+  //   height: 18px;
+  // }
+
+  .pie:before {
+    content: "";
+    display: inline-flex; // block
+    border-radius: 50%;
+    background-color: green;
+    border: 2px solid green;
+    margin-left: auto;
+    margin-right: auto;
+    vertical-align: middle;
+    width: 18px;
+    height: 18px;
+  }
+
+  // .pie.spinner-border:before {
+  //   content: none;
+  // }
+
+  // .pie.ten:before
+  .pie.pie-no-access:before {
+    border: 2px solid #cc0d0d;
+    background-color: transparent;
+    background-image: linear-gradient(90deg, transparent 50%, white 50%), linear-gradient(90deg, white 50%, transparent 50%);
+  }
+
+  // .pie.twentyfive:before
+  .pie.pie-own-record:before {
+    background-color: #ffca00;
+    border: 2px solid #ffca00;
+    background-image: linear-gradient(52.5deg, transparent 50%, white 50%), linear-gradient(127.5deg, white 50%, transparent 50%);
+    /*background-image: linear-gradient(180deg, white 50%, white 70%, green 70%);*/
+  }
+
+  // .pie.fifty:before
+  .pie.pie-businessunit:before {
+    background-color: #ffca00;
+    border: 2px solid #ffca00;
+    background-image: linear-gradient(180deg, white 50%, transparent 50%);
+  }
+
+  // .pie.seventyfive:before
+  .pie.pie-parent-child:before {
+    background-image: linear-gradient(232.5deg, transparent 50%, green 50%), linear-gradient(127.5deg, white 50%, transparent 50%);
+  }
+
+  // .pie.onehundred:before
+  .pie.pie-organization:before {
+    background-image: none;
+  }
+
+  // EVENT EFFECT:
+  // .pie.cursor-pointer:focus-within:before,
+  .pie.cursor-pointer:focus-visible:before,
+  .pie.cursor-pointer:hover:before {
+    box-shadow: 0 0 0 0.2rem rgba(38,143,255,.5);
+  }
+
+  // .pie.cursor-pointer:focus-visible:before,
+  .pie.cursor-pointer:active:before {
+    box-shadow: 0 0 0 0.2rem #007bff;
+  }
+
+  // Ant Transfer component
+  .transfer-responsive > div {
+    width: 100% !important;
+  }
+  .transfer-responsive .a-transfer-operation {
+    flex-direction: row;
+    justify-content: center;
+    column-gap: .5rem;
+    padding: 1rem;
+  }
+  .transfer-responsive .a-transfer-operation .a-btn:first-child {
+    margin: 0;
+  }
+  .transfer-responsive .a-transfer-operation .a-btn > span {
+    transform: rotate(90deg);
+  }
+
+  .antUpload .a-upload {
+    @apply inline-block rounded-md;
+  }
+  .antUpload .a-upload:focus-visible {
+    @apply ring;
+  }
+
+  // Prevent scroll when loading data
+  .antSelectLoading .rc-virtual-list-holder {
+    overflow-y: hidden !important;
+    height: 228px;
+  }
+
+  // DatePicker.RangePicker, responsive style for mobile / small device
+  .antRangePicker.a-picker-dropdown-range {
+    left: auto !important;
+  }
+  .antRangePicker .a-picker-panels {
+    width: 100vw;
+    overflow-x: auto;
+  }
+}
+
+// Always compile Here
+
+// Disabled state
+.a-input-number-disabled,
+.a-input[disabled], // .a-input-disabled,
+.a-select-disabled .a-select-selector {
+  color: #555 !important;
+}
+
+// antd Card
+// .antCard-custom
+// .a-card .a-card-head-wrapper {
+//   flex-wrap: wrap;
+//   gap: 1rem;
+// }
+
+// DEV : Override for responsive
+// .a-card .a-card-head-title {
+//   flex: none;
+//   // width: 100%;
+// }
+
+// .a-notification,
+.ant-notification {
+  z-index: 2056 !important; // 1060
+}
+
+.a-select-selection-placeholder {
+  user-select: none;
+}
+
+// Ant Tree
+.a-tree-switcher-noop:empty {
+  width: auto;
+}
+
+.a-modal-close + div .a-modal-confirm-title {
+  padding-right: 24px;
+}
+
+.a-layout-sider-children {
+  display: flex;
+  flex-direction: column;
+}
+
+// // DEV: For hide sider menus when laoding access control
+// .loadingAccessControl .sider-menu > li:not(.sider-search) {
+//   display: none;
+// } 
+
+.a-upload-list-item-image {
+  object-fit: cover; // contain
+}

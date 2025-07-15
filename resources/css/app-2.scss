@@ -1,0 +1,23 @@
+:root{
+  --q-bg-main:#fff;
+  --q-bg-nav:#dbeafe;
+}
+#loaderApp,.nojs{
+  position:fixed;
+  background-color:var(--q-bg-main)
+}
+.load-spin,.nojs{
+  display:grid;
+  place-content:center;
+  text-align:center
+}
+.load-spin{
+  user-select:none;
+  z-index:1055
+}
+.inset-0{
+  inset:0
+}
+.cwait{
+  cursor:wait
+}

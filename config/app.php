@@ -12,6 +12,10 @@ return [
   */
   'name' => env('APP_NAME', 'App'),
 
+  // CUSTOM
+  'version' => env('APP_VERSION', '1'),
+  // 'min_password' => env('APP_MIN_PASSWORD', 6),
+
   /*
   |--------------------------------------------------------------------------
   | Application Environment

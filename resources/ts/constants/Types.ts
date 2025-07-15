@@ -1,0 +1,20 @@
+export interface IAdvert {
+  id?: string,
+  advert_category_id: string,
+  title: string,
+  description: string,
+  price: string | number,
+  brand?: string,
+  model?: string,
+  year: string | number,
+  variant?: string,
+  transmission?: string,
+  fuel_type?: string,
+  odometer?: string,
+  engine?: string,
+  color?: string,
+  Files: any,
+  feature: string,
+  matching_classification?: any,
+}
+

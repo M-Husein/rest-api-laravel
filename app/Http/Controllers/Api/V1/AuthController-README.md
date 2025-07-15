@@ -5,6 +5,8 @@
 ## login (used)
 ```php
 public function login(LoginRequest $req){
+  $this->limitRequest($req, 'login');
+
   $remember = $req->boolean('remember');
 
   if(!Auth::attempt($req->only('email', 'password'), $remember)){

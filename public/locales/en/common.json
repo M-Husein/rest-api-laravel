@@ -1,0 +1,141 @@
+{
+  "pages": {
+    "login": {
+      "signin": "Sign in",
+      "signup": "Sign up",
+      "divider": "or",
+      "fields": {
+        "email": "Email",
+        "password": "Password"
+      },
+      "errors": {
+        "validEmail": "Invalid email address",
+        "username": "Invalid username",
+        "failed": "We apologize that an error occurred. Please try again"
+      },
+      "buttons": {
+        "submit": "Login",
+        "forgotPassword": "Forgot password?",
+        "noAccount": "Don't have an account?",
+        "rememberMe": "Remember me"
+      },
+      "or": "Or sign in with"
+    },
+    "forgotPassword": {
+      "title": "Forgot your password?",
+      "fields": {
+        "email": "Email"
+      },
+      "buttons": {
+        "submit": "Send reset instructions"
+      },
+      "desc": "Enter your email, phone, or username and we'll send you a link to reset your password."
+    },
+    "register": {
+      "title": "Sign up for your account",
+      "fields": {
+        "email": "Email",
+        "password": "Password"
+      },
+      "errors": {
+        "validEmail": "Invalid email address"
+      },
+      "buttons": {
+        "submit": "Register",
+        "haveAccount": "Have an account?"
+      }
+    },
+    "updatePassword": {
+      "title": "Update password",
+      "fields": {
+        "password": "New Password",
+        "confirmPassword": "Confirm new password"
+      },
+      "errors": {
+        "confirmPasswordNotMatch": "Passwords do not match"
+      },
+      "buttons": {
+        "submit": "Update"
+      }
+    },
+    "error": {
+      "404": "Sorry, the page you visited does not exist.",
+      "backHome": "Back to Home",
+      "resource404": "Are you sure you have created the {{resource}} resource."
+    }
+  },
+  "actions": {
+    "list": "List",
+    "create": "Create",
+    "edit": "Edit",
+    "show": "Show"
+  },
+  "buttons": {
+    "create": "Create",
+    "save": "Save",
+    "logout": "Logout",
+    "delete": "Delete",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "confirm": "Are you sure?",
+    "filter": "Filter",
+    "clear": "Clear",
+    "refresh": "Refresh",
+    "show": "Show",
+    "undo": "Undo",
+    "import": "Import",
+    "clone": "Clone",
+    "close": "Close",
+    "selectFile": "Upload File",
+    "notAccessTitle": "You don't have permission to access",
+    "deleteSelected": "Delete selected"
+  },
+  "warnWhenUnsavedChanges": "You have unsaved changes, are you sure you want to leave?",
+  "logoutInfo": "You are logged out from another tab/window.",
+  "notifications": {
+    "success": "Successful",
+    "error": "Error (status code: {{statusCode}})",
+    "undoable": "You have {{seconds}} seconds to undo",
+    "createSuccess": "Successfully created {{resource}}",
+    "createError": "There was an error creating {{resource}} (status code: {{statusCode}})",
+    "deleteSuccess": "Successfully deleted {{resource}}",
+    "deleteError": "Error when deleting {{resource}} (status code: {{statusCode}})",
+    "editSuccess": "Successfully edited {{resource}}",
+    "editError": "Error when editing {{resource}} (status code: {{statusCode}})",
+    "importProgress": "Importing: {{processed}}/{{total}}",
+    "readError": "Error when showing {{resource}}"
+  },
+  "confirms": {
+    "delete": "Do you want to delete these items?",
+    "toggleActive": "Are you sure to {{action}} {{type}} {{name}}?",
+    "doYouWant": "Do you want {{name}}?",
+    "activate": "Are you sure to activate {{name}}?",
+    "ensure": "Are you sure to {{name}}?"
+  },
+  "error": {
+    "unspecific": "Something went wrong.",
+    "process": "Failed to {{type}}, please try again.",
+    "required": "{{name}} is required.",
+    "invalid": "Invalid {{name}}.",
+    "minLength": "Minimum {{v}} characters.",
+    "trim": "There should be no spaces, tabs / enter at the beginning & end."
+  },
+  "loading": "Loading",
+  "table": {
+    "actions": "Actions"
+  },
+  "tags": {
+    "clone": "Clone"
+  },
+  "failed": "Failed",
+  "language": "Language",
+  "theme": "Theme",
+  "noData": "No Data",
+  "reload": "Reload",
+  "yes": "Yes",
+  "activate": "Activate",
+  "deactivate": "Deactivate",
+  "download": "Download",
+  "toProcess": "to process",
+  "haveAccount": "Have an account?"
+}

@@ -1,0 +1,6 @@
+import { AuthPage } from "@refinedev/antd";
+
+// Register
+export default function(){
+  return <AuthPage type="register" />;
+};

@@ -1,0 +1,469 @@
+// import { AxiosInstance } from "axios";
+import { DataProvider } from "@refinedev/core";
+import { getToken, clearToken } from '@/utils/authToken';
+import { httpRequest, generateSort, generateFilter } from "./utils";
+import i18n from "@/i18n";
+
+class CustomError extends Error { // @ts-ignore
+  constructor(name: string, message: string, cause?: any) {
+    super(message);
+    this.name = name; // @ts-ignore
+    this.cause = cause;
+  }
+}
+
+type MethodTypes = "get" | "delete" | "head" | "options";
+type MethodTypesWithBody = "post" | "put" | "patch";
+type MethodCommons = "get" | "post" | "put" | "patch";
+
+// Omit<
+//   Required<DataProvider>,
+//   "createMany" | "updateMany" | "deleteMany"
+// >
+
+// const ERROR_UNSPECIFIC = "Terjadi kesalahan"; // Something went wrong
+
+const parseFilters = (filters: any, query: any) => {
+  if (filters?.length) {
+    filters.forEach((f: any) => {
+      query[`filter[${f.field}]`] = f.value;
+    });
+  }
+}
+
+const parseSorts = (sorters: any, query: any) => {
+  if (sorters?.length) {
+    query.sort = sorters.map((s: any) => s.order === "desc" ? `-${s.field}` : s.field).join(",");
+  }
+}
+
+export const dataProvider = (
+  apiUrl: string,
+  httpClient = httpRequest, // : AxiosInstance = httpRequest
+): DataProvider => ({
+  getList: async ({ resource, pagination, filters, sorters, meta }) => {
+    const token = getToken();
+    if(token){
+      const {
+        current = 1,
+        pageSize = 10,
+        mode = "server",
+      } = pagination ?? {};
+  
+      // payload, params
+      const { method, queryContext, searchParams, q, headers, ...requestOptions } = meta ?? {};
+      // const requestMethod = (method as MethodTypes) ?? "get";
+      const requestMethod = (method as MethodCommons) ?? "get";
+  
+      try {
+        const commonOptions = {
+          signal: queryContext?.signal, // For abort request
+          headers: {
+            ...headers,
+            Authorization: 'Bearer ' + token,
+          },
+          ...requestOptions
+        };
+
+        const isGetMethod = requestMethod === "get";
+        const paginationOff = mode === "off";
+  
+        let response: any;
+
+        if(requestMethod === "post"){
+          response = await httpClient.post(resource, { 
+            ...commonOptions,
+            searchParams,
+          }).json();
+        }
+        else if(isGetMethod){
+          // const queryFilters = generateFilter(filters);
+            
+          // const query: {
+          //   _start?: number;
+          //   _end?: number;
+          //   _sort?: string;
+          //   _order?: string;
+          // } = {};
+
+          // if (mode === "server") {
+          //   query._start = (current - 1) * pageSize;
+          //   query._end = current * pageSize;
+          // }
+
+          // const generatedSort = generateSort(sorters);
+          // if (generatedSort) {
+          //   const { _sort, _order } = generatedSort;
+          //   query._sort = _sort.join(",");
+          //   query._order = _order.join(",");
+          // }
+
+          let query: any = {};
+
+          if(paginationOff){
+            query.searchParams = searchParams;
+          }else{
+            if(q){
+              query.q = q;
+            }
+
+            query.page = current;
+            query.perPage = pageSize;
+
+            parseFilters(filters, query);
+            parseSorts(sorters, query);
+
+            if(searchParams){
+              query = { ...searchParams, ...query };
+            }
+          }
+
+          response = await httpClient.get(resource, { 
+            ...commonOptions,
+            searchParams: query,
+          }).json();
+        }
+        
+        // console.log('getList response: ', response);
+
+        const data = response?.data;
+  
+        if(data && !response?.errors){
+          if(paginationOff){
+            return data;
+          }
+
+          const { total, ...otherData } = response;
+
+          return {
+            ...otherData,
+            data,
+            total: total || data.length || 0,
+          };
+        }
+  
+        throw new CustomError('ReadError', response?.message || i18n.t('error.unspecific'), response);
+      } catch(e){
+        throw e;
+      }
+    }
+    else{
+      clearToken();
+      throw new CustomError('ReadError', i18n.t('error.unspecific'));
+    }
+  },
+
+  getMany: async ({ resource, ids, meta }) => {
+    const token = getToken();
+    if(token){
+      const { method, queryContext, searchParams, headers, ...requestOptions } = meta ?? {};
+      const requestMethod = (method as MethodTypes) ?? "get";
+  
+      try {
+        // { data }
+        const response: any = await httpClient(
+          resource, // apiUrl + '/' + resource,
+          { 
+            ...requestOptions,
+            method: requestMethod,
+            signal: queryContext?.signal, 
+            searchParams: { ...searchParams, id: ids }, 
+            headers: {
+              ...headers,
+              Authorization: 'Bearer ' + token,
+            },
+          }
+        )
+        .json();
+        
+        if(response?.errors){
+          throw new CustomError('ReadError', response?.message || i18n.t('error.unspecific'), response);
+        }
+        return response;
+      } catch(e){
+        throw e;
+      }
+    }
+    else{
+      clearToken();
+      throw new CustomError('ReadError', i18n.t('error.unspecific'));
+    }
+  },
+
+  // { resource, variables, meta } | body, json
+  create: async ({ resource, variables, meta }) => {
+    const token = getToken();
+    if(token){
+      const { method, headers, body, ...requestOptions } = meta ?? {}; // , queryContext
+      const requestMethod = (method as MethodCommons) ?? "post"; // MethodTypesWithBody | MethodCommons
+  
+      try {
+        const response: any = await httpClient(
+          resource,
+          {
+            ...requestOptions,
+            method: requestMethod,
+            body,
+            json: requestMethod === 'get' || body ? undefined : variables,
+            headers: {
+              ...headers,
+              Authorization: 'Bearer ' + token,
+            },
+          }
+        ).json();
+
+        // console.log('req: ', req)
+
+        // console.log('queryContext: ', queryContext)
+        /** @DEV : signal not work if method get */
+        // const { data } = await httpClient({
+        //   ...requestOptions,
+        //   method: requestMethod,
+        //   url: apiUrl + '/' + resource,
+        //   data: variables,
+        //   signal: requestMethod === 'get' ? queryContext?.signal : requestOptions.signal,
+        // });
+  
+        if(response?.errors){
+          throw new CustomError('CreateError', response?.message || i18n.t('error.unspecific'), response);
+        }
+        return response;
+      } catch(e) {
+        throw e;
+      }
+    }
+    else{
+      clearToken();
+      throw new CustomError('ReadError', i18n.t('error.unspecific'));
+    }
+  },
+
+  update: async ({ resource, id, variables, meta }) => {
+    const token = getToken();
+    if(token){
+      const { method, headers } = meta ?? {}; // , queryContext, ...requestOptions
+      const requestMethod = (method as MethodTypesWithBody) ?? "put";
+  
+      try {
+        const response: any = await httpClient(
+          resource + (id ? '/' + id : ''), // `${apiUrl}/${resource}${id ? '/' + id : ''}`,
+          {
+            method: requestMethod,
+            json: variables,
+            headers: {
+              ...headers,
+              Authorization: 'Bearer ' + token,
+            },
+          }
+          /** @DEV : must check & test (use or not) */
+          // { signal: queryContext?.signal, ...requestOptions }
+          // { ...queryContext, ...requestOptions }
+        ).json();
+  
+        if(response?.errors){
+          throw new CustomError('UpdateError', response?.message || i18n.t('error.unspecific'), response);
+        }
+        return response;
+      } catch(e) {
+        throw e;
+      }
+    }
+    else{
+      clearToken();
+      throw new CustomError('ReadError', i18n.t('error.unspecific'));
+    }
+  },
+
+  getOne: async ({ resource, id, meta }) => {
+    const token = getToken();
+    if(token){
+      const { method, queryContext, headers, ...requestOptions } = meta ?? {};
+      const requestMethod = (method as MethodTypes) ?? "get";
+  
+      try {
+        const response: any = await httpClient(
+          resource + (id ? '/' + id : ''),
+          { 
+            ...requestOptions,
+            method: requestMethod,
+            signal: queryContext?.signal, 
+            headers: {
+              ...headers,
+              Authorization: 'Bearer ' + token,
+            },
+          }
+        ).json();
+  
+        if(response?.errors){
+          throw new CustomError('ReadError', response?.message || i18n.t('error.unspecific'), response);
+        }
+        return response;
+      } catch(e) {
+        throw e;
+      }
+    }
+    else{
+      clearToken();
+      throw new CustomError('ReadError', i18n.t('error.unspecific'));
+    }
+  },
+  
+  deleteOne: async ({ resource, id, variables, meta }) => {
+    const token = getToken();
+    if(token){
+      const { method, headers } = meta ?? {}; // , queryContext
+      const requestMethod = (method as MethodTypesWithBody) ?? "delete";
+  
+      try {
+        const response: any = await httpClient(
+          resource + "/" + id,
+          {
+            method: requestMethod,
+            json: variables,
+            headers: {
+              ...headers,
+              Authorization: 'Bearer ' + token,
+            },
+          },
+          /** @DEV : must check & test (use or not) */
+          // { signal: queryContext?.signal }
+        ).json();
+  
+        if(response?.errors){
+          throw new CustomError('DeleteError', response?.message || i18n.t('error.unspecific'), response);
+        }
+        return response;
+      } catch(e){
+        throw e;
+      }
+    }
+    else{
+      clearToken();
+      throw new CustomError('ReadError', i18n.t('error.unspecific'));
+    }
+  },
+
+  deleteMany: async ({ resource, ids, meta }) => { // variables
+    const token = getToken();
+    if(token){
+      const { method, headers } = meta ?? {}; // , queryContext
+      const requestMethod = (method as MethodTypesWithBody) ?? "delete";
+  
+      try {
+        const response: any = await httpClient(
+          resource, 
+          { 
+            method: requestMethod,
+            json: ids,
+            headers: {
+              ...headers,
+              Authorization: 'Bearer ' + token,
+            },
+          }, // , variables
+
+          /** @DEV : must check & test (use or not) */
+          // { signal: queryContext?.signal }
+        ).json();
+  
+        if(response?.errors){
+          throw new CustomError('DeleteManyError', response?.message || i18n.t('error.unspecific'), response);
+        }
+        return response;
+      } catch(e) {
+        throw e;
+      }
+    }
+    else{
+      clearToken();
+      throw new CustomError('ReadError', i18n.t('error.unspecific'));
+    }
+  },
+
+  getApiUrl: () => apiUrl,
+
+  custom: async ({
+    url,
+    method,
+    filters,
+    sorters,
+    payload, 
+    query,
+    // headers,
+    meta: { queryContext, signal: abortSignal, searchParams, headers, ...requestOptions } = {},
+  }) => {
+    const token = getToken();
+    if(token){
+      const commonOptions = {
+        ...requestOptions,
+        signal: abortSignal || queryContext?.signal,
+        headers: {
+          ...headers,
+          Authorization: 'Bearer ' + token,
+        },
+      };
+
+      try {
+        let response: any;
+        switch (method) {
+          case "put":
+          case "post":
+          case "patch":
+            response = await httpClient(url, { 
+              ...commonOptions,
+              method, 
+              json: payload,
+              searchParams, 
+            })
+            .json();
+            
+            break;
+
+          case "delete":
+            response = await httpClient.delete(url, {
+              ...commonOptions,
+              // data: payload,
+              // body,
+              json: payload,
+            })
+            .json();
+
+            break;
+
+          default:
+            let sortQuery = {};
+            if (sorters) {
+              const generatedSort = generateSort(sorters);
+              if (generatedSort) {
+                const { _sort, _order } = generatedSort;
+                sortQuery = {
+                  _sort: _sort.join(","),
+                  _order: _order.join(","),
+                };
+              }
+            }
+        
+            const filterQuery = filters ? generateFilter(filters) : {};
+
+            response = await httpClient.get(url, { 
+              ...commonOptions,
+              searchParams: { ...searchParams, ...filterQuery, ...sortQuery, ...query },
+            })
+            .json();
+
+            break;
+        }
+  
+        if(response?.errors){
+          throw new CustomError(method, response?.message || i18n.t('error.unspecific'), response);
+        }
+        return Promise.resolve(response);
+      } catch(e) {
+        throw e;
+      }
+    }
+    else{
+      clearToken();
+      throw new CustomError('ReadError', i18n.t('error.unspecific'));
+    }
+  },
+});

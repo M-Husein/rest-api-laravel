@@ -18,7 +18,7 @@ trait QueryTools{
     $qb = QueryBuilder::for($query);
 
     // Add global search when 'q' parameter exists
-    if($searches && $request->has('q')){
+    if($searches && $request->filled('q')){
       $searchValue = $request->q;
       $qb->where(function($query) use ($searchValue, $searches){
         foreach($searches as $field){

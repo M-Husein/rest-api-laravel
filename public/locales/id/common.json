@@ -1,0 +1,141 @@
+{
+  "pages": {
+    "login": {
+      "signin": "Sign in",
+      "signup": "Sign up",
+      "divider": "atau",
+      "fields": {
+        "email": "Email",
+        "password": "Password"
+      },
+      "errors": {
+        "validEmail": "Alamat email salah",
+        "username": "Nama pengguna tidak valid",
+        "failed": "Kami mohon maaf telah terjadi kesalahan. Silahkan dicoba kembali."
+      },
+      "buttons": {
+        "submit": "Login",
+        "forgotPassword": "Tidak ingat kata sandi?",
+        "noAccount": "Belum punya akun?",
+        "rememberMe": "Remember me"
+      },
+      "or": "Atau masuk dengan"
+    },
+    "forgotPassword": {
+      "title": "Lupa kata sandi Anda?",
+      "fields": {
+        "email": "Email"
+      },
+      "buttons": {
+        "submit": "Kirim instruksi pengaturan ulang"
+      },
+      "desc": "Masukkan email, telepon, atau nama pengguna Anda dan kami akan mengirimkan Anda tautan untuk mengatur ulang kata sandi Anda."
+    },
+    "register": {
+      "title": "Daftarkan akun Anda",
+      "fields": {
+        "email": "Email",
+        "password": "Password"
+      },
+      "errors": {
+        "validEmail": "Alamat email salah"
+      },
+      "buttons": {
+        "submit": "Daftar",
+        "haveAccount": "Punya akun?"
+      }
+    },
+    "updatePassword": {
+      "title": "Update password",
+      "fields": {
+        "password": "Password Baru",
+        "confirmPassword": "Konfirmasi Password Baru"
+      },
+      "errors": {
+        "confirmPasswordNotMatch": "Password tidak cocok"
+      },
+      "buttons": {
+        "submit": "Update"
+      }
+    },
+    "error": {
+      "404": "Maaf, halaman yang Anda kunjungi tidak ada.",
+      "backHome": "Kembali ke Home",
+      "resource404": "Apakah Anda yakin telah membuat sumber daya {{resource}}."
+    }
+  },
+  "actions": {
+    "list": "Daftar",
+    "create": "Buat",
+    "edit": "Edit",
+    "show": "Lihat"
+  },
+  "buttons": {
+    "create": "Buat",
+    "save": "Simpan",
+    "logout": "Logout",
+    "delete": "Hapus",
+    "edit": "Edit",
+    "cancel": "Batal",
+    "confirm": "Apa Anda yakin?",
+    "filter": "Filter",
+    "clear": "Clear",
+    "refresh": "Refresh",
+    "show": "Lihat",
+    "undo": "Undo",
+    "import": "Import",
+    "clone": "Klon",
+    "close": "Tutup",
+    "selectFile": "Upload File",
+    "notAccessTitle": "Anda tidak memiliki izin untuk mengakses",
+    "deleteSelected": "Hapus yang dipilih"
+  },
+  "warnWhenUnsavedChanges": "Anda memiliki perubahan yang belum disimpan, Anda yakin ingin keluar?",
+  "logoutInfo": "Anda keluar dari tab/jendela lain.",
+  "notifications": {
+    "success": "Berhasil",
+    "error": "Error (Kode status: {{statusCode}})",
+    "undoable": "Anda memiliki waktu {{seconds}} detik untuk membatalkan",
+    "createSuccess": "Berhasil membuat {{resource}}",
+    "createError": "Terjadi kesalahan saat membuat {{resource}} (Kode status: {{statusCode}})",
+    "deleteSuccess": "Berhasil menghapus {{resource}}",
+    "deleteError": "Terjadi kesalahan saat menghapus {{resource}} (Kode status: {{statusCode}})",
+    "editSuccess": "Berhasil edit {{resource}}",
+    "editError": "Terjadi kesalahan saat edit {{resource}} (Kode status: {{statusCode}})",
+    "importProgress": "Mengimpor: {{processed}}/{{total}}",
+    "readError": "Terjadi kesalahan saat menampilkan {{resource}}"
+  },
+  "confirms": {
+    "delete": "Apakah Anda ingin menghapus item ini?",
+    "toggleActive": "Apakah Anda yakin untuk {{action}} {{type}} {{name}}?",
+    "doYouWant": "Apakah Anda ingin {{name}}?",
+    "activate": "Apakah Anda yakin untuk mengaktifkan {{name}}?",
+    "ensure": "Apakah Anda yakin {{name}}?"
+  },
+  "error": {
+    "unspecific": "Terjadi Kesalahan.",
+    "process": "Gagal {{type}}, silahkan coba lagi.",
+    "required": "{{name}} harus diisi.",
+    "invalid": "{{name}} tidak valid.",
+    "minLength": "Minimal {{v}} karakter.",
+    "trim": "Tidak boleh ada spasi, tab / enter di awal & akhir."
+  },
+  "loading": "Loading",
+  "table": {
+    "actions": "Actions"
+  },
+  "tags": {
+    "clone": "Clone"
+  },
+  "failed": "Gagal",
+  "language": "Bahasa",
+  "theme": "Tema",
+  "noData": "Tidak ada data",
+  "reload": "Muat ulang",
+  "yes": "Ya",
+  "activate": "Mengaktifkan",
+  "deactivate": "Menonaktifkan",
+  "download": "Unduh",
+  "toProcess": "memproses",
+  "haveAccount": "Punya akun?"
+}

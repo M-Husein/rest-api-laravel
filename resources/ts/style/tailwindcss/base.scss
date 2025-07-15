@@ -1,0 +1,17 @@
+@tailwind base;
+
+@layer base {
+  // :root {
+  //   --gradient-blue: linear-gradient(180deg,#079BDA 0%,#004B7E 100%);
+  // }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  label {
+    display: inline-block;
+  }
+}
+
+// Always compile Here

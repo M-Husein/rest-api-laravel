@@ -8,11 +8,15 @@ return new class extends Migration{
     Schema::create('language_lines', function(Blueprint $table){
       $table->id();
 
-      // Group of the translation (e.g., 'auth', 'validation', 'single')
-      $table->string('group');
+      // Translation group (e.g., 'auth', 'validation', 'single')
+			$table->string('group', 100);
 
       // Key of the translation within its group (e.g., 'failed', 'password')
-      $table->string('key');
+      $table->string('key', 150);
+
+      // Option
+      // Language code (ISO 639-1, e.g. 'en', 'id')
+			// $table->char('lang', 5); // Compact, indexable, consistent
 
       /**
        * To check whether this line is user-made (custom) or not (default Laravel/package)
@@ -20,11 +24,14 @@ return new class extends Migration{
        */
       $table->boolean('is_custom')->default(false);
 
-      // JSON column to store translations for multiple locales (e.g., {"en": "Hello", "es": "Hola"})
+      // // JSON column to store translations for multiple locales (e.g., {"en": "Hello", "es": "Hola"})
       $table->json('text');
 
-      // Timestamps for created_at and updated_at columns
+      // Option change to `text()`
+			// $table->text('text');
+
       $table->timestamps();
+      // $table->softDeletes(); // Timestamps and soft deletes
 
       /**
        * Unique Composite Index:
@@ -32,7 +39,10 @@ return new class extends Migration{
        * This automatically creates an efficient index for lookups when querying by both 'group' and 'key',
        * which is the most common way translations are retrieved.
        */
-      $table->unique(['group', 'key']);
+      $table->unique(['group', 'key'], 'language_lines_unique');
+
+      // Option
+      // $table->unique(['group', 'key', 'lang'], 'language_lines_unique');
     });
   }
 

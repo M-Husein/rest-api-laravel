@@ -1,0 +1,45 @@
+import { useState, useEffect } from 'react';
+// import { Layout } from 'antd';
+import { useNavigate } from 'react-router-dom';
+
+// en-GB | id-ID
+const parseDate = (date: any) => new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long', day: 'numeric' }).format(date);
+
+export function Header({ El }: any){
+  const navigate = useNavigate();
+  const [dateNow, setDateNow] = useState<any>(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => setDateNow(new Date()), 1e3);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <El
+      className="bg-nav text-white leading-4 h-auto flex flex-row flex-wrap items-center py-2 px-6 rounded-lg"
+      style={{
+        minHeight: '23vh'
+      }}
+    >
+      <a
+        onClick={() => navigate('/')}
+      >
+        <img
+          src="/media/img/logo/logo_text.png"
+          alt="Bukit Asam"
+          // draggable={false}
+          // height={85}
+          className="max-w-full"
+        />
+      </a>
+
+      <div className="text-right ml-auto">
+        <b className="text-xl">
+          {parseDate(dateNow)}
+        </b>
+        <div className="text-2xl text-sky-1 font-bold my-px">Lunch Time</div>
+        <time className="text-lg">12.00 - 15.00</time>
+      </div>
+    </El>
+  )
+}

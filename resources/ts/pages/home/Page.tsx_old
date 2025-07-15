@@ -1,0 +1,130 @@
+import { useState } from "react";
+import { useDocumentTitle } from "@refinedev/react-router-v6";
+// import { useNotification } from "@refinedev/core";
+import { Row, Col, Button } from 'antd';
+
+const centeredClass = "flex flex-col justify-center items-center grow h-full ";
+
+export default function Page(){
+  useDocumentTitle(import.meta.env.VITE_APP_NAME);
+
+  // const { open: openNotif } = useNotification();
+  const [isTap, setIsTap] = useState(false);
+  const [choice, setChoice] = useState<any>();
+  const [animationHands, setAnimationHands] = useState(true);
+
+  const doChoice = (type: string) => {
+    setChoice(type)
+
+    // openNotif?.({
+    //   type: "success",
+    //   message: "Enjoy your meal!", 
+    //   description: "Thank You",
+    //   // @ts-ignore
+    //   duration: 4,
+    //   showProgress: true,
+    //   pauseOnHover: false,
+    //   role: "status", // OPTION
+    // })
+
+    setTimeout(() => {
+      setAnimationHands(false)
+    }, 1500)
+
+    setTimeout(() => {
+      setChoice('')
+      setIsTap(false)
+      setAnimationHands(true)
+    }, 4e3)
+  }
+
+  return (
+    <div className={centeredClass + "text-center"}>
+      {isTap ? 
+        <div className={centeredClass + "w-full mt-4 p-4 bg-white border border-sky-1 rounded-lg shadow-md"}>
+          <Row gutter={[24, 24]} className="xl_w-3/4 items-center h-full grow">
+            <Col md={8} xs={24}>
+              <div className="inline-block rounded-full border-18 border-sky-2">
+                <img
+                  alt="User"
+                  src="/media/img/user_dummy.png"
+                  draggable={false}
+                  // width={275}
+                  // height={275}
+                  className="max-w-full rounded-full p-1"
+                />
+              </div>
+            </Col>
+
+            <Col md={16} xs={24}>
+              {choice ?
+                <>
+                  <img 
+                    width={125} 
+                    // height={95}
+                    alt="🙏" 
+                    // src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f64f/512.gif" 
+                    src={"/media/img/folded_hands." + (animationHands ? "gif" : "svg")}
+                  />
+
+                  <h1 className="text-4xl leading-tight text-sky-2 font-bold mb-0 mt-4 animate__animated animate__tada">
+                    Thank you and 
+                    <br />
+                    enjoy your meal!
+                  </h1>
+                </>
+                :
+                <>
+                  <h1 className="text-4xl font-semibold">Welcome Joko Mulyono</h1>
+                  <p className="text-sky-2 text-3xl font-semibold">Would You like to</p>
+                  <hr className="my-12 mx-auto border-4 border-gray-300 w-44" />
+                  <Row gutter={[24, 24]} className="justify-center px-2">
+                    <Col md={10} xs={24}>
+                      <Button
+                        size="large"
+                        type="primary"
+                        className="w-full h-32 text-3xl font-bold bg-sky-2 hover_!bg-sky-1"
+                        onClick={() => doChoice('DineIn')}
+                      >
+                        Dine In
+                      </Button>
+                    </Col>
+                    <Col md={10} xs={24}>
+                      <Button
+                        size="large"
+                        type="primary"
+                        className="w-full h-32 text-3xl font-bold"
+                        onClick={() => doChoice('TakeAway')}
+                      >
+                        Take Away
+                      </Button>
+                    </Col>
+                  </Row>
+                </>
+              }
+            </Col>
+          </Row>
+        </div>
+        :
+        <>
+          <h1 className="text-4xl leading-tight text-sky-2 font-bold mb-9">
+            Please tap Your card
+            <br />
+            on card reader
+          </h1>
+    
+          <img
+            alt="Card reader"
+            src="/media/img/card_reader.svg"
+            draggable={false}
+            className="max-w-full"
+            style={{
+              maxHeight: 'calc(100vh - 405px)'
+            }}
+            onClick={() => setIsTap(true)}
+          />
+        </>
+      }
+    </div>
+  );
+}

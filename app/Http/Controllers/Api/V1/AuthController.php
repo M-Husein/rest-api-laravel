@@ -14,6 +14,8 @@ class AuthController extends Controller{
   use RateLimit;
 
   public function login(LoginRequest $req){
+    $this->limitRequest($req, 'login');
+
     $remember = $req->boolean('remember');
 
     if(Auth::attempt($req->only('email', 'password'), $remember)){
@@ -39,6 +41,11 @@ class AuthController extends Controller{
         $req->session()->regenerate();
       }
 
+      $user->roles = [
+        'key' => config('roles.keys.' . $user->role),
+        'name' => config('roles.names.' . $user->role)
+      ];
+
       return jsonSuccess([
         'user' => $user,
         'token' => $token,
@@ -51,7 +58,13 @@ class AuthController extends Controller{
 
   public function logout(Request $req){
     // ✅ Revoke current token (for token-based clients)
-    $req->user()->currentAccessToken()->delete();
+    // $req->user()->currentAccessToken()->delete();
+
+    // ✅ Revoke token if it's a PersonalAccessToken
+    $token = $req->user()?->currentAccessToken();
+    if($token instanceof PersonalAccessToken){
+      $token->delete();
+    }
 
     // ✅ Invalidate session (for SPA clients)
     if($req->hasSession()){
@@ -60,7 +73,8 @@ class AuthController extends Controller{
       $req->session()->regenerateToken();
     }
 
-    return response()->noContent();
+    // return response()->noContent();
+    return jsonSuccess(1);
   }
 
   public function logoutOthers(Request $req){
