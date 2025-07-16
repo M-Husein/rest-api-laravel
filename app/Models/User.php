@@ -6,10 +6,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Auth\Notifications\VerifyEmail;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Carbon;
-use Illuminate\Notifications\Messages\MailMessage;
+// use Illuminate\Auth\Notifications\VerifyEmail;
+// use Illuminate\Support\Facades\URL;
+// use Illuminate\Support\Carbon;
+// use Illuminate\Notifications\Messages\MailMessage;
 
 class User extends Authenticatable implements MustVerifyEmail{
 	use HasFactory, Notifiable, HasApiTokens, SoftDeletes;
@@ -64,26 +64,26 @@ class User extends Authenticatable implements MustVerifyEmail{
    * Override the default email verification notification
    * to use a custom expiration time and API-friendly link.
    */
-  public function sendEmailVerificationNotification(){
-    $this->notify(new class($this) extends VerifyEmail{
-      public function toMail($notifiable){
-        $expiration = config('auth.verification.expire', 60); // minutes
+  // public function sendEmailVerificationNotification(){
+  //   $this->notify(new class($this) extends VerifyEmail{
+  //     public function toMail($notifiable){
+  //       $expiration = config('auth.verification.expire', 60); // minutes
 
-        $verificationUrl = URL::temporarySignedRoute(
-          'verification.verify',
-          Carbon::now()->addMinutes($expiration),
-          [
-            'id' => $notifiable->getKey(),
-            'hash' => sha1($notifiable->getEmailForVerification())
-          ]
-        );
+  //       $verificationUrl = URL::temporarySignedRoute(
+  //         'verification.verify',
+  //         Carbon::now()->addMinutes($expiration),
+  //         [
+  //           'id' => $notifiable->getKey(),
+  //           'hash' => sha1($notifiable->getEmailForVerification())
+  //         ]
+  //       );
 
-        return (new MailMessage)
-          ->subject('Verify Your Email')
-          ->line('Click the button below to verify your email address.')
-          ->action('Verify Email', $verificationUrl)
-          ->line("This link will expire in {$expiration} minutes.");
-      }
-    });
-  }
+  //       return (new MailMessage)
+  //         ->subject('Verify Your Email')
+  //         ->line('Click the button below to verify your email address.')
+  //         ->action('Verify Email', $verificationUrl)
+  //         ->line("This link will expire in {$expiration} minutes.");
+  //     }
+  //   });
+  // }
 }

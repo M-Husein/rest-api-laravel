@@ -96,7 +96,8 @@ return [
   'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
   // CUSTOM
-  'verification' => [
-    'expire' => 120, // minutes (default is 60)
-  ],
+  // To custumize expire email verification link
+  // 'verification' => [
+  //   'expire' => 120, // minutes (default is 60)
+  // ],
 ];
