@@ -1,20 +1,7 @@
 import { AuthProvider } from "@refinedev/core";
 import { api, httpRequest } from '@/providers/dataProvider';
 import { TOKEN_KEY, getToken, setToken, clearToken } from '@/utils/authToken';
-
-const getQuery = (key: string) => new URLSearchParams(location.search).get(key);
-// const setAppLang = (url: string) => {
-//   const lang = getQuery('lang');
-//   if(!url.includes('lang=') && lang){
-//     // const queryString = params.toString();
-//     // return queryString 
-//     //   ? url + (url.includes('?') ? '&' : '?') + queryString
-//     //   : url;
-//     const qlang = 'lang=' + lang;
-//     return url.includes('?') ? '&' + qlang : '?' + qlang;
-//   }
-//   return url;
-// }
+import { setAppLang } from '@/utils/setAppLang';
 
 const HTTP_UNAUTHORIZED = [401, 419];
 
@@ -33,7 +20,10 @@ export const authProvider: AuthProvider = {
       /** @OPTION : For cross domain */
       // await api.get('sanctum/csrf-cookie');
 
-      const req: any = await httpRequest.post('register', { json }).json();
+      const req: any = await httpRequest.post('register', {
+        searchParams: setAppLang(),
+        json 
+      }).json();
       // console.log('req: ', req);
 
       // if(req?.data){
@@ -96,12 +86,8 @@ export const authProvider: AuthProvider = {
         /** @OPTION : For cross domain */
         // await api.get('sanctum/csrf-cookie');
 
-        const lang = getQuery('lang') as string;
-        // const searchParams = lang ? { lang } : {};
-
-        // setAppLang('login')
         const req: any = await httpRequest.post('login', {
-          searchParams: lang ? { lang } : {},
+          searchParams: setAppLang(),
           json: provider 
             ? { provider, type: "spa" } 
             : { email, username, password, remember, type: "spa" }
@@ -144,6 +130,7 @@ export const authProvider: AuthProvider = {
 
       /** @OPTION : make sure logout api success */
       const req: any = await httpRequest.post('logout', {
+        searchParams: setAppLang(),
         keepalive: true
       })
       .json();
@@ -202,7 +189,7 @@ export const authProvider: AuthProvider = {
     };
 
     try {
-      const req: any = await httpRequest('me').json();
+      const req: any = await httpRequest('me', { searchParams: setAppLang() }).json();
 
       // console.log('req: ', req);
 
@@ -244,7 +231,7 @@ export const authProvider: AuthProvider = {
 
     try { // send password reset link to the user's email address here
       // 'forgot-password/' + username
-      const req: any = await api.post('forgot-password');
+      const req: any = await api.post('forgot-password', { searchParams: setAppLang() });
       // console.log('req: ', req);
       if(req?.data){
         return {

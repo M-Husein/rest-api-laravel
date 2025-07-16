@@ -3,6 +3,7 @@ import { DataProvider } from "@refinedev/core";
 // import { httpRequest, generateSort, generateFilter } from "./utils";
 import { httpRequest } from "./utils/httpRequest";
 import i18n from "@/i18n";
+import { setAppLang } from '@/utils/setAppLang';
 
 class CustomError extends Error { // @ts-ignore
   constructor(name: string, message: string, cause?: any) {
@@ -36,24 +37,27 @@ export const dataProvider = (
   apiUrl: string,
   httpClient = httpRequest,
 ): DataProvider => ({
-  getList: async ({ resource, pagination, filters, sorters, meta }) => {
+  getList: async ({ 
+    resource, 
+    pagination, 
+    filters, 
+    sorters, 
+    meta: { method, queryContext, searchParams, q, ...requestOptions } = {}
+  }) => {
     const {
       current = 1,
       pageSize = 10,
       mode = "server",
     } = pagination ?? {};
 
-    const { method, queryContext, searchParams, q, ...requestOptions } = meta ?? {};
-    const requestMethod = (method as MethodCommons) ?? "get";
+    // const { method, queryContext, searchParams, q, ...requestOptions } = meta ?? {};
 
     try {
       const paginationOff = mode === "off"; // mode === "server"
 
-      let query: any = {};
+      let query: any = { ...setAppLang(), ...searchParams };
 
-      if(paginationOff){
-        query.searchParams = searchParams;
-      }else{
+      if(!paginationOff){
         if(q){
           query.q = q;
         }
@@ -65,14 +69,10 @@ export const dataProvider = (
 
         parseFilters(filters, query);
         parseSorts(sorters, query);
-
-        if(searchParams){
-          query = { ...searchParams, ...query };
-        }
       }
 
       const response: any = await httpClient(resource, {
-        method: requestMethod,
+        method: (method as MethodCommons) ?? "get",
         signal: queryContext?.signal, // For abort request
         ...requestOptions,
         searchParams: query,
@@ -82,38 +82,41 @@ export const dataProvider = (
 
       const data = response?.data;
 
-      if(data && !response?.errors){
-        if(paginationOff){
-          return data;
-        }
-
-        const { total, ...otherData } = response;
-
-        return {
-          ...otherData,
-          data,
-          total: total || data.length || 0,
-        };
+      if(response?.errors){
+        throw new CustomError('ReadError', response?.message || i18n.t('error.unspecific'), response);
       }
 
-      throw new CustomError('ReadError', response?.message || i18n.t('error.unspecific'), response);
+      if(paginationOff){
+        return data;
+      }
+
+      const { total, ...otherData } = response;
+
+      return {
+        ...otherData,
+        data,
+        total: total || data.length || 0,
+      };
     } catch(e){
       throw e;
     }
   },
 
-  getMany: async ({ resource, ids, meta }) => {
-    const { method, queryContext, searchParams, ...requestOptions } = meta ?? {};
-    const requestMethod = (method as MethodTypes) ?? "get";
+  getMany: async ({ 
+    resource, 
+    ids, 
+    meta: { method, queryContext, searchParams, ...requestOptions } = {}
+  }) => {
+    // const { method, queryContext, searchParams, ...requestOptions } = meta ?? {};
 
     try {
       const response: any = await httpClient(
         resource, // apiUrl + '/' + resource,
         { 
           ...requestOptions,
-          method: requestMethod,
+          method: (method as MethodTypes) ?? "get",
           signal: queryContext?.signal, 
-          searchParams: { ...searchParams, id: ids }, 
+          searchParams: { ...setAppLang(), ...searchParams, id: ids }, 
         }
       )
       .json();
@@ -128,8 +131,12 @@ export const dataProvider = (
   },
 
   // { resource, variables, meta } | body, json
-  create: async ({ resource, variables, meta }) => {
-    const { method, body, ...requestOptions } = meta ?? {}; // , queryContext
+  create: async ({ 
+    resource, 
+    variables, 
+    meta: { method, body, searchParams, ...requestOptions } = {}
+  }) => {
+    // const { method, body, ...requestOptions } = meta ?? {}; // , queryContext
     const requestMethod = (method as MethodCommons) ?? "post"; // MethodTypesWithBody | MethodCommons
 
     try {
@@ -140,6 +147,7 @@ export const dataProvider = (
           method: requestMethod,
           body,
           json: requestMethod === 'get' || body ? undefined : variables,
+          searchParams: { ...setAppLang(), ...searchParams },
         }
       ).json();
 
@@ -164,8 +172,13 @@ export const dataProvider = (
     }
   },
 
-  update: async ({ resource, id, variables, meta }) => {
-    const { method } = meta ?? {}; // , queryContext, ...requestOptions
+  update: async ({ 
+    resource, 
+    id, 
+    variables, 
+    meta: { method, searchParams } = {}
+  }) => {
+    // const { method } = meta ?? {}; // , queryContext, ...requestOptions
 
     try {
       const response: any = await httpClient(
@@ -173,6 +186,7 @@ export const dataProvider = (
         {
           method: (method as MethodTypesWithBody) ?? "put",
           json: variables,
+          searchParams: { ...setAppLang(), ...searchParams },
         }
         /** @DEV : must check & test (use or not) */
         // { signal: queryContext?.signal, ...requestOptions }
@@ -188,8 +202,12 @@ export const dataProvider = (
     }
   },
 
-  getOne: async ({ resource, id, meta }) => {
-    const { method, queryContext, ...requestOptions } = meta ?? {};
+  getOne: async ({ 
+    resource, 
+    id, 
+    meta: { method, queryContext, searchParams, ...requestOptions } = {}
+  }) => {
+    // const { method, queryContext, ...requestOptions } = meta ?? {};
 
     try {
       const response: any = await httpClient(
@@ -197,6 +215,7 @@ export const dataProvider = (
         { 
           ...requestOptions,
           method: (method as MethodTypes) ?? "get",
+          searchParams: { ...setAppLang(), ...searchParams },
           signal: queryContext?.signal,
         }
       ).json();
@@ -210,8 +229,13 @@ export const dataProvider = (
     }
   },
   
-  deleteOne: async ({ resource, id, variables, meta }) => {
-    const { method } = meta ?? {}; // , queryContext
+  deleteOne: async ({ 
+    resource, 
+    id, 
+    variables, 
+    meta: { method, searchParams } = {}
+  }) => {
+    // const { method } = meta ?? {}; // , queryContext
 
     try {
       const response: any = await httpClient(
@@ -219,6 +243,7 @@ export const dataProvider = (
         {
           method: (method as MethodTypesWithBody) ?? "delete",
           json: variables,
+          searchParams: { ...setAppLang(), ...searchParams },
         },
         /** @DEV : must check & test (use or not) */
         // { signal: queryContext?.signal }
@@ -233,8 +258,13 @@ export const dataProvider = (
     }
   },
 
-  deleteMany: async ({ resource, ids, meta }) => { // variables
-    const { method } = meta ?? {}; // , queryContext
+  deleteMany: async ({ 
+    resource, 
+    ids, 
+    meta: { method, searchParams } = {}
+    // variables
+  }) => {
+    // const { method } = meta ?? {}; // , queryContext
 
     try {
       const response: any = await httpClient(
@@ -242,6 +272,7 @@ export const dataProvider = (
         { 
           method: (method as MethodTypesWithBody) ?? "delete",
           json: ids,
+          searchParams: { ...setAppLang(), ...searchParams },
         }, // , variables
 
         /** @DEV : must check & test (use or not) */
@@ -286,11 +317,9 @@ export const dataProvider = (
     try {
       const paginationOff = mode === "off"; // mode === "server"
 
-      let query: any = {};
+      let query: any = { ...setAppLang(), ...searchParams };
 
-      if(paginationOff){
-        query.searchParams = searchParams;
-      }else{
+      if(!paginationOff){
         if(q){
           query.q = q;
         }
@@ -300,19 +329,11 @@ export const dataProvider = (
 
         parseFilters(filters, query);
         parseSorts(sorters, query);
-
-        if(searchParams){
-          query = { ...searchParams, ...query };
-        }
       }
 
       const response: any = await httpClient(url, {
         method: (method as MethodCommons) ?? "get",
         signal: queryContext?.signal, // For abort request
-        // headers: {
-        //   ...headers,
-        //   Authorization: 'Bearer ' + token,
-        // },
         ...requestOptions,
         searchParams: query,
       }).json();
@@ -321,102 +342,23 @@ export const dataProvider = (
 
       const data = response?.data;
 
-      if(data && !response?.errors){
-        if(paginationOff){
-          return data;
-        }
-
-        const { total, ...otherData } = response;
-
-        return {
-          ...otherData,
-          data,
-          total: total || data.length || 0,
-        };
+      if(response?.errors){
+        throw new CustomError('ReadError', response?.message || i18n.t('error.unspecific'), response);
       }
 
-      throw new CustomError('ReadError', response?.message || i18n.t('error.unspecific'), response);
+      if(paginationOff){
+        return data;
+      }
+
+      const { total, ...otherData } = response;
+
+      return {
+        ...otherData,
+        data,
+        total: total || data.length || 0,
+      };
     } catch(e){
       throw e;
     }
-
-    // payload, params
-    // const { method, queryContext, searchParams, q, headers, ...requestOptions } = meta ?? {};
-    // const requestMethod = (method as MethodTypes) ?? "get";
-
-    // const token = getToken();
-    // if(token){
-    //   const commonOptions = {
-    //     ...requestOptions,
-    //     signal: abortSignal || queryContext?.signal,
-    //     headers: {
-    //       ...headers,
-    //       Authorization: 'Bearer ' + token,
-    //     },
-    //   };
-
-    //   try {
-    //     let response: any;
-    //     switch (method) {
-    //       case "put":
-    //       case "post":
-    //       case "patch":
-    //         response = await httpClient(url, { 
-    //           ...commonOptions,
-    //           method, 
-    //           json: payload,
-    //           searchParams, 
-    //         })
-    //         .json();
-            
-    //         break;
-
-    //       case "delete":
-    //         response = await httpClient.delete(url, {
-    //           ...commonOptions,
-    //           // data: payload,
-    //           // body,
-    //           json: payload,
-    //         })
-    //         .json();
-
-    //         break;
-
-    //       default:
-    //         let sortQuery = {};
-    //         if (sorters) {
-    //           const generatedSort = generateSort(sorters);
-    //           if (generatedSort) {
-    //             const { _sort, _order } = generatedSort;
-    //             sortQuery = {
-    //               _sort: _sort.join(","),
-    //               _order: _order.join(","),
-    //             };
-    //           }
-    //         }
-        
-    //         const filterQuery = filters ? generateFilter(filters) : {};
-
-    //         response = await httpClient.get(url, { 
-    //           ...commonOptions,
-    //           searchParams: { ...searchParams, ...filterQuery, ...sortQuery, ...query },
-    //         })
-    //         .json();
-
-    //         break;
-    //     }
-  
-    //     if(response?.errors){
-    //       throw new CustomError(method, response?.message || i18n.t('error.unspecific'), response);
-    //     }
-    //     return Promise.resolve(response);
-    //   } catch(e) {
-    //     throw e;
-    //   }
-    // }
-    // else{
-    //   clearToken();
-    //   throw new CustomError('ReadError', i18n.t('error.unspecific'));
-    // }
   },
 });
