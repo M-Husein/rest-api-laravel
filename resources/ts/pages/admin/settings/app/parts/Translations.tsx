@@ -197,6 +197,17 @@ export const Translations = ({
         rowSelection={{
           selectedRowKeys,
           onChange: setSelectedRowKeys,
+          getCheckboxProps: (row: any) => ({
+            disabled: !row.is_custom, // Disable checkbox for 'inactive' rows
+            // className: row.is_custom ? "" : "content-visibility-hidden",
+            style: row.is_custom ? {} : { contentVisibility: 'hidden' }
+          }),
+          // renderCell: (checked: any, row: any, index: any, originNode: any) => {
+          //   if (row.is_custom) {
+          //     return originNode;
+          //   }
+          //   return null; // Hide checkbox for this row
+          // },
         }}
         loading={loadingTable}
         columns={columns}

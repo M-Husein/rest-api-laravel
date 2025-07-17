@@ -158,7 +158,7 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "/", // /admin
+        path: "/app", // /admin
         element: <LayoutPrivate />,
         children: [
           { index: true, element: lazyComponent(AdminHome) },

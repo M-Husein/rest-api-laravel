@@ -8,7 +8,7 @@ import { PiMapPinAreaFill, PiCity } from "react-icons/pi";
 export const RESOURCES: any = [
   {
     name: "home",
-    list: "/", // /admin
+    list: "/app", // /admin
     meta: { label: "Home", icon: <HomeOutlined /> }
   },
   // {
@@ -19,25 +19,25 @@ export const RESOURCES: any = [
   {
     name: "currency", // @ts-ignore
     entity_name: "currency",
-    list: "/currencies",
+    list: "/app/currencies",
     meta: { label: "Currencies", icon: <GrCurrency /> }
   },
   {
     name: "country", // @ts-ignore
     entity_name: "country",
-    list: "/country",
+    list: "/app/country",
     meta: { label: "Country", icon: <LuFlag /> }
   },
   {
     name: "province", // @ts-ignore
     entity_name: "province",
-    list: "/province",
+    list: "/app/province",
     meta: { label: "Province", icon: <PiMapPinAreaFill /> }
   },
   {
     name: "city", // @ts-ignore
     entity_name: "city",
-    list: "/city",
+    list: "/app/city",
     meta: { label: "City", icon: <PiCity /> }
   },
   {
@@ -46,25 +46,25 @@ export const RESOURCES: any = [
   },
   {
     name: "app",
-    list: "/settings/app",
+    list: "/app/settings/app",
     meta: { parent: "settings", label: "App", icon: <ToolOutlined /> },
   },
   {
     name: "application_user", // @ts-ignore
     entity_name: "application_user",
-    list: "/settings/users", // /admin/users
+    list: "/app/settings/users", // /admin/users
     meta: { parent: "settings", label: "Users", icon: <UserOutlined /> },
   },
   {
     name: "team", // @ts-ignore
     entity_name: "team",
-    list: "/settings/teams", // /admin/users
+    list: "/app/settings/teams", // /admin/users
     meta: { parent: "settings", label: "Teams", icon: <UsergroupAddOutlined /> },
   },
   {
     name: "role_access", // @ts-ignore
     entity_name: "role_access",
-    list: "/settings/roles-permissions", // /admin/roles-permissions
+    list: "/app/settings/roles-permissions", // /admin/roles-permissions
     meta: { parent: "settings", label: "Roles & Permissions", icon: <LuUserRoundCog /> },
   },
 ];

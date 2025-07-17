@@ -3,6 +3,10 @@ import { api, httpRequest } from '@/providers/dataProvider';
 import { TOKEN_KEY, getToken, setToken, clearToken } from '@/utils/authToken';
 import { setAppLang } from '@/utils/setAppLang';
 
+const toggleLoaderApp = () => {
+  (document.getElementById('loaderApp') as HTMLElement)?.classList.toggle('hidden');
+}
+
 const HTTP_UNAUTHORIZED = [401, 419];
 
 export const authProvider: AuthProvider = {
@@ -46,7 +50,7 @@ export const authProvider: AuthProvider = {
 
         return {
           success: true,
-          redirectTo: "/",
+          redirectTo: "/app",
           successNotification: {
             message: req.data.message || "Registration Successful",
             description: "You have successfully registered",
@@ -102,7 +106,7 @@ export const authProvider: AuthProvider = {
           // window.location.replace('/');
           return {
             success: true,
-            redirectTo: "/",
+            redirectTo: "/app",
           };
         }
 
@@ -123,6 +127,8 @@ export const authProvider: AuthProvider = {
         message: "Logout failed",
       },
     };
+
+    toggleLoaderApp();
 
     try {
       /** @OPTION : For cross domain */
@@ -174,6 +180,8 @@ export const authProvider: AuthProvider = {
       return errorResponse;
     } catch { // (e)
       return errorResponse;
+    } finally {
+      toggleLoaderApp();
     }
   },
   
