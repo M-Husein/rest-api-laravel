@@ -1,59 +1,93 @@
 :root{
-  --q-bg-main:#fff;
-  --q-bg-nav:#dbeafe;
+  --q-bg-main: #fff;
+  --q-bg-nav: #dbeafe;
 }
-#loaderApp,.nojs{
-  position:fixed;
-  background-color:var(--q-bg-main)
+
+#loaderApp,
+.nojs {
+  position: fixed;
+  background-color: var(--q-bg-main)
 }
-.load-spin,.nojs{
-  display:grid;
-  place-content:center;
-  text-align:center
+
+.load-spin,
+.nojs {
+  display: grid;
+  place-content: center;
+  text-align: center
 }
-.load-spin{
-  user-select:none;
-  z-index:1055;
-  cursor:wait
+
+.load-spin {
+  user-select: none;
+  z-index: 1055;
+  cursor: wait
 }
-.inset-0{
-  inset:0
+
+.inset-0 {
+  inset: 0
 }
-.cwait{
-  cursor:wait
+
+.cwait {
+  cursor: wait
 }
-@-webkit-keyframes spin{
-  to{
-    -webkit-transform:rotate(360deg);
-    transform:rotate(360deg)
+.text-0 {
+  font-size: 0;
+}
+
+// Option to hide next elements when show loader App.
+#loaderApp:not(.hidden) ~ * {
+  display: none !important;
+  content-visibility: hidden;
+  // Option
+  pointer-events: none;
+}
+
+@-webkit-keyframes spin {
+  to {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg)
   }
 }
-@keyframes spin{
-  to{
-    -webkit-transform:rotate(360deg);
-    transform:rotate(360deg)
+@keyframes spin {
+  to {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg)
   }
 }
-.spinner-border{
-  color:#1677ff;
-  display:inline-block;
-  width:2rem;
-  height:2rem;
-  vertical-align:-0.125em;
-  border:.25em solid currentcolor;
-  border-right-color:transparent;
-  border-radius:50%;
-  -webkit-animation:.75s linear infinite spin;
-  animation:.75s linear infinite spin
+
+.spin-border {
+  color: #1677ff;
+  display: inline-block;
+  // width: 2rem;
+  // height: 2rem;
+  vertical-align: -0.125em;
+  border: .25em solid currentcolor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  -webkit-animation: .75s linear infinite spin;
+  animation: .75s linear infinite spin
 }
-.spinner-border-sm{
-  width:1rem;
-  height:1rem;
-  border-width:.2em
+
+.spin-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: .2em
 }
-@media(prefers-reduced-motion:reduce){
-  .spinner-border{
-    -webkit-animation-duration:1.5s;
-    animation-duration:1.5s
+
+// .spin-border:not(img)
+.spin-border:not([width]):not([height]) {
+  width: 2rem;
+  height: 2rem;
+}
+// .spin-border:not([width]) {
+//   width: 2rem;
+// }
+// .spin-border:not([height]) {
+//   height: 2rem;
+// }
+
+@media(prefers-reduced-motion: reduce) {
+  .spin-border {
+    -webkit-animation-duration: 1.5s;
+    animation-duration: 1.5s
   }
 }

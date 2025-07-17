@@ -24,18 +24,18 @@ export const authProvider: AuthProvider = {
       /** @OPTION : For cross domain */
       // await api.get('sanctum/csrf-cookie');
 
-      const req: any = await httpRequest.post('register', {
+      const response: any = await httpRequest.post('register', {
         searchParams: setAppLang(),
         json 
       }).json();
-      // console.log('req: ', req);
+      // console.log('response: ', response);
 
-      // if(req?.data){
+      // if(response?.data){
       //   return {
       //     success: true,
       //     redirectTo: redirectPath,
       //     successNotification: {
-      //       message: req.message || "Registration Successful",
+      //       message: response.message || "Registration Successful",
       //       description: "You have successfully registered",
       //     },
       //   };
@@ -44,15 +44,15 @@ export const authProvider: AuthProvider = {
       // return errorResponse;
 
       /** @OPTION : Auto login */
-      if(req?.data){
-        // let { token, expiresAt } = req.data;
-        setToken(req.data.token, req.data.expiresAt);
+      if(response?.data){
+        // let { token, expiresAt } = response.data;
+        setToken(response.data.token, response.data.expiresAt);
 
         return {
           success: true,
           redirectTo: "/app",
           successNotification: {
-            message: req.data.message || "Registration Successful",
+            message: response.data.message || "Registration Successful",
             description: "You have successfully registered",
           },
         };
@@ -90,18 +90,18 @@ export const authProvider: AuthProvider = {
         /** @OPTION : For cross domain */
         // await api.get('sanctum/csrf-cookie');
 
-        const req: any = await httpRequest.post('login', {
+        const response: any = await httpRequest.post('login', {
           searchParams: setAppLang(),
           json: provider 
             ? { provider, type: "spa" } 
             : { email, username, password, remember, type: "spa" }
         }).json();
 
-        // console.log('req: ', req);
+        // console.log('response: ', response);
 
-        if(req?.data){
-          // let { token, expiresAt } = req.data;
-          setToken(req.data.token, req.data.expiresAt);
+        if(response?.data){
+          // let { token, expiresAt } = response.data;
+          setToken(response.data.token, response.data.expiresAt);
 
           // window.location.replace('/');
           return {
@@ -135,12 +135,12 @@ export const authProvider: AuthProvider = {
       // await api.get('sanctum/csrf-cookie');
 
       /** @OPTION : make sure logout api success */
-      const req: any = await httpRequest.post('logout', {
+      const response: any = await httpRequest.post('logout', {
         searchParams: setAppLang(),
         keepalive: true
       })
       .json();
-      // console.log('req: ', req);
+      // console.log('response: ', response);
 
       // httpRequest.post('logout', {
       //   keepalive: true,
@@ -166,7 +166,7 @@ export const authProvider: AuthProvider = {
       // };
 
       /** @OPTION : make sure logout api success */
-      if(req?.data){
+      if(response?.data){
         clearToken(); // Clear data
 
         const bc = new BroadcastChannel(import.meta.env.VITE_BC_NAME);
@@ -197,13 +197,13 @@ export const authProvider: AuthProvider = {
     };
 
     try {
-      const req: any = await httpRequest('me', { searchParams: setAppLang() }).json();
+      const response: any = await httpRequest('me', { searchParams: setAppLang() }).json();
 
       // console.log('req: ', req);
 
-      if(req?.data){
-        sessionStorage.setItem(TOKEN_KEY, JSON.stringify(req.data));
-        return { ...req.data, authenticated: true }
+      if(response?.data){
+        sessionStorage.setItem(TOKEN_KEY, JSON.stringify(response.data));
+        return { ...response.data, authenticated: true }
       }
 
       clearToken(); // Clear data
@@ -239,9 +239,9 @@ export const authProvider: AuthProvider = {
 
     try { // send password reset link to the user's email address here
       // 'forgot-password/' + username
-      const req: any = await api.post('forgot-password', { searchParams: setAppLang() });
-      // console.log('req: ', req);
-      if(req?.data){
+      const response: any = await api.post('forgot-password', { searchParams: setAppLang() });
+      // console.log('response: ', response);
+      if(response?.data){
         return {
           success: true,
           redirectTo: "/auth/login",

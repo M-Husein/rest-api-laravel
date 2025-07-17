@@ -15,7 +15,7 @@ $urlCurrent = url()->current();
 <meta name="format-detection" content="telephone=no,address=no,email=no">
 <meta name="robots" content="index,follow">{{-- ,max-image-preview:large --}}
 <link rel="alternate" href="{{ $urlCurrent }}" hreflang="x-default">
-<link rel="alternate" href="{{ $urlCurrent }}/?hl=id" hreflang="id">
+<link rel="alternate" href="{{ $urlCurrent }}/?lang=id" hreflang="id">
 
 {{-- <link rel="canonical" href="{{ $baseUrl->full() }}"> --}}
 {{-- <meta property="og:url" content="{{ $baseUrl->full() }}"/> --}}
@@ -29,10 +29,10 @@ $urlCurrent = url()->current();
 @vite(['resources/css/app.scss','resources/ts/main.tsx'])
 </head>
 <body class="antialiased">
-<div id="app"></div>
 <div id="loaderApp" class="load-spin inset-0 cwait">
-	<img aria-hidden="true" draggable="false" src="/logo-32x32.png?v={{ $ver }}" alt="{{ $appName }}" class="inset-0" style="position:fixed;margin:auto;font-size:0"/>
-	<b class="spinner-border" style="width:64px;height:64px" role="status"></b>
+	<img aria-hidden="true" draggable="false" src="/logo-32x32.png?v={{ $ver }}" alt="{{ $appName }}" class="inset-0 text-0" style="position:fixed;margin:auto"/>
+	{{-- <b class="spin-border" style="width:64px;height:64px" role="status"></b> --}}
+  <img class="spin-border" width="64" height="64" role="status" aria-hidden="true"/>
 
   {{-- To use this loader change 'resources/css/app.css' to 'resources/css/app-2.css' --}}
 	{{-- <svg role="status" stroke-width="2" viewBox="0 0 32 32" width="87" height="87" fill="none" stroke="#1677ff">
@@ -42,6 +42,7 @@ $urlCurrent = url()->current();
     </circle>
 	</svg> --}}
 </div>
+<div id="app"></div>
 <noscript>
 	<style>#loaderApp{display:none}.nojs{font-family:Arial}</style>
 	<div data-nosnippet aria-hidden="true" class="inset-0 nojs">

@@ -24,8 +24,8 @@ Route::get('app/{uri?}',function(){
     'X-Content-Type-Options' => 'nosniff',
     'X-Frame-Options' => 'SAMEORIGIN',
     'X-XSS-Protection' => '1; mode=block',
-    'X-Robots-Tag' => 'none,noarchive'
-    // 'X-Powered-By' => 'Programmeria', // Option
+    'X-Robots-Tag' => 'none,noarchive',
+    // 'X-Powered-By' => config('app.name', 'RestApi'), // Option
     // 'Access-Control-Allow-Origin' => '*',
     // 'Feature-Policy' => "display-capture 'self'"
   ]);
@@ -46,7 +46,8 @@ Route::get('{uri?}',function(){
 	$view = view('app');
 	return response($view)->withHeaders([
 		'X-Frame-Options' => 'SAMEORIGIN',
-		'X-XSS-Protection' => '1; mode=block'
+		'X-XSS-Protection' => '1; mode=block',
+    // 'X-Powered-By' => config('app.name', 'RestApi'), // Option
 	]);
 })->where('uri','(.*)');
 

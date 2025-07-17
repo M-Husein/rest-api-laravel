@@ -1,23 +1,39 @@
-:root{
-  --q-bg-main:#fff;
-  --q-bg-nav:#dbeafe;
+:root {
+  --q-bg-main: #fff;
+  --q-bg-nav: #dbeafe;
 }
-#loaderApp,.nojs{
-  position:fixed;
-  background-color:var(--q-bg-main)
+
+#loaderApp,
+.nojs {
+  position: fixed;
+  background-color: var(--q-bg-main)
 }
-.load-spin,.nojs{
-  display:grid;
-  place-content:center;
-  text-align:center
+
+.load-spin,
+.nojs {
+  display: grid;
+  place-content: center;
+  text-align: center
 }
-.load-spin{
-  user-select:none;
-  z-index:1055
+
+.load-spin {
+  user-select: none;
+  z-index: 1055
 }
-.inset-0{
-  inset:0
+
+.inset-0 {
+  inset: 0
 }
-.cwait{
-  cursor:wait
+
+.cwait {
+  cursor: wait
+}
+
+.text-0 {
+  font-size: 0;
+}
+
+// Option to hide next elements when show loader App.
+#loaderApp:not(.hidden) ~ * {
+  display: none !important;
 }
