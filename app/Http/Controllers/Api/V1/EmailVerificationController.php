@@ -29,9 +29,7 @@ class EmailVerificationController extends Controller{
   // }
 
   // , $id, $hash
-  public function index(Request $req){ // EmailVerificationRequest $req
-    // $req->fulfill(); // Marks email as verified
-
+  public function index(Request $req){
     // ✅ Check if the signed URL is expired or tampered
     if(!URL::hasValidSignature($req)){
       abort(403, 'Invalid or expired verification link.');
@@ -50,7 +48,7 @@ class EmailVerificationController extends Controller{
     return view('app');
   }
 
-  public function show(Request $req, $id, $hash){
+  public function verify(Request $req, $id, $hash){
     $user = $req->user() ?? User::findOrFail($id);
 
     // ✅ Check if the hash matches the user's email
@@ -70,7 +68,7 @@ class EmailVerificationController extends Controller{
     return jsonSuccess($user, 'Email verified successfully.');
   }
 
-  public function store(Request $req){
+  public function send(Request $req){
     $req->user()->sendEmailVerificationNotification();
     return jsonSuccess('Verification link sent');
   }

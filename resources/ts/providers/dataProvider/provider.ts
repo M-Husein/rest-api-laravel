@@ -1,5 +1,4 @@
 import { DataProvider } from "@refinedev/core";
-// import { getToken, clearToken } from '@/utils/authToken';
 // import { httpRequest, generateSort, generateFilter } from "./utils";
 import { httpRequest } from "./utils/httpRequest";
 import i18n from "@/i18n";

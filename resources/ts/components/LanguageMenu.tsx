@@ -4,6 +4,15 @@ import { useGetLocale, useSetLocale, useTranslate } from "@refinedev/core";
 import { useTranslation } from "react-i18next";
 import dayjs from 'dayjs';
 
+const renderFlag = (lang: string | undefined, size: number) => (
+  <Avatar
+    size={size}
+    shape="square"
+    alt={lang}
+    src={`/media/img/flags/lang-${lang}.svg`}
+  />
+);
+
 export const LanguageMenu = ({
   overlayStyle,
 }: any) => {
@@ -21,14 +30,7 @@ export const LanguageMenu = ({
         dayjs.locale(lang);
         changeLanguage(lang);
       },
-      icon: (
-        <Avatar
-          size={16}
-          shape="square"
-          alt={lang}
-          src={`/media/img/flags/${lang}.svg`}
-        />
-      ),
+      icon: renderFlag(lang, 16),
       // @ts-ignore
       label: APP.locales[lang],
     }));
@@ -48,12 +50,7 @@ export const LanguageMenu = ({
         className="flex items-center px-1" //  !p-0
         title={translate("language")}
       >
-        <Avatar
-          size={22} // 16
-          shape="square"
-          alt={currentLocale}
-          src={`/media/img/flags/${currentLocale}.svg`}
-        />
+        {renderFlag(currentLocale, 22)}
       </Button>
     </Dropdown>
   );

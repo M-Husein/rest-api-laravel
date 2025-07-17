@@ -54,11 +54,11 @@ Route::prefix('v1')->middleware(['web','hybrid.csrf'])->group(function(){
   Route::middleware('auth:sanctum')->group(function(){
   // Route::middleware(['web','auth:sanctum','hybrid.csrf'])->group(function(){
     // ✅ Verification link callback
-    Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'show']);
+    Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify']);
       // ->middleware('signed'); // ->name('verification.verify');
 
     // ✅ Resend verification email
-    Route::post('email/verification-notification', [EmailVerificationController::class, 'store'])
+    Route::post('email/verification-notification', [EmailVerificationController::class, 'send'])
       ->middleware('throttle:6,1')->name('verification.send');
 
     Route::post('logout', [AuthController::class, 'logout']);
