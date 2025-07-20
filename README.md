@@ -1,10 +1,17 @@
 # Rest API using Laravel
 
+This branch has the following features:
+1. Simple Static RBAC.
+2. Multi-language / i18n with SEO support.
+
+---
+
 This repository has several branches with special features. Here is the list of branches:
 1. [`main`](https://github.com/M-Husein/rest-api-laravel)
   - Dynamic Complex RBAC
 2. [`feat/static-RBAC`](https://github.com/M-Husein/rest-api-laravel/tree/feat/static-RBAC)
   - Simple Static RBAC
+  - Not optimize SEO (to SEO go to [`feat/static-RBAC-i18n-SEO`](https://github.com/M-Husein/rest-api-laravel/tree/feat/static-RBAC-i18n-SEO))
 3. `feat/dynamic-RBAC`
   - Dynamic RBAC
 
