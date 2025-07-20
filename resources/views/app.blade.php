@@ -1,12 +1,12 @@
 @php
 $appName = config('app.name', 'App2U');
-$lang = str_replace('_', '-', app()->getLocale());
+$lang = $user?->lang ?? str_replace('_', '-', app()->getLocale());
 $ver = config('app.version');
 $baseUrl = url('');
 $urlCurrent = url()->current();
 @endphp
 <!DOCTYPE html>
-<html lang="{{ $lang }}">
+<html lang="{{ $lang }}" class="{{ $user?->theme }}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -24,7 +24,18 @@ $urlCurrent = url()->current();
 <meta property="og:image" content="{{ $baseUrl }}/logo-144x144.png">
 <meta name="twitter:image" content="{{ $baseUrl }}/logo-144x144.png">
 <title>{{ $appName }}</title>
-<script src="/js/APP.js?v={{ $ver }}"></script>
+{{-- <script src="/js/APP.js?v={{ $ver }}"></script> --}}
+<script>
+const APP=Object.freeze({
+  api:"{{ $baseUrl }}/api/v1",
+  timeout:<?php echo config('app.timeout');?>,
+  defaultLang:"{{ config('app.fallback_locale') }}",
+  locales:{
+    id:"Indonesia",
+    en:"English"
+  }
+});
+</script>
 @viteReactRefresh
 @vite(['resources/css/app.scss','resources/ts/main.tsx'])
 </head>

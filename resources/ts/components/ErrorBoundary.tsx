@@ -9,27 +9,25 @@ interface ErrorBoundaryProps {
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
-export function ErrorBoundary({
+export const ErrorBoundary = ({
   children,
   onError,
-}: ErrorBoundaryProps){
-  return (
-    <ReactErrorBoundary
-      FallbackComponent={Fallback}
-      // onReset={(details) => {
-      //   // Reset the state of your app so the error doesn't happen again
-      //   console.log('onReset details: ', details)
-      // }}
-      onError={onError}
-    >
-      {children}
-    </ReactErrorBoundary>
-  )
-}
+}: ErrorBoundaryProps) => (
+  <ReactErrorBoundary
+    FallbackComponent={Fallback}
+    // onReset={(details) => {
+    //   // Reset the state of your app so the error doesn't happen again
+    //   console.log('onReset details: ', details)
+    // }}
+    onError={onError}
+  >
+    {children}
+  </ReactErrorBoundary>
+);
 
-function Fallback({ resetErrorBoundary }: any){ // error,
+const Fallback = ({ resetErrorBoundary }: any) => { // error,
   const { push } = useNavigation();
-  const rootRoute = ['/', '/home'];
+  const rootRoute = ['/', '/app']; // /home
 
   const backTo = () => { // e: any    
     push("/");

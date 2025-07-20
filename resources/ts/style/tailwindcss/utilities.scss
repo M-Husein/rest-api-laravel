@@ -77,6 +77,16 @@
   .txt-pre-wrap {
     @apply whitespace-pre-wrap;
   }
+
+  /*
+  content-visibility: visible;
+  content-visibility: hidden;
+  content-visibility: auto;
+  */
+
+  // .content-v-hide {
+  //   content-visibility: hidden;
+  // }
 }
 
 // Always compile Here

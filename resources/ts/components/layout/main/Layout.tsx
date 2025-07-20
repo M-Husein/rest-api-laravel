@@ -1,16 +1,22 @@
+import { useIsAuthenticated } from "@refinedev/core";
 import { Layout as AntLayout } from 'antd';
 // import { Header } from './Header';
+import { Nav } from './Nav';
 
-export function Layout({
-  head,
+export const Layout = ({
+  // head,
   children,
-}: any){
-  return (
-    <AntLayout className="min-h-fullscreen p-2">
-      <AntLayout className="p-2 border-4 border-sky-2 rounded-lg">
-        {head}
+}: any) => {
+  const { isLoading, data } = useIsAuthenticated();
 
-        <AntLayout.Content className="flex flex-col">
+  return (
+    <AntLayout className="min-h-fullscreen">
+      <AntLayout>
+        {/* {head ?? <Nav loading={isLoading} user={data} />} */}
+
+        <Nav loading={isLoading} user={data} />
+
+        <AntLayout.Content>
           {children}
         </AntLayout.Content>
       </AntLayout>

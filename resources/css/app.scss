@@ -17,9 +17,9 @@
 }
 
 .load-spin {
-  user-select: none;
   z-index: 1055;
-  cursor: wait
+  cursor: wait;
+  user-select: none
 }
 
 .inset-0 {
@@ -35,10 +35,10 @@
 
 // Option to hide next elements when show loader App.
 #loaderApp:not(.hidden) ~ * {
-  display: none !important;
-  content-visibility: hidden;
+  display: none;
   // Option
-  pointer-events: none;
+  // content-visibility: hidden;
+  // pointer-events: none;
 }
 
 @-webkit-keyframes spin {

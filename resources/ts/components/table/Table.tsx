@@ -1,4 +1,4 @@
-// import type { TableProps } from 'antd';
+import type { TableProps } from 'antd';
 // import { useRef } from 'react';
 import { Table as AntTable } from 'antd'; // , Input
 
@@ -10,16 +10,22 @@ import { Table as AntTable } from 'antd'; // , Input
  * @DOCS : https://ant.design/components/table
  */
 export const Table = ({
+  // dataSource,
   pagination,
+  // scroll,
   ...etc
-}: any) => {
+}: TableProps) => {
   return (
     <AntTable
       size="small"
       rowKey="id"
       bordered
+      // virtual={!!scroll?.x && !!scroll?.y && dataSource?.length > 500} // 1e3
 
       {...etc}
+
+      // dataSource={dataSource}
+      // scroll={scroll}
 
       pagination={
         pagination ? {

@@ -4,11 +4,17 @@ import { HomeOutlined, UserOutlined, SettingOutlined, UsergroupAddOutlined, Tool
 import { LuUserRoundCog, LuFlag } from "react-icons/lu";
 import { GrCurrency } from "react-icons/gr";
 import { PiMapPinAreaFill, PiCity } from "react-icons/pi";
+import { getAppLang } from '@/utils/setAppLang'; // setAppLang, 
+
+// const locale = setAppLang();
+// const langParam = locale ? "?lang=" + locale.lang : "";
+
+const appLang = getAppLang();
 
 export const RESOURCES: any = [
   {
     name: "home",
-    list: "/app", // /admin
+    list: "/app" + appLang.str, // /admin
     meta: { label: "Home", icon: <HomeOutlined /> }
   },
   // {
@@ -46,7 +52,7 @@ export const RESOURCES: any = [
   },
   {
     name: "app",
-    list: "/app/settings/app",
+    list: "/app/settings/app" + appLang.str,
     meta: { parent: "settings", label: "App", icon: <ToolOutlined /> },
   },
   {

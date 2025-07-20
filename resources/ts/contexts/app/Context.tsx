@@ -8,14 +8,24 @@ import enUS from 'antd/locale/en_US';
 import idID from 'antd/locale/id_ID';
 import 'dayjs/locale/en';
 
-const currentLang = localStorage.getItem("i18nextLng") || 'en';
+const currentLang = localStorage.getItem("i18nextLng") || APP.defaultLang || 'en';
 
 dayjs.locale(currentLang); // Initial value for locale date
 
 /** @OPTION : For toggle color scheme */
-const toggleTheme = (isDark: boolean) => {
+const toggleTheme = (theme: string) => { // isDark: string
   let html = document.documentElement;
-  html.classList.toggle("dark", isDark);
+
+  // html.classList.toggle("dark", isDark);
+  
+  if(theme === 'dark'){
+    html.classList.remove('light','system');
+  }else{
+    html.classList.remove('dark','system');
+  }
+
+  html.classList.add(theme);
+  
   let metaTheme = html.querySelector('meta[name=theme-color]') as any;
   if(metaTheme){
     metaTheme.content = getComputedStyle(html).getPropertyValue('--q-bg-nav'); // --q-bg-main
@@ -97,7 +107,7 @@ export const AppTheme: React.FC<PropsWithChildren> = ({
 
   useEffect(() => {
     localStorage.setItem("theme", theme);
-    toggleTheme(theme === "dark");
+    toggleTheme(theme); // theme === "dark"
   }, [theme]);
 
   const setColorMode = () => {

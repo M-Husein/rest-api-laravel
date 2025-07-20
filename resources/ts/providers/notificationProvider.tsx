@@ -22,6 +22,10 @@ export const useNotificationProvider = (): NotificationProvider => {
         return;
       }
 
+      // console.log('message: ', message);
+      // console.log('description: ', description);
+      // console.log('etc: ', etc);
+
       let isProgress = type === "progress";
 
       notification.open({

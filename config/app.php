@@ -112,8 +112,10 @@ return [
     'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
     'store' => env('APP_MAINTENANCE_STORE', 'database'),
   ],
+  // CUSTOM
   'paths' => [
     base_path('lang'),
     resource_path('lang'),
   ],
+  'timeout' => env('TIMEOUT', '3e4')
 ];

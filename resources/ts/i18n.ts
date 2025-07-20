@@ -3,7 +3,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpApi, { HttpBackendOptions } from 'i18next-http-backend';
 import { initReactI18next } from "react-i18next";
 
-const LANGS = ["id", "en"];
+const LANGS = Object.keys(APP.locales); // ["id", "en"];
 
 i18n
   .use(HttpApi)
@@ -14,7 +14,7 @@ i18n
     // debug: import.meta.env.DEV, // !import.meta.env.PROD, // import.meta.env.MODE === 'development',
     // if use `lng` lng not store in localStorage
     // lng: 'en', // if using a language detector, do not define the lng option
-    // lng: document.documentElement.lang,
+    lng: document.documentElement.lang,
     supportedLngs: LANGS,
     backend: {
       loadPath: "/locales/{{lng}}/{{ns}}.json",

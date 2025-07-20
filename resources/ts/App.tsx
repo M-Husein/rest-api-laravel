@@ -12,12 +12,12 @@ import { AppTheme, AppContextProvider } from "@/contexts/app/Context";
 import { useNotificationProvider } from "@/providers/notificationProvider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SplashScreen } from '@/components/SplashScreen';
-// import { Layout } from '@/components/layout/main/Layout';
+import { Layout } from '@/components/layout/main/Layout';
 import { lazyComponent } from '@/utils/components';
 import { RESOURCES } from '@/routes/resources';
 
 // Pages:
-// const Home = lazy(() => import('@/pages/home/Page'));
+const Home = lazy(() => import('@/pages/home/Page'));
 const Login = lazy(() => import('@/pages/login/Page'));
 const Register = lazy(() => import('@/pages/register/Page'));
 const ForgotPassword = lazy(() => import('@/pages/forgot-password/Page'));
@@ -118,7 +118,8 @@ const RefineProvider = () => {
 const LayoutPrivate = () => (
   <Authenticated
     key="authenticated-inner"
-    fallback={<CatchAllNavigate to="/auth/login" />}
+    // fallback={<CatchAllNavigate to="/auth/login" />}
+    fallback={<CatchAllNavigate to={import.meta.env.VITE_LOGIN_PATH} />}
   >
     {lazyApp(
       <LayoutAdmin>
@@ -141,15 +142,15 @@ const router = createBrowserRouter([
   {
     Component: RefineProvider,
     children: [
-      // {
-      //   path: "/",
-      //   // element: <Layout><Outlet /></Layout>,
-      //   children: [
-      //     { index: true, element: lazyComponent(Home, <SplashScreen />) },
-      //     // { path: "/ordering-status", element: lazyComponent(OrderingStatus, <SplashScreen />) },
-      //     { path: "/menu/:id", element: lazyComponent(Menu, <SplashScreen />) },
-      //   ],
-      // },
+      {
+        path: "/",
+        element: <Layout><Outlet /></Layout>,
+        children: [
+          { index: true, element: lazyComponent(Home, <SplashScreen />) },
+          // { path: "/ordering-status", element: lazyComponent(OrderingStatus, <SplashScreen />) },
+          // { path: "/menu/:id", element: lazyComponent(Menu, <SplashScreen />) },
+        ],
+      },
       {
         path: "email/verify/:id/:hash",
         // element: <Layout><Outlet /></Layout>,
@@ -158,7 +159,7 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "/app", // /admin
+        path: "app", // /admin
         element: <LayoutPrivate />,
         children: [
           { index: true, element: lazyComponent(AdminHome) },
@@ -227,7 +228,7 @@ const router = createBrowserRouter([
         ]
       },
       {
-        path: '/auth',
+        path: '/auth', // import.meta.env.VITE_LOGIN_PATH
         element: <LayoutAuth />,
         children: [
           { path: "login", element: lazyComponent(Login, <SplashScreen />) },

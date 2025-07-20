@@ -4,6 +4,7 @@ use Closure;
 use Illuminate\Http\Request;
 // use Illuminate\Support\Facades\App;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 
 class SetLocale{
   /**
@@ -11,6 +12,16 @@ class SetLocale{
    * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
    */
   public function handle(Request $req, Closure $next): Response{
+    // Check if the user is authenticated
+    if(Auth::check()){
+      $userLang = Auth::user()->lang; // auth()->user()?->lang
+      // If the user has a preferred language, set it
+      if($userLang){
+        app()->setLocale($userLang);
+        return $next($req);
+      }
+    }
+    
     $locales = config('app.locales');
     $lang = config('app.fallback_locale');
 

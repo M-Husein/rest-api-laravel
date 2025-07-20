@@ -1,3 +1,5 @@
+import plugin from 'tailwindcss/plugin';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   corePlugins: {
@@ -36,5 +38,19 @@ export default {
       // },
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(function({ addUtilities }){
+      addUtilities({
+        '.content-v-hide': {
+          'content-visibility': 'hidden',
+        },
+        '.content-v-visible': {
+          'content-visibility': 'visible',
+        },
+        '.content-v-auto': {
+          'content-visibility': 'auto',
+        },
+      });
+    }),
+  ],
 }

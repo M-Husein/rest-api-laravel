@@ -84,7 +84,12 @@ Route::prefix('v1')->middleware(['web','hybrid.csrf'])->group(function(){
     Route::middleware(['role:admin','verified'])->group(function(){
       Route::get('users/lazy', [UserController::class, 'lazy']);
       Route::delete('users/deletes', [UserController::class, 'deletes']);
+      Route::put('users/language', [UserController::class, 'language']); // updateLanguage
+      Route::put('users/theme', [UserController::class, 'theme']); // updateTheme
+
+      Route::delete('app-translations/deletes', [AppTranslationController::class, 'deletes']);
       Route::apiResource('app-translations', AppTranslationController::class);
+
       Route::post('clear-cache', ClearCacheController::class);
     });
 

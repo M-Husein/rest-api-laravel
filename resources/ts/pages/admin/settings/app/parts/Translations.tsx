@@ -1,8 +1,9 @@
 import type { TableColumnsType } from 'antd'; // TableProps
 import { useState } from 'react';
-import { HttpError, useGetIdentity, useParsed } from "@refinedev/core"; // useCreate, useOne, useNotification, useUpdate
+import { HttpError, useTranslate, useGetIdentity, useParsed, useDelete, useDeleteMany } from "@refinedev/core"; // useCreate, useOne, useNotification, useUpdate
 import { useTable, getDefaultSortOrder } from "@refinedev/antd";
 import { useForm } from "@refinedev/react-hook-form"; // useModalForm
+// import { useForm } from '@/utils/hooks/useForm';
 import { Button, Modal } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'; // CheckOutlined
 import { Table } from '@/components/table/Table';
@@ -18,6 +19,9 @@ export const Translations = ({
 }: any) => {
   const { data: currentUser } = useGetIdentity<any>();
   const { params: { current, pageSize, sorters, filters } } = useParsed<any>();
+  const translate = useTranslate();
+  const { mutate: mutateDelete, isPending: isLoadingDelete } = useDelete();
+  const { mutate: mutateDeleteMany, isPending: isLoadingDeleteMany } = useDeleteMany();
   const [modalApi, modalContextHolder] = Modal.useModal();
   const [searchValue, setSearchValue] = useState<string>('');
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>([]);
@@ -52,7 +56,7 @@ export const Translations = ({
   // console.log('sorters: ', sorters);
   // console.log('currentUser: ', currentUser);
 
-  let loadingTable = isLoading || isFetching || isRefetching;
+  // let loadingTable = isLoading || isFetching || isRefetching;
 
   const {
     formState: { errors },
@@ -61,18 +65,22 @@ export const Translations = ({
     control,
     reset,
     handleSubmit,
-  } = useForm<any, HttpError, any>({
+  } = useForm({ // <any, HttpError, any>
     values: dataForm,
     refineCoreProps: {
-      queryOptions: { enabled: false },
-      redirect: false,
+      // queryOptions: { enabled: false },
+      // redirect: false,
       resource: API,
       action: dataForm?.id ? "edit" : "create",
       id: dataForm?.id,
       onMutationSuccess(){
-        // onCancel(null);
-        setDataForm(null);
+        doCancel();
       },
+      // successNotification: (resData: any) => ({
+      //   type: "success",
+      //   message: resData.message,
+      //   description: resData.description || translate('notifications.success')
+      // }),
     },
   });
 
@@ -85,13 +93,76 @@ export const Translations = ({
     onFinish({ ...newValues, is_custom: true });
   }
 
+  const confirmModal = (title: any, callback: (fn: any) => void): void => {
+    const modalConfirm = modalApi.confirm({
+      keyboard: false,
+      centered: true,
+      title,
+      cancelButtonProps: { disabled: false },
+      onOk(){
+        const updateConfirm = (disabled: boolean) => {
+          modalConfirm.update({
+            cancelButtonProps: { disabled }
+          })
+        }
+
+        updateConfirm(true);
+
+        return callback(updateConfirm);
+      },
+    });
+  }
+
+  const clickDelete = (data: any) => {
+    confirmModal(
+      translate('confirms.delete'),
+      (updateConfirm) => new Promise((resolve, reject) => {
+        mutateDelete({
+          resource: API,
+          id: data.id,
+        }, {
+          onError: (e) => {
+            updateConfirm(false)
+            reject(e)
+          },
+          onSuccess: (data: any) => {
+            refetch();
+            resolve(data);
+          },
+        });
+      })
+    );
+  }
+
+  const onClickDeleteRows = async (ids: Array<string | number>) => {
+    confirmModal(
+      translate('confirms.delete'),
+      (updateConfirm) => new Promise((resolve, reject) => {
+        mutateDeleteMany({
+          ids,
+          resource: API + "/deletes",
+        }, {
+          onError: (e) => {
+            updateConfirm(false)
+            reject(e)
+          },
+          onSuccess: (data: any) => {
+            setSelectedRowKeys([]);
+            refetch();
+            resolve(data);
+          },
+        });
+      })
+    );
+  }
+
   const columns: TableColumnsType<any> = [
     {  
       title: 'Group',
       dataIndex: 'group',
       key: 'group',
       width: 215,
-      sorter: (a: any, b: any) => a.country_name - b.country_name,
+      sorter: (a: any, b: any) => a.group - b.group,
       sortOrder: getDefaultSortOrder('group', sorter),
       ...getColumnSearchProps('group'),
     },
@@ -100,6 +171,7 @@ export const Translations = ({
       dataIndex: 'key',
       key: 'key',
       width: 195,
+      sorter: (a: any, b: any) => a.key - b.key,
       sortOrder: getDefaultSortOrder('key', sorter),
       ...getColumnSearchProps('key'),
     },
@@ -107,7 +179,7 @@ export const Translations = ({
       title: 'Custom',
       dataIndex: 'is_custom',
       key: 'is_custom',
-      width: 35,
+      width: 45,
       align: 'center',
       render: (txt: any) => !!txt && "✅" // txt ? "✅" : "❌"
     },
@@ -140,7 +212,7 @@ export const Translations = ({
                 danger
                 disabled={formLoading}
                 icon={<DeleteOutlined />}
-                // onClick={() => clickDelete(row)}
+                onClick={() => clickDelete(row)}
               />
             )}
           </>
@@ -151,23 +223,23 @@ export const Translations = ({
 
   const renderTitle = () => (
     <Header
-      title="App Translations" // {title}
+      title="Translations" // {title}
       content={
         <>
           {!!selectedRowKeys.length && (
             <Button
               danger
               type="primary"
-              disabled={formLoading}
-              // onClick={() => onClickDeleteRows(selectedRowKeys)}
+              disabled={formLoading || isLoadingDeleteMany}
+              onClick={() => onClickDeleteRows(selectedRowKeys)}
             >
               Delete selected ({selectedRowKeys.length})
             </Button>
           )}
 
           <ButtonReload
-            // disabled={isLoadingDelete || isLoadingDeleteMany}
-            disabled={formLoading}
+            disabled={formLoading || isLoadingDelete || isLoadingDeleteMany}
+            // disabled={formLoading}
             loading={!isLoading && isRefetching}
             onClick={() => refetch()}
           />
@@ -188,19 +260,21 @@ export const Translations = ({
     />
   );
 
+  // console.log('tableProps: ', tableProps);
+
   return (
     <>
       <Table
         {...tableProps}
         className="antTable max-md_antTable-xs"
-        scroll={{ x: 1115 }}
+        scroll={{ x: 975 }} // , y: 750
         rowSelection={{
           selectedRowKeys,
           onChange: setSelectedRowKeys,
           getCheckboxProps: (row: any) => ({
             disabled: !row.is_custom, // Disable checkbox for 'inactive' rows
-            // className: row.is_custom ? "" : "content-visibility-hidden",
-            style: row.is_custom ? {} : { contentVisibility: 'hidden' }
+            className: row.is_custom ? "" : "content-v-hide",
+            // style: row.is_custom ? {} : { contentVisibility: 'hidden' }
           }),
           // renderCell: (checked: any, row: any, index: any, originNode: any) => {
           //   if (row.is_custom) {
@@ -209,7 +283,7 @@ export const Translations = ({
           //   return null; // Hide checkbox for this row
           // },
         }}
-        loading={loadingTable}
+        loading={isLoading || isFetching || isRefetching} // loadingTable
         columns={columns}
         title={renderTitle}
       />
@@ -217,6 +291,7 @@ export const Translations = ({
       {modalContextHolder}
 
       <FormModal
+        t={translate}
         control={control}
         errors={errors}
         disabled={formLoading}

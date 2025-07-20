@@ -20,6 +20,8 @@ class UserSeeder extends Seeder{
       'password' => Hash::make('password'),
       'email_verified_at' => now(),
       'role' => $adminId,
+      'lang' => 'en',
+      // 'theme' => 'light',
     ]);
 
     User::create([
@@ -28,6 +30,7 @@ class UserSeeder extends Seeder{
       'email' => 'editor@email.com',
       'password' => Hash::make('password'),
       'role' => $editorId,
+      'lang' => 'en',
     ]);
 
     User::create([
@@ -36,6 +39,7 @@ class UserSeeder extends Seeder{
       'email' => 'viewer@email.com',
       'password' => Hash::make('password'),
       'role' => $viewerId,
+      'lang' => 'en',
     ]);
   }
 }

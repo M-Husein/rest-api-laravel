@@ -1,10 +1,9 @@
 import { useEffect } from "react"; // , useState
-import { useGo, useRouterType } from "@refinedev/core"; // , useResource
+// import { useResource } from "@refinedev/core";
 import { RefineErrorPageProps } from "@refinedev/ui-types";
 import { Button, Result } from "antd";
 import { useNavigation } from "@refinedev/core";
-
-// const { Text } = Typography;
+import { toggleLoaderApp } from '@/utils/dom';
 
 /**
  * When the app is navigated to a non-existent route, refine shows a default error page.
@@ -15,8 +14,6 @@ import { useNavigation } from "@refinedev/core";
 export const ErrorComponent: React.FC<RefineErrorPageProps> = () => {
   // const [errorMessage, setErrorMessage] = useState<string>();
   const { push } = useNavigation();
-  const go = useGo();
-  const routerType = useRouterType();
 
   // const { resource, action } = useResource();
 
@@ -38,7 +35,8 @@ export const ErrorComponent: React.FC<RefineErrorPageProps> = () => {
   // }, [resource, action]);
 
   useEffect(() => {
-    document.getElementById('loaderApp')?.classList.add('hidden');
+    // document.getElementById('loaderApp')?.classList.add('hidden');
+    toggleLoaderApp();
   }, []);
 
   return (
@@ -51,15 +49,7 @@ export const ErrorComponent: React.FC<RefineErrorPageProps> = () => {
 
           <Button
             type="primary"
-            onClick={() => {
-              routerType === "legacy" ? push("/") : go({ to: "/" })
-
-              // if (routerType === "legacy") {
-              //   push("/");
-              // } else {
-              //   go({ to: "/" });
-              // }
-            }}
+            onClick={() => push("/")}
           >
             Back to Home
           </Button>
