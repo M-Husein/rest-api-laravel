@@ -1,11 +1,11 @@
 @php
 $appName = config('app.name', 'Restapi');
-$lang = str_replace('_', '-', app()->getLocale());
+$lang = $user?->lang ?? str_replace('_', '-', app()->getLocale());
 $ver = config('app.version');
 $baseUrl = url('');
 @endphp
 <!DOCTYPE html>
-<html lang="{{ $lang }}">
+<html lang="{{ $lang }}" class="{{ $user?->theme }}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -26,11 +26,22 @@ $baseUrl = url('');
 {{-- <link rel="icon" href="/logo.svg" type="image/svg+xml"> --}}
 <link rel="apple-touch-icon" href="/logo-180x180.png">
 {{-- <link rel="stylesheet" href="/css/Q.css?v={{ $ver }}"> --}}
-<script src="/js/APP.js?v={{ $ver }}"></script>
+{{-- <script src="/js/APP.js?v={{ $ver }}"></script> --}}
+<script>
+const APP=Object.freeze({
+  api:"{{ $baseUrl }}/api/v1",
+  timeout:<?php echo config('app.timeout');?>,
+  defaultLang:"{{ config('app.fallback_locale') }}",
+  locales:{
+    id:"Indonesia",
+    en:"English"
+  }
+});
+</script>
 @viteReactRefresh
 @vite(['resources/css/app.scss','resources/ts/main.tsx'])
 </head>
-<body class="min-h-screen antialiased admin" data-nosnippet>
+<body class="min-h-fullscreen antialiased bg-main admin" data-nosnippet>
 <div id="loaderApp" class="load-spin inset-0 cwait">
 	<img aria-hidden="true" src="/logo-32x32.png?v={{ $ver }}" alt="{{ $appName }}" class="inset-0 text-0" style="position:fixed;margin:auto"/>
 	{{-- <b class="spin-border" style="width:64px;height:64px" role="status"></b> --}}

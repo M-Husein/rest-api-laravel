@@ -9,11 +9,7 @@ export default function Page(){
   return (
     <Card 
       title="Home"
-      className="shadow" // flex flex-col  h-full
-      // classNames={{ 
-      //   title: "text-center text-2xl text-sky-900 font-bold",
-      //   body: "!p-0 h-full grow" 
-      // }}
+      className="shadow"
     >
       
     </Card>

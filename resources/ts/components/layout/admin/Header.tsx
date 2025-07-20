@@ -1,6 +1,6 @@
 import type { RefineThemedLayoutV2HeaderProps } from "@refinedev/antd";
 // import type { IUser } from '@/types/Types';
-import { useGetIdentity, useWarnAboutChange, useTranslate, useLogout } from "@refinedev/core";
+import { useGetIdentity, useWarnAboutChange, useTranslate, useLogout, useUpdate } from "@refinedev/core";
 import { Layout, Dropdown, Button, Switch, Avatar, Modal } from "antd"; // Badge,
 import { UserOutlined } from '@ant-design/icons'; // , MoonFilled, SunFilled, SettingOutlined
 import { useLocation, NavLink } from "react-router-dom";
@@ -19,6 +19,7 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = () => {
   const { warnWhen, setWarnWhen } = useWarnAboutChange();
   const [modalApi, modalContextHolder] = Modal.useModal();
   const translate = useTranslate();
+  const { mutate, isPending } = useUpdate();
 
   const { name, username, email, avatar } = currentUser || {};
   const fixName = name || username;
@@ -39,6 +40,21 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = () => {
     }
   }
 
+  const changeTheme = () => {
+    let themeValue = theme === "dark" ? "light" : "dark";
+    mutate({
+      resource: "users", // users/theme
+      id: "theme",
+      values: { theme: themeValue },
+      meta: {
+        keepalive: true
+      },
+      successNotification: () => false,
+    });
+
+    setTheme(themeValue);
+  }
+
   return (
     <Layout.Header
       style={{ padding: '0 14px' }}
@@ -50,13 +66,15 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = () => {
         <Switch
           checkedChildren="🌛" // <MoonFilled />
           unCheckedChildren="🔆" // <SunFilled />
-          onChange={() => setTheme(theme === "dark" ? "light" : "dark")}
+          onChange={changeTheme}
           defaultChecked={theme === "dark"}
+          loading={isPending}
         />
         
         <div className="relative mx-3">
           <LanguageMenu
             overlayStyle={overlayStyle}
+            user={currentUser}
           />
         </div>
 

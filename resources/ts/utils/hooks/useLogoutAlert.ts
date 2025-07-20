@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 // import { Modal } from 'antd';
+import { getAppLang } from '@/utils/setAppLang'; // setAppLang, 
 
 export const useLogoutAlert = (modalApi: any, options?: any) => {
   // const [modalApi, modalContextHolder] = Modal.useModal();
@@ -16,18 +17,26 @@ export const useLogoutAlert = (modalApi: any, options?: any) => {
           content: options?.content || "You are logged out from another tab/window.",
           okText: "Login",
           okButtonProps: {
-            onClick: () => window.location.replace('/auth/login'),
+            onClick: () => {
+              // const locale = setAppLang();
+
+              // '/auth/login'
+              window.location.replace(
+                // import.meta.env.VITE_LOGIN_PATH + (locale ? "?lang=" + locale.lang : "")
+                import.meta.env.VITE_LOGIN_PATH + getAppLang().str
+              )
+            },
           },
         });
       }
     }
 
-    const bc = new BroadcastChannel(import.meta.env.VITE_BC_NAME);
+    const BC = new BroadcastChannel(import.meta.env.VITE_BC_NAME);
 
-    bc.addEventListener('message', onMessage);
+    BC.addEventListener('message', onMessage);
 
     return () => {
-      bc.removeEventListener('message', onMessage);
+      BC.removeEventListener('message', onMessage);
     }
   }, []);
 

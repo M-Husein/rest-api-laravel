@@ -1,54 +1,65 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+return new class extends Migration{
+  /**
+   * Run the migrations.
+   */
+  public function up(): void{
+    Schema::create('users', function(Blueprint $table){
+      $table->id();
+      $table->string('name');
+      $table->string('email')->unique();
+      $table->timestamp('email_verified_at')->nullable();
+      $table->string('password');
 
-            $table->string('username')->unique();
-            $table->string('avatar')->nullable(); // ->default('/user.svg')
-            $table->softDeletes(); // Added for soft delete support
+      $table->string('username')->unique();
+      $table->string('avatar')->nullable(); // ->default('/user.svg')
 
-            $table->rememberToken();
-            $table->timestamps();
-        });
+      // Add a string column for the language code
+      $table->string('lang', 10)->nullable();
 
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
+      /**
+       * Why 6 ??
+       * Just use 'system', 'dark', or 'light'
+       * 
+       * Why 20 ??
+       * 'high-contrast' (15 characters)
+       * 'corporate-blue' (15 characters)
+       * 'solarized-light' (16 characters)
+       */
+      $table->string('theme', 6)->default('light'); // system, dark, light
 
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
-        });
-    }
+      $table->softDeletes(); // Added for soft delete support
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
-        Schema::dropIfExists('sessions');
-    }
+      $table->rememberToken();
+      $table->timestamps();
+    });
+
+    Schema::create('password_reset_tokens', function(Blueprint $table){
+      $table->string('email')->primary();
+      $table->string('token');
+      $table->timestamp('created_at')->nullable();
+    });
+
+    Schema::create('sessions', function(Blueprint $table){
+      $table->string('id')->primary();
+      $table->foreignId('user_id')->nullable()->index();
+      $table->string('ip_address', 45)->nullable();
+      $table->text('user_agent')->nullable();
+      $table->longText('payload');
+      $table->integer('last_activity')->index();
+    });
+  }
+
+  /**
+   * Reverse the migrations.
+   */
+  public function down(): void{
+    Schema::dropIfExists('users');
+    Schema::dropIfExists('password_reset_tokens');
+    Schema::dropIfExists('sessions');
+  }
 };

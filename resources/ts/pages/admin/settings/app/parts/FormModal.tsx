@@ -1,6 +1,6 @@
 // import { Fragment, useState } from "react";
-import { useTranslation } from "react-i18next";
-// import { useGetLocale } from "@refinedev/core"; // , useSetLocale, useTranslate
+// import { useTranslation } from "react-i18next";
+// import { useTranslate } from "@refinedev/core"; // , useSetLocale, useGetLocale
 import { Controller } from 'react-hook-form';
 import { Modal, Input } from 'antd'; // Tabs
 import { Form } from '@/components/forms/Form';
@@ -18,6 +18,7 @@ const VALIDATIONS: any = {
 };
 
 export const FormModal = ({
+  t,
   control,
   errors,
   values,
@@ -25,55 +26,15 @@ export const FormModal = ({
   onSubmit,
   ...etc
 }: any) => {
-  const { i18n } = useTranslation();
+  // const { i18n } = useTranslation();
   // const locale = useGetLocale();
   // const currentLocale = locale();
-  const supportedLocales = i18n.languages || Object.keys(APP.locales);
+  const supportedLocales = Object.keys(APP.locales); // i18n.languages || 
   const hasId = values?.id;
   const isCustom = values?.is_custom === 0;
   // const [tabActive, setTabActive] = useState<any>(currentLocale);
 
   // console.log('i18n: ', i18n);
-
-  // const items = supportedLocales.map((key) => {
-  //   let label = key.toUpperCase();
-  //   return {
-  //     key,
-  //     label,
-  //     children: (
-  //       <Fragment key={key}>
-  //         <Controller
-  //           name={`text.${key}`}
-  //           control={control}
-  //           render={({ field }) => (
-  //             <Input.TextArea
-  //               {...field}
-  //               id={"ts" + key}
-  //               rows={4}
-  //               placeholder={`Translation for ${label}`}
-  //               disabled={disabled}
-  //               status={errors.text?.[key] ? "error" : ""}
-  //             />
-  //           )}
-  //           // Apply validation rules. Consider making the current locale's translation required.
-  //           rules={{
-  //             ...VALIDATIONS,
-  //             required: {
-  //               // value: key === i18n.language, // Only require translation for the currently active locale
-  //               value: key === tabActive,
-  //               message: `Translation for ${label} is required`
-  //             }
-  //           }}
-  //         />
-  //         {errors.text?.[key] && (
-  //           <div className="mt-1 text-red-600 text-xs">
-  //             {errors.text[key].message}
-  //           </div>
-  //         )}
-  //       </Fragment>
-  //     )
-  //   }
-  // });
 
   return (
     <Modal
@@ -83,8 +44,8 @@ export const FormModal = ({
       keyboard={false}
       maskClosable={false}
       closeIcon={!disabled}
-      title={(hasId ? 'Edit' : 'Create') + " Translation" + (values?.is_custom || !hasId ? "" : " (Default)")}
-      okText="Save"
+      title={t(`buttons.${hasId ? 'edit' : 'create'}`) + " Translation" + (values?.is_custom || !hasId ? "" : " (Default)")}
+      okText={t('buttons.save')}
       okButtonProps={{ 
         htmlType: "submit", 
         form: "formModal",
@@ -194,3 +155,43 @@ export const FormModal = ({
     </Modal>
   );
 }
+
+// const items = supportedLocales.map((key) => {
+//   let label = key.toUpperCase();
+//   return {
+//     key,
+//     label,
+//     children: (
+//       <Fragment key={key}>
+//         <Controller
+//           name={`text.${key}`}
+//           control={control}
+//           render={({ field }) => (
+//             <Input.TextArea
+//               {...field}
+//               id={"ts" + key}
+//               rows={4}
+//               placeholder={`Translation for ${label}`}
+//               disabled={disabled}
+//               status={errors.text?.[key] ? "error" : ""}
+//             />
+//           )}
+//           // Apply validation rules. Consider making the current locale's translation required.
+//           rules={{
+//             ...VALIDATIONS,
+//             required: {
+//               // value: key === i18n.language, // Only require translation for the currently active locale
+//               value: key === tabActive,
+//               message: `Translation for ${label} is required`
+//             }
+//           }}
+//         />
+//         {errors.text?.[key] && (
+//           <div className="mt-1 text-red-600 text-xs">
+//             {errors.text[key].message}
+//           </div>
+//         )}
+//       </Fragment>
+//     )
+//   }
+// });

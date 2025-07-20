@@ -89,7 +89,7 @@ class AppTranslationController extends Controller{
     ]);
 
     // Clear translation cache
-    Cache::forget(config('translation-loader.cache_key', 'spatie.translation-loader.translations'));
+    self::clearCache();
 
     // $responseMessage = 'Translation line created successfully.';
     // if($isFileBasedConflict){
@@ -166,7 +166,7 @@ class AppTranslationController extends Controller{
   public function update(Request $request, LanguageLine $app_translation){
     $rules = [];
     // $dataToUpdate = []; // This variable might become less necessary with improved handling of 'text'
-    $responseMessage = 'Translation line updated successfully.';
+    // $responseMessage = 'Translation line updated successfully.';
 
     if($app_translation->is_custom){
       // For custom entries, allow changing group, key, and text
@@ -226,32 +226,45 @@ class AppTranslationController extends Controller{
     $app_translation->save(); // Use save() instead of update() if you're manually setting attributes
 
     // Clear translation cache
-    Cache::forget(config('translation-loader.cache_key', 'spatie.translation-loader.translations'));
+    self::clearCache();
 
     // Re-cast is_custom for response consistency if not using model casting (though better to use model casting)
     // $app_translation->is_custom = (bool) $app_translation->is_custom;
 
-    return jsonSuccess($app_translation, $responseMessage);
+    return jsonSuccess($app_translation); // , $responseMessage
   }
 
   /**
    * Remove the specified resource from storage.
    * Can only delete custom-made translations.
    */
-  public function destroy(string $id){
-    $languageLine = LanguageLine::findOrFail($id);
-
-    if(!$languageLine){
-      return jsonError(__('api_messages.resource_not_found'), 404);
-    }
-
-    if($languageLine->is_custom){
-      $languageLine->delete();
+  public function destroy(LanguageLine $app_translation){
+    if($app_translation->is_custom){
+      $app_translation->delete();
       // Clear translation cache
-      Cache::forget(config('translation-loader.cache_key', 'spatie.translation-loader.translations'));
+      self::clearCache(); // $this->
       return response()->noContent();
     }
     // 403 Forbidden
     return jsonError('Only custom translations can be deleted.', 403);
+  }
+
+  public function deletes(Request $req){
+    // $this->authorize('manage-users'); // Only admin
+
+    $validated = $req->validate([
+      'ids' => 'bail|required|array',
+      'ids.*' => 'exists:language_lines,id'
+    ]);
+
+    $q = LanguageLine::whereIn('id', $validated['ids']);
+
+    $q->chunkById(200, fn($data) => $data->each->delete());
+
+    return response()->noContent();
+  }
+
+  protected static function clearCache(){
+    Cache::forget(config('translation-loader.cache_key', 'spatie.translation-loader.translations'));
   }
 }

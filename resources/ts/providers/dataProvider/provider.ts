@@ -12,6 +12,8 @@ class CustomError extends Error { // @ts-ignore
   }
 }
 
+const queryParamString = (searchParams: any) => new URLSearchParams({ ...setAppLang(), ...searchParams }).toString();
+
 type MethodTypes = "get" | "delete" | "head" | "options";
 type MethodTypesWithBody = "post" | "put" | "patch";
 type MethodCommons = "get" | "post" | "put" | "patch";
@@ -146,7 +148,7 @@ export const dataProvider = (
           method: requestMethod,
           body,
           json: requestMethod === 'get' || body ? undefined : variables,
-          searchParams: { ...setAppLang(), ...searchParams },
+          searchParams: queryParamString(searchParams),
         }
       ).json();
 
@@ -175,27 +177,47 @@ export const dataProvider = (
     resource, 
     id, 
     variables, 
-    meta: { method, searchParams } = {}
+    meta: { method, searchParams, ...requestOptions } = {}
   }) => {
-    // const { method } = meta ?? {}; // , queryContext, ...requestOptions
+    // const { method } = meta ?? {}; // , queryContext
 
     try {
       const response: any = await httpClient(
         resource + (id ? '/' + id : ''), // `${apiUrl}/${resource}${id ? '/' + id : ''}`,
         {
+          ...requestOptions,
           method: (method as MethodTypesWithBody) ?? "put",
           json: variables,
-          searchParams: { ...setAppLang(), ...searchParams },
+          searchParams: queryParamString(searchParams),
         }
         /** @DEV : must check & test (use or not) */
         // { signal: queryContext?.signal, ...requestOptions }
         // { ...queryContext, ...requestOptions }
       ).json();
 
+      // console.log('update response: ', response);
+
+      // let data = null;
+      // if (response.status !== 204) {
+      //   data = response.json();
+      // }
+
       if(response?.errors){
         throw new CustomError('UpdateError', response?.message || i18n.t('error.unspecific'), response);
       }
-      return response;
+      
+      return response; // response
+
+      // return {
+      //   ...response,
+      //   successNotification: {
+      //     message: response.message,
+      //     description: "You have successfully registered",
+      //   },
+      //   notifications: {
+      //     message: response.message,
+      //   },
+      // }
     } catch(e) {
       throw e;
     }
@@ -214,7 +236,7 @@ export const dataProvider = (
         { 
           ...requestOptions,
           method: (method as MethodTypes) ?? "get",
-          searchParams: { ...setAppLang(), ...searchParams },
+          searchParams: queryParamString(searchParams),
           signal: queryContext?.signal,
         }
       ).json();
@@ -232,7 +254,7 @@ export const dataProvider = (
     resource, 
     id, 
     variables, 
-    meta: { method, searchParams } = {}
+    meta: { method, searchParams, ...requestOptions } = {}
   }) => {
     // const { method } = meta ?? {}; // , queryContext
 
@@ -240,9 +262,10 @@ export const dataProvider = (
       const response: any = await httpClient(
         resource + "/" + id,
         {
+          ...requestOptions,
           method: (method as MethodTypesWithBody) ?? "delete",
           json: variables,
-          searchParams: { ...setAppLang(), ...searchParams },
+          searchParams: queryParamString(searchParams),
         },
         /** @DEV : must check & test (use or not) */
         // { signal: queryContext?.signal }
@@ -260,7 +283,7 @@ export const dataProvider = (
   deleteMany: async ({ 
     resource, 
     ids, 
-    meta: { method, searchParams } = {}
+    meta: { method, searchParams, ...requestOptions } = {}
     // variables
   }) => {
     // const { method } = meta ?? {}; // , queryContext
@@ -269,9 +292,10 @@ export const dataProvider = (
       const response: any = await httpClient(
         resource, 
         { 
+          ...requestOptions,
           method: (method as MethodTypesWithBody) ?? "delete",
-          json: ids,
-          searchParams: { ...setAppLang(), ...searchParams },
+          json: { ids },
+          searchParams: queryParamString(searchParams),
         }, // , variables
 
         /** @DEV : must check & test (use or not) */

@@ -7,6 +7,7 @@ use Illuminate\Http\Request; // {Request, Response}
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Spatie\QueryBuilder\AllowedFilter;
+use Illuminate\Validation\Rule;
 use App\Traits\QueryTools;
 
 class UserController extends Controller{
@@ -178,6 +179,7 @@ class UserController extends Controller{
 
     // Prevent deleting self from the bulk list
     $userId = $req->user()->id;
+
     if(in_array($userId, $validated['ids'])){
       return jsonError(
         'You cannot include your own account in a bulk deletion request.',
@@ -237,5 +239,73 @@ class UserController extends Controller{
       'expires_at' => $item->expires_at
     ]);
     return jsonSuccess($tokens);
+  }
+
+  /**
+   * Update the authenticated user's language preference.
+   *
+   * @param  \Illuminate\Http\Request  $request
+   * @return \Illuminate\Http\JsonResponse
+   */
+  public function language(Request $req){
+    $user = $req->user();
+
+    if($user){
+      $validated = $req->validate([
+        'lang' => [
+          'bail',
+          'required',
+          'string',
+          'max:10',
+          Rule::in(config('app.locales', [config('app.fallback_locale')])),
+        ],
+      ]);
+
+      // Update only the 'lang' field
+      // This is the fastest way to update a single field:
+      $user->forceFill(['lang' => $validated['lang']])->save();
+      // Or simply: $user->lang = $validated['lang']; $user->save();
+      // forceFill is slightly faster as it bypasses fillable/guarded checks,
+      // but $user->lang = ...; $user->save(); is also very fast for one field.
+
+      // Immediately set the application's locale for the current request
+      // This ensures subsequent responses in the same request use the new language.
+
+      app()->setLocale($validated['lang']);
+
+      // return jsonSuccess(
+      //   1,
+      //   // Example translated message
+      //   __('api_messages.language_updated_successfully', [], App::getLocale())
+      // );
+
+      return jsonSuccess(1);
+      // return response()->noContent();
+    }
+
+    return jsonError('Unauthenticated.', 401);
+  }
+
+  public function theme(Request $req){
+    $user = $req->user();
+
+    if($user){
+      $validated = $req->validate([
+        'theme' => [
+          'bail',
+          'required',
+          'string',
+          'max:6', // 20
+          Rule::in(['dark', 'light', 'system']),
+        ],
+      ]);
+
+      $user->forceFill(['theme' => $validated['theme']])->save();
+
+      return jsonSuccess(1);
+      // return response()->noContent();
+    }
+
+    return jsonError('Unauthenticated.', 401);
   }
 }

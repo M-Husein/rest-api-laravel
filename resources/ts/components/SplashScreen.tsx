@@ -1,13 +1,22 @@
 import { useEffect } from 'react';
+import { toggleLoaderApp } from '@/utils/dom';
 
 export const SplashScreen: React.FC = () => {
+  // useEffect(() => {
+  //   const loader = document.getElementById('loaderApp');
+  //   // Show loading
+  //   loader?.classList.remove('hidden');
+    
+  //   return () => { // Hide loading
+  //     loader?.classList.add('hidden');
+  //   }
+  // }, []);
+
   useEffect(() => {
-    const loader = document.getElementById('loaderApp');
-    // Show loading
-    loader?.classList.remove('hidden');
+    toggleLoaderApp(false);
     
     return () => { // Hide loading
-      loader?.classList.add('hidden');
+      toggleLoaderApp(true);
     }
   }, []);
 

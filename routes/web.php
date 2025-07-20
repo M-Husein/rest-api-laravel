@@ -19,7 +19,7 @@ use App\Http\Controllers\Api\V1\EmailVerificationController;
 // });
 
 Route::get('app/{uri?}',function(){
-  $view = view('admin');
+  $view = view('admin', ['user' => auth()->user()]);
   return response($view)->withHeaders([
     'X-Content-Type-Options' => 'nosniff',
     'X-Frame-Options' => 'SAMEORIGIN',
@@ -31,11 +31,11 @@ Route::get('app/{uri?}',function(){
   ]);
 })->where('uri','(.*)');
 
-Route::get('/', fn() => view('app'));
+// Route::get('/', fn() => view('app'));
 
 Route::middleware('guest')->group(function(){
-  Route::get('auth/login', fn() => view('app'))->name('login');
-  Route::get('auth/register', fn() => view('app'))->name('register');
+  Route::get('auth/login', fn() => view('app', ['user' => auth()->user()]))->name('login');
+  Route::get('auth/register', fn() => view('app', ['user' => auth()->user()]))->name('register');
 });
 
 Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'index'])
@@ -43,7 +43,7 @@ Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'ind
 
 // All route
 Route::get('{uri?}',function(){
-	$view = view('app');
+	$view = view('app', ['user' => auth()->user()]);
 	return response($view)->withHeaders([
 		'X-Frame-Options' => 'SAMEORIGIN',
 		'X-XSS-Protection' => '1; mode=block',

@@ -16,3 +16,11 @@ export const triggerFocusEnter = (element: string | any) => { // HTMLElement
     }));
   }
 }
+
+/**
+ * Show/hide Splash Screen.
+ * @returns void;
+ */
+export const toggleLoaderApp = (force?: boolean): void => {
+  (document.getElementById('loaderApp') as HTMLElement)?.classList.toggle('hidden', force);
+}

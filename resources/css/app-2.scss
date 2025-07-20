@@ -17,8 +17,8 @@
 }
 
 .load-spin {
-  user-select: none;
-  z-index: 1055
+  z-index: 1055;
+  user-select: none
 }
 
 .inset-0 {
@@ -35,5 +35,5 @@
 
 // Option to hide next elements when show loader App.
 #loaderApp:not(.hidden) ~ * {
-  display: none !important;
+  display: none;
 }
