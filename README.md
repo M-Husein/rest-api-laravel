@@ -15,6 +15,15 @@ This repository has several branches with special features. Here is the list of 
 3. `feat/dynamic-RBAC`
   - Dynamic RBAC
 
+---
+
+## Development Notes
+Use `DB_DATABASE` in `.env` with a name that describes the feature, for example:
+`.env`
+```bash
+DB_DATABASE=rest_api_static_rbac
+```
+
 ## Custom CLI
 
 To generate resource.
