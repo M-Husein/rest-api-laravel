@@ -115,8 +115,8 @@
   "error": {
     "unspecific": "Something went wrong.",
     "process": "Failed to {{type}}, please try again.",
-    "required": "{{name}} is required.",
-    "invalid": "Invalid {{name}}.",
+    "required": "Is required.",
+    "invalid": "Invalid value.",
     "minLength": "Minimum {{v}} characters.",
     "trim": "There should be no spaces, tabs / enter at the beginning & end."
   },

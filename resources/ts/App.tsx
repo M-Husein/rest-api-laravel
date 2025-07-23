@@ -152,7 +152,7 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "email/verify/:id/:hash",
+        path: "verification", // email/verify/:id/:hash
         // element: <Layout><Outlet /></Layout>,
         children: [
           { index: true, element: lazyComponent(EmailVerification, <SplashScreen />) },

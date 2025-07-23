@@ -14,7 +14,8 @@ i18n
     // debug: import.meta.env.DEV, // !import.meta.env.PROD, // import.meta.env.MODE === 'development',
     // if use `lng` lng not store in localStorage
     // lng: 'en', // if using a language detector, do not define the lng option
-    lng: document.documentElement.lang,
+    // lng: document.documentElement.lang,
+    lng: localStorage.getItem("i18nextLng") || document.documentElement.lang, // APP.defaultLang
     supportedLngs: LANGS,
     backend: {
       loadPath: "/locales/{{lng}}/{{ns}}.json",

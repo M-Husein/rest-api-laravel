@@ -5,7 +5,7 @@ $ver = config('app.version');
 $baseUrl = url('');
 @endphp
 <!DOCTYPE html>
-<html lang="{{ $lang }}" class="{{ $user?->theme }}">
+<html lang="{{ $lang }}" class="{{ $user?->theme }}" data-nosnippet>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -29,6 +29,7 @@ $baseUrl = url('');
 {{-- <script src="/js/APP.js?v={{ $ver }}"></script> --}}
 <script>
 const APP=Object.freeze({
+  name:"{{$appName}}",
   api:"{{ $baseUrl }}/api/v1",
   timeout:<?php echo config('app.timeout');?>,
   defaultLang:"{{ config('app.fallback_locale') }}",
@@ -41,14 +42,14 @@ const APP=Object.freeze({
 @viteReactRefresh
 @vite(['resources/css/app.scss','resources/ts/main.tsx'])
 </head>
-<body class="min-h-fullscreen antialiased bg-main admin" data-nosnippet>
-<div id="loaderApp" class="load-spin inset-0 cwait">
-	<img aria-hidden="true" src="/logo-32x32.png?v={{ $ver }}" alt="{{ $appName }}" class="inset-0 text-0" style="position:fixed;margin:auto"/>
-	{{-- <b class="spin-border" style="width:64px;height:64px" role="status"></b> --}}
-  <img class="spin-border" width="64" height="64" role="status" aria-hidden="true"/>
+<body class="antialiased min-h-fullscreen bg-main admin" data-nosnippet>
+<div id="loaderApp" class="load-spin fixed inset-0 cwait">
+	<img draggable="false" src="/logo-32x32.png?v={{ $ver }}" alt="" class="fixed inset-0 m-auto"/>
+	<b class="spin-border w-16 h-16" role="status" aria-label="Loading"></b>
+  {{-- <img class="spin-border" width="64" height="64" role="status"/> --}}
 
   {{-- To use this loader change 'resources/css/app.css' to 'resources/css/app-2.css' --}}
-	{{-- <svg role="status" stroke-width="2" viewBox="0 0 32 32" width="87" height="87" fill="none" stroke="#1677ff">
+	{{-- <svg role="status" aria-label="Loading" stroke-width="2" viewBox="0 0 32 32" width="87" height="87" fill="none" stroke="#1677ff">
     <circle stroke-width="2" r="12" cx="16" cy="16" fill="none" opacity="0.125"></circle>
     <circle stroke-width="2" r="12" cx="16" cy="16" fill="none" stroke-dasharray="20 110">
       <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 16 16" to="360 16 16" dur="750ms" repeatCount="indefinite"></animateTransform>
@@ -58,9 +59,10 @@ const APP=Object.freeze({
 <div id="app"></div>
 <noscript>
 	<style>#loaderApp{display:none}.nojs{font-family:Arial}</style>
-	<div aria-hidden="true" class="inset-0 nojs">
-		<p data-nosnippet>You need to enable JavaScript to run this app.</p>
-		<a rel="noopener noreferrer nofollow" target="_blank" href="https://www.enablejavascript.io/{{ $lang }}">GUIDE</a>
+	<div class="fixed inset-0 nojs text-base">
+    <div class="text-5xl">⚠️</div>
+		<p>{{__('nojs')}}.</p>
+		<a class="underline-offset-4 m-auto" rel="noopener noreferrer nofollow" target="_blank" href="https://www.enablejavascript.io/{{ $lang }}">{{__('guide')}}</a>
 	</div>
 </noscript>
 </body></html>

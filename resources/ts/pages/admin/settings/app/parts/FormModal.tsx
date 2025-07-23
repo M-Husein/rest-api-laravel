@@ -1,21 +1,9 @@
 // import { Fragment, useState } from "react";
 // import { useTranslation } from "react-i18next";
-// import { useTranslate } from "@refinedev/core"; // , useSetLocale, useGetLocale
+import { useTranslate } from "@refinedev/core"; // , useSetLocale, useGetLocale
 import { Controller } from 'react-hook-form';
 import { Modal, Input } from 'antd'; // Tabs
 import { Form } from '@/components/forms/Form';
-
-const VALIDATIONS: any = {
-  required: "is required",
-  minLength: {
-    value: 2,
-    message: "Minimum length 2"
-  },
-  pattern: {
-    value: /^\S(.*\S)?$/,
-    message: "No leading and trailing whitespace"
-  },
-};
 
 export const FormModal = ({
   t,
@@ -26,6 +14,7 @@ export const FormModal = ({
   onSubmit,
   ...etc
 }: any) => {
+  const translate = useTranslate();
   // const { i18n } = useTranslation();
   // const locale = useGetLocale();
   // const currentLocale = locale();
@@ -35,6 +24,19 @@ export const FormModal = ({
   // const [tabActive, setTabActive] = useState<any>(currentLocale);
 
   // console.log('i18n: ', i18n);
+
+  const VALIDATIONS: any = {
+    required: translate('error.required'),
+    minLength: {
+      value: 2,
+      message: translate('error.required', { v: 2 })
+    },
+    pattern: {
+      // value: /^\S(.*\S)?$/, // Allow enter in middle or not start/end
+      value: /^\S(?:[\s\S]*\S)?$/,
+      message: translate('error.trim')
+    },
+  };
 
   return (
     <Modal

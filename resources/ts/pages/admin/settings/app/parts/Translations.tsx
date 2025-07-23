@@ -68,8 +68,9 @@ export const Translations = ({
   } = useForm({ // <any, HttpError, any>
     values: dataForm,
     refineCoreProps: {
-      // queryOptions: { enabled: false },
-      // redirect: false,
+      queryOptions: { enabled: false },
+      redirect: false,
+      // Code above for disable refine to auto fetch to endpoint detail e.g "api/users/1"
       resource: API,
       action: dataForm?.id ? "edit" : "create",
       id: dataForm?.id,

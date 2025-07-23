@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 // import { Modal } from 'antd';
-import { getAppLang } from '@/utils/setAppLang'; // setAppLang, 
 
 export const useLogoutAlert = (modalApi: any, options?: any) => {
   // const [modalApi, modalContextHolder] = Modal.useModal();
@@ -18,13 +17,8 @@ export const useLogoutAlert = (modalApi: any, options?: any) => {
           okText: "Login",
           okButtonProps: {
             onClick: () => {
-              // const locale = setAppLang();
-
               // '/auth/login'
-              window.location.replace(
-                // import.meta.env.VITE_LOGIN_PATH + (locale ? "?lang=" + locale.lang : "")
-                import.meta.env.VITE_LOGIN_PATH + getAppLang().str
-              )
+              window.location.replace(import.meta.env.VITE_LOGIN_PATH)
             },
           },
         });

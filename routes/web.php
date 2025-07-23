@@ -38,8 +38,11 @@ Route::middleware('guest')->group(function(){
   Route::get('auth/register', fn() => view('app', ['user' => auth()->user()]))->name('register');
 });
 
-Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'index'])
-  ->middleware('signed')->name('verification.verify');
+// This is the route a user clicks from their email.
+// It uses signed middleware and redirects to a front-end view.
+Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'verifyWeb'])
+  ->middleware(['signed', 'throttle:6,1'])
+  ->name('verification.verify');
 
 // All route
 Route::get('{uri?}',function(){

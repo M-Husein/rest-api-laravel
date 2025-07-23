@@ -1,9 +1,9 @@
 import type { MenuProps } from "antd";
 import { Dropdown, Avatar, Button } from 'antd';
-import { useGetLocale, useSetLocale, useTranslate, useNavigation, useUpdate } from "@refinedev/core"; // 
+import { useGetLocale, useSetLocale, useTranslate, useUpdate } from "@refinedev/core"; // 
 import { useTranslation } from "react-i18next";
 import dayjs from 'dayjs';
-// import { getAppLang } from '@/utils/setAppLang'; // setAppLang, 
+import { setZodLocale } from '@/utils/locale/setZodLocale';
 
 const renderFlag = (lang: string | undefined, size: number) => (
   <Avatar
@@ -23,12 +23,12 @@ export const LanguageMenu = ({
   const currentLocale = locale();
   const changeLanguage = useSetLocale();
   const translate = useTranslate();
-  const { replace } = useNavigation();
   const { mutate, isPending } = useUpdate();
 
   // console.log('user: ', user);
 
-  const changeLocale = (lang: string) => {
+  const changeLocale = async (lang: string) => {
+    // Only hit by user logged.
     if(user?.authenticated){
       mutate({
         resource: "users", // users/language
@@ -43,38 +43,8 @@ export const LanguageMenu = ({
 
     dayjs.locale(lang);
     changeLanguage(lang);
-
-    let { pathname, search } = window.location;
-    // console.log('pathname: ', pathname);
-    // console.log('search: ', search);
-
-    // replace(
-    //   // pathname + (lang === APP.defaultLang ? search : (search ? search + "&" : "?") + "lang=" + lang)
-    //   pathname + (lang === APP.defaultLang ? "" : (search ? search + "&" : "?") + "lang=" + lang)
-    // );
-
-    let params: any;
-
-    if(lang === APP.defaultLang){
-      params = new URLSearchParams(search);
-      params.delete('lang');
-      params = "?" + params.toString();
-    }else{
-      params = (search ? search + "&" : "?") + "lang=" + lang;
-    }
-
-    replace(pathname + params);
     document.documentElement.lang = lang;
-
-    // window.location.replace(
-    //   pathname + (lang === APP.defaultLang ? "" : (search ? search + "&" : "?") + "lang=" + lang)
-    // );
-
-    // window.location.replace(pathname + params);
-
-    // if(window.confirm('Are You sure to change App language? App will reload.')){
-      
-    // }
+    await setZodLocale(lang);
   }
 
   const languageOptions: MenuProps["items"] = [...(i18n.languages || [])]

@@ -73,12 +73,12 @@ export const Nav = ({ loading, user }:  any) => {
     if(loading || isLoading){
       return [
         ...MENUS,
-        languageMenu(userData),
         {
           key: '1',
           label: <Skeleton.Button active style={{ width: 32, minWidth: 32 }} />,
           className: "after-no leading-normal",
-        }
+        },
+        languageMenu(userData),
       ];
     }
 
@@ -106,7 +106,6 @@ export const Nav = ({ loading, user }:  any) => {
 
       return [
         ...MENUS,
-        languageMenu(userData),
         {
           key: "user",
           label: (
@@ -125,12 +124,12 @@ export const Nav = ({ loading, user }:  any) => {
           popupOffset: [-130, 0],
           children: userMenus,
         },
+        languageMenu(userData),
       ];
     }
 
     return [
       ...MENUS,
-      languageMenu(userData),
       {
         key: '/auth/login',
         label: (
@@ -152,7 +151,8 @@ export const Nav = ({ loading, user }:  any) => {
             Register
           </NavLink>
         ),
-      }
+      },
+      languageMenu(userData),
     ];
   }
 

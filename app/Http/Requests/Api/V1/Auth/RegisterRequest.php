@@ -14,7 +14,9 @@ class RegisterRequest extends FormRequest{
       'username' => 'bail|sometimes|string|max:50|unique:users,username', // Username is optional, but if present, must be unique
       'password' => 'bail|required|string|min:6|confirmed',
       'role' => 'bail|sometimes|integer|in:' . implode(',', array_keys(config('roles.keys'))),
-      'type' => 'nullable|string'
+      'lang' => 'bail|string|max:10',
+      // Explicit client type
+      'type' => 'bail|required|in:spa,native'
     ];
   }
 

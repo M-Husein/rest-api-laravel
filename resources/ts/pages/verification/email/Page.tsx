@@ -1,62 +1,64 @@
-// import { useState } from "react";
+import { useEffect } from "react";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { HttpError, useParsed, useOne, useNavigation } from "@refinedev/core"; // , useNotification, useUpdate
-import { Card, Button } from 'antd';
+import { useParsed, useNavigation, useNotification } from "@refinedev/core"; // useCreate, HttpError, useOne
+// import { Card, Button } from 'antd';
+// import { getToken } from '@/utils/authToken';
 
-const title = "Email Verification";
-
-// get 'email/verify/{id}/{hash}'
-// post 'email/verification-notification'
+const title = "Verification"; // Email Verification
 
 export default function Page(){
-  useDocumentTitle(title + " - " + import.meta.env.VITE_APP_NAME);
+  useDocumentTitle(title + " - " + APP.name); // import.meta.env.VITE_APP_NAME
 
-  // params: { current, pageSize, sorters, filters }
-  const { id, pathname } = useParsed<any>();
+  const { params: { status } } = useParsed<any>();
+  // const { mutate, isPending } = useCreate();
   const { replace } = useNavigation();
+  const { open: openNotif } = useNotification();
 
-  const {
-    data,
-    isLoading,
-  } = useOne<any, HttpError>({
-    queryOptions: {
-      enabled: !!id
-    },
-    resource: pathname?.replace('/',''), // "email/verify"
-    id: "",
-    successNotification: (res: any) => {
-      if(res.data){ //  === 1
-        replace('/');
-      }
-      return {
-        type: "success",
-        message: "Verified",
-        description: res.message,
-      }
+  useEffect(() => {
+    if(status){ //  || getToken()
+      openNotif?.({
+        type: status || "success",
+        message: "✔️",
+        description: "Verified"
+      });
+
+      replace(import.meta.env.VITE_LOGIN_PATH);
     }
-  });
+  }, []); // status
 
-  // console.log('pathname: ', pathname);
-  // console.log('data: ', data);
+  return null;
 
-  return (
-    <div className="grid place-content-center min-h-screen">
-      <Card 
-        title={title}
-        className="shadow"
-      >
-        {/* @ts-ignore */}
-        <h1 className="text-lg">{isLoading ? "Loading" : data?.message}</h1>
+  // if(status){
+  //   return null;
+  // }
 
-        {!!data?.data && (
-          <Button
-            type="primary"
-            onClick={() => replace('/')}
-          >
-            Back to Home
-          </Button>
-        )}
-      </Card>
-    </div>
-  );
+  // return (
+  //   <div className="grid place-content-center min-h-screen">
+  //     <Card 
+  //       title={title}
+  //       className="shadow"
+  //     >
+  //       <h1 className="text-lg">
+  //         Didn't receive the verification email?
+  //       </h1>
+
+  //       <Button
+  //         type="primary"
+  //         loading={isPending}
+  //         onClick={() => {
+  //           mutate({
+  //             resource: "verification/spa",
+  //             values: {},
+  //           }, {
+  //             onSuccess: () => {
+  //               replace(import.meta.env.VITE_LOGIN_PATH)
+  //             }
+  //           })
+  //         }}
+  //       >
+  //         Resending a link
+  //       </Button>
+  //     </Card>
+  //   </div>
+  // );
 }

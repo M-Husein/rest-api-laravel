@@ -115,8 +115,8 @@
   "error": {
     "unspecific": "Terjadi Kesalahan.",
     "process": "Gagal {{type}}, silahkan coba lagi.",
-    "required": "{{name}} harus diisi.",
-    "invalid": "{{name}} tidak valid.",
+    "required": "Harus diisi.",
+    "invalid": "Tidak valid.",
     "minLength": "Minimal {{v}} karakter.",
     "trim": "Tidak boleh ada spasi, tab / enter di awal & akhir."
   },

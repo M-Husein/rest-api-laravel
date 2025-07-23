@@ -1,20 +1,20 @@
 interface AppConfig {
+  name: string,
   api: string,
   timeout: number,
   defaultLang: string,
   locales: {
     [string]: string
-  },
-  user?: any,
+  }
 }
 
 /**
  * App Config
+ * @var name : "App name"
  * @var api : "http://localhost:8000/api/v1"
  * @var timeout : 30000
  * @var defaultLang : "id" | "en"
  * @var locales : { id:"Indonesia", en:"English" }
- * @var user?: any
  */
 declare const APP: Readonly<AppConfig>;
 

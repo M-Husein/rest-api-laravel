@@ -16,6 +16,7 @@ export default {
     './resources/views/**/*.blade.php',
     './resources/ts/**/*.tsx',
   ],
+  blocklist: ['fixed', 'inset-0', 'm-auto', 'w-16', 'h-16', 'text-base', 'text-5xl', 'underline-offset-4'],
   theme: {
     extend: {
       zIndex: {

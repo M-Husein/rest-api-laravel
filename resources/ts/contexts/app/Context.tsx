@@ -4,25 +4,38 @@ import { useGetLocale } from "@refinedev/core";
 import { ConfigProvider, App as AntdApp, theme as AntdTheme } from "antd";
 // import { StyleProvider } from '@ant-design/cssinjs';
 import dayjs from 'dayjs';
-import enUS from 'antd/locale/en_US';
-import idID from 'antd/locale/id_ID';
+import { getAntdLocale } from '@/utils/locale/getAntdLocale';
+import { setZodLocale } from '@/utils/locale/setZodLocale';
+// import enUS from 'antd/locale/en_US';
+// import idID from 'antd/locale/id_ID';
+import { toggleLoaderApp } from '@/utils/dom';
 import 'dayjs/locale/en';
 
-const currentLang = localStorage.getItem("i18nextLng") || APP.defaultLang || 'en';
+// const htmlLang = document.documentElement.lang;
+const currentLang = localStorage.getItem("i18nextLng") || document.documentElement.lang; // APP.defaultLang;
+
+// console.log('currentLang: ', currentLang);
 
 dayjs.locale(currentLang); // Initial value for locale date
+document.documentElement.lang = currentLang;
+
+// Hack for Refine run check to get user authentication
+sessionStorage.removeItem('LoginError');
+
+if(currentLang !== APP.defaultLang){
+  (async () => await setZodLocale(currentLang))();
+}
 
 /** @OPTION : For toggle color scheme */
 const toggleTheme = (theme: string) => { // isDark: string
   let html = document.documentElement;
 
   // html.classList.toggle("dark", isDark);
-  
-  if(theme === 'dark'){
-    html.classList.remove('light','system');
-  }else{
-    html.classList.remove('dark','system');
-  }
+
+  html.classList.remove(
+    (theme === 'dark' ? 'light' : 'dark'),
+    'system'
+  );
 
   html.classList.add(theme);
   
@@ -32,10 +45,10 @@ const toggleTheme = (theme: string) => { // isDark: string
   }
 }
 
-const AntLanguages: { [key: string]: any } = {
-  id: idID,
-  en: enUS,
-};
+// const AntLanguages: { [key: string]: any } = {
+//   id: idID,
+//   en: enUS,
+// };
 
 type AppThemeType = {
   theme: string;
@@ -63,6 +76,9 @@ export const useApp = () => {
 
 // AppLocale
 export const AppContextProvider = ({ children }: PropsWithChildren) => {
+  const [antdLocale, setAntdState] = useState<any>();
+  // const [isLoading, setIsLoading] = useState<boolean>(true);
+
   const locale = useGetLocale();
   const currentLocale = locale();
 
@@ -77,9 +93,34 @@ export const AppContextProvider = ({ children }: PropsWithChildren) => {
 
   const value = useMemo(() => ({ user, setUser: setupUser }), [user]);
 
+  useEffect(() => {
+    (async () => {
+      // setIsLoading(true);
+      toggleLoaderApp();
+      try {
+        // Mapping for each library's locale naming convention
+        // const zodCode = defaultLocaleCode;
+        // const dayjsCode = defaultLocaleCode;
+        // const antdCode = currentLocale === 'en' ? 'en_US' : 'id_ID';
+
+        const loadedAntdLocale = await getAntdLocale(currentLocale || 'en');
+        setAntdState(loadedAntdLocale || undefined);
+
+      } catch (error) {
+        console.error("Error loading locales:", error);
+      } 
+      finally {
+        // setIsLoading(false);
+        setTimeout(toggleLoaderApp, 250);
+      }
+    })()
+  }, [currentLocale]);
+
   return (
     <ConfigProvider
-      locale={AntLanguages[currentLocale || currentLang]}
+      // locale={AntLanguages[currentLocale || currentLang]}
+      locale={antdLocale}
+      // componentDisabled={isLoading}
     >
       <AppContext.Provider
         // value={{

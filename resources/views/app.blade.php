@@ -14,8 +14,6 @@ $urlCurrent = url()->current();
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="format-detection" content="telephone=no,address=no,email=no">
 <meta name="robots" content="index,follow">{{-- ,max-image-preview:large --}}
-<link rel="alternate" href="{{ $urlCurrent }}" hreflang="x-default">
-<link rel="alternate" href="{{ $urlCurrent }}/?lang=id" hreflang="id">
 
 {{-- <link rel="canonical" href="{{ $baseUrl->full() }}"> --}}
 {{-- <meta property="og:url" content="{{ $baseUrl->full() }}"/> --}}
@@ -24,9 +22,9 @@ $urlCurrent = url()->current();
 <meta property="og:image" content="{{ $baseUrl }}/logo-144x144.png">
 <meta name="twitter:image" content="{{ $baseUrl }}/logo-144x144.png">
 <title>{{ $appName }}</title>
-{{-- <script src="/js/APP.js?v={{ $ver }}"></script> --}}
 <script>
 const APP=Object.freeze({
+  name:"{{$appName}}",
   api:"{{ $baseUrl }}/api/v1",
   timeout:<?php echo config('app.timeout');?>,
   defaultLang:"{{ config('app.fallback_locale') }}",
@@ -39,26 +37,17 @@ const APP=Object.freeze({
 @viteReactRefresh
 @vite(['resources/css/app.scss','resources/ts/main.tsx'])
 </head>
-<body class="antialiased">
-<div id="loaderApp" class="load-spin inset-0 cwait">
-	<img aria-hidden="true" draggable="false" src="/logo-32x32.png?v={{ $ver }}" alt="{{ $appName }}" class="inset-0 text-0" style="position:fixed;margin:auto"/>
-	{{-- <b class="spin-border" style="width:64px;height:64px" role="status"></b> --}}
-  <img class="spin-border" width="64" height="64" role="status" aria-hidden="true"/>
-
-  {{-- To use this loader change 'resources/css/app.css' to 'resources/css/app-2.css' --}}
-	{{-- <svg role="status" stroke-width="2" viewBox="0 0 32 32" width="87" height="87" fill="none" stroke="#1677ff">
-    <circle stroke-width="2" r="12" cx="16" cy="16" fill="none" opacity="0.125"></circle>
-    <circle stroke-width="2" r="12" cx="16" cy="16" fill="none" stroke-dasharray="20 110">
-      <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 16 16" to="360 16 16" dur="750ms" repeatCount="indefinite"></animateTransform>
-    </circle>
-	</svg> --}}
+<body class="antialiased min-h-fullscreen bg-main">
+<div data-nosnippet id="loaderApp" class="load-spin fixed inset-0 cwait">
+	<img draggable="false" src="/logo-32x32.png?v={{ $ver }}" alt="" class="fixed inset-0 m-auto"/>
+	<b class="spin-border w-16 h-16" role="status" aria-label="Loading"></b>
 </div>
 <div id="app"></div>
 <noscript>
 	<style>#loaderApp{display:none}.nojs{font-family:Arial}</style>
-	<div data-nosnippet aria-hidden="true" class="inset-0 nojs">
-		<p data-nosnippet>You need to enable JavaScript to run this app.</p>
-		<a rel="noopener noreferrer nofollow" target="_blank" href="https://www.enablejavascript.io/{{ $lang }}">GUIDE</a>
+	<div data-nosnippet class="fixed inset-0 nojs text-base">
+		<p>{{__('nojs')}}.</p>
+		<a class="underline-offset-4 m-auto" rel="noopener noreferrer nofollow" target="_blank" href="https://www.enablejavascript.io/{{ $lang }}">{{__('guide')}}</a>
 	</div>
 </noscript>
 </body></html>

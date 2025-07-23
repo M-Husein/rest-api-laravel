@@ -1,5 +1,5 @@
 <?php
-use Illuminate\Http\Request;
+// use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\{
   AuthController,
@@ -16,30 +16,6 @@ use App\Http\Controllers\Api\V1\{
 // const ROLE_EDITOR = 'editor';
 // const ROLE_VIEWER = 'viewer';
 
-// use Illuminate\Support\Facades\URL;
-// use Illuminate\Auth\Events\Verified;
-// use App\Models\User;
-
-// Route::get('/verify-email/{id}/{hash}', function (Request $request, $id, $hash) {
-//     $user = User::findOrFail($id);
-
-//     if (! URL::hasValidSignature($request)) {
-//         return response()->json(['message' => 'Invalid or expired verification link.'], 403);
-//     }
-
-//     if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-//         return response()->json(['message' => 'Invalid verification hash.'], 403);
-//     }
-
-//     if (! $user->hasVerifiedEmail()) {
-//         $user->markEmailAsVerified();
-//         event(new Verified($user));
-//     }
-
-//     return response()->json(['message' => 'Email verified successfully.']);
-// })->name('verification.verify');
-
-
 Route::prefix('v1')->middleware(['web','hybrid.csrf'])->group(function(){
   Route::middleware('guest')->group(function(){
     Route::post('login', [AuthController::class, 'login']);
@@ -53,12 +29,12 @@ Route::prefix('v1')->middleware(['web','hybrid.csrf'])->group(function(){
 
   Route::middleware('auth:sanctum')->group(function(){
   // Route::middleware(['web','auth:sanctum','hybrid.csrf'])->group(function(){
-    // ✅ Verification link callback
-    Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify']);
+    // Verification link callback
+    // Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify']);
       // ->middleware('signed'); // ->name('verification.verify');
 
-    // ✅ Resend verification email
-    Route::post('email/verification-notification', [EmailVerificationController::class, 'send'])
+    // Resend verification email
+    Route::post('verification/{type}', [EmailVerificationController::class, 'send'])
       ->middleware('throttle:6,1')->name('verification.send');
 
     Route::post('logout', [AuthController::class, 'logout']);

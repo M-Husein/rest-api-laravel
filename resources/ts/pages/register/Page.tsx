@@ -23,7 +23,8 @@ type IFormValues = {
 export default function Page(){
   const translate = useTranslate();
   const authProvider = useActiveAuthProvider();
-  const { mutate: register, isLoading } = useRegister<any>({ // <RegisterFormTypes>
+  // <RegisterFormTypes>
+  const { mutate: register, isPending } = useRegister<any>({ // isLoading
     v3LegacyAuthProviderCompatible: !!authProvider?.isLegacy 
   });
 
@@ -46,7 +47,7 @@ export default function Page(){
       title="Register"
       form={
         <Form
-          disabled={isLoading}
+          disabled={isPending}
           onSubmit={handleSubmit(doRegister)}
           fieldsetClass="space-y-6"
         >
@@ -61,7 +62,7 @@ export default function Page(){
                   size="large"
                   id="uname"
                   className="mt-1"
-                  disabled={isLoading}
+                  disabled={isPending}
                   status={errors.name ? "error" : ""}
                   autoComplete="name"
                   autoCorrect="off"
@@ -99,7 +100,7 @@ export default function Page(){
                   size="large"
                   id="emailReg"
                   className="mt-1"
-                  disabled={isLoading}
+                  disabled={isPending}
                   inputMode="email"
                   status={errors.email ? "error" : ""}
                   autoComplete="email"
@@ -132,7 +133,7 @@ export default function Page(){
                   size="large"
                   id="pwd"
                   className="mt-1"
-                  disabled={isLoading}
+                  disabled={isPending}
                   status={errors.password ? "error" : ""}
                   autoComplete="new-password"
                   autoCapitalize="off"
@@ -166,7 +167,7 @@ export default function Page(){
                   size="large"
                   id="confirmPwd"
                   className="mt-1"
-                  disabled={isLoading}
+                  disabled={isPending}
                   status={errors.password_confirmation ? "error" : ""}
                   autoComplete="new-password"
                   autoCapitalize="off"
@@ -191,7 +192,7 @@ export default function Page(){
             size="large"
             htmlType="submit"
             className="w-full mt-9"
-            loading={isLoading}
+            loading={isPending}
           >
             {translate("pages.register.buttons.submit")}
           </Button>
@@ -218,8 +219,8 @@ export default function Page(){
             {' '}
             <Link 
               to="/auth/login" 
-              tabIndex={isLoading ? -1 : 0} 
-              className={(isLoading ? "pe-none opacity-65 " : "") + "font-bold focus-visible_ring"}
+              tabIndex={isPending ? -1 : 0} 
+              className={(isPending ? "pe-none opacity-65 " : "") + "font-bold focus-visible_ring"}
             >
               {translate("pages.login.signin")}
             </Link>

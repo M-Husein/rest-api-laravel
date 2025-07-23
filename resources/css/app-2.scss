@@ -3,17 +3,41 @@
   --q-bg-nav: #dbeafe;
 }
 
+.dark .bg-theme {
+  background-color: #001529; // 001529 | 141414
+}
+
+.bg-main {
+  background-color: var(--q-bg-main); // $main_color;
+}
+
+// Navbar main
+.bg-nav {
+  background-color: var(--q-bg-nav);
+}
+:root.dark {
+  --q-bg-main: #1f1f1f;
+  --q-bg-nav: #1f1f1f;
+}
+
+.txt-main {
+  color: #212529;
+}
+.dark .txt-main {
+  color: #fff;
+}
+
 #loaderApp,
 .nojs {
   position: fixed;
-  background-color: var(--q-bg-main)
+  background-color: var(--q-bg-main);
 }
 
 .load-spin,
 .nojs {
   display: grid;
   place-content: center;
-  text-align: center
+  text-align: center;
 }
 
 .load-spin {
@@ -21,19 +45,43 @@
   user-select: none
 }
 
-.inset-0 {
-  inset: 0
+// Define here cause blocklist in tailwind.config
+.fixed {
+  position: fixed;
 }
+.m-auto {
+  margin: auto;
+}
+.inset-0 {
+  inset: 0;
+}
+.text-base {
+  font-size: 1rem; /* 16px */
+  line-height: 1.5rem; /* 24px */
+}
+.text-5xl {
+  font-size: 3rem; /* 48px */
+  line-height: 1;
+}
+// .text-0 {
+//   font-size: 0;
+// }
+.underline-offset-4	{
+  text-underline-offset: 4px;
+}
+.w-16 {
+  width: 4rem;
+}
+.h-16 {
+  height: 4rem;
+}
+// End like tailwind
 
 .cwait {
-  cursor: wait
-}
-
-.text-0 {
-  font-size: 0;
+  cursor: wait;
 }
 
 // Option to hide next elements when show loader App.
-#loaderApp:not(.hidden) ~ * {
+#loaderApp:not(.hidden) + * {
   display: none;
 }

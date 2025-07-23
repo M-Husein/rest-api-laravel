@@ -19,7 +19,7 @@ export const getToken = (): cookieResult => {
   return Cookies.get(TOKEN_KEY);
 }
 
-export const setToken = (token: any, expiresAt: any): void => {
+export const setToken = (token: string, expiresAt: string): void => {
   Cookies.set(
     TOKEN_KEY, 
     token,

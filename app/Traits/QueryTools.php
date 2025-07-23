@@ -57,7 +57,7 @@ trait QueryTools{
     Builder | QueryBuilder $query,
     Request $request
   ){
-    return response()->json(
+    return $this->jsonData(
       $query
         ->paginate($request->perPage ?? config('api.per_page', 10))
         ->appends($request->query())
@@ -108,10 +108,19 @@ trait QueryTools{
     //   'next' => $data->nextPageUrl()
     // ]
 
-    return response()->json(
+    return $this->jsonData(
       $this->buildQuery($query, $request, $searches, $filters, $sorts, $includes)
         ->simplePaginate($request->perPage ?? config('api.per_page', 10))
         ->appends($request->query())
+    );
+  }
+
+  protected function jsonData($data){
+    return response()->json(
+      $data,
+      200,
+      [],
+      JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
     );
   }
 

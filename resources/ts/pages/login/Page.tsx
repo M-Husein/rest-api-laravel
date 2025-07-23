@@ -4,15 +4,18 @@ import { Link } from "react-router-dom";
 import { useForm } from "@refinedev/react-hook-form";
 import { Controller } from 'react-hook-form'; // useForm, 
 // import { MailOutlined, LockOutlined } from '@ant-design/icons';
+import { z } from "zod";
+// import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Layout } from '@/components/layout/auth/Layout';
 import { Form } from '@/components/forms/Form';
 import { socialsProvider } from '@/providers/socialsProvider';
-import { email as emailRegExp } from '@/utils/regExp';
+// import { email as emailRegExp } from '@/utils/regExp';
 
 type IFormValues = {
   email: string;
   password: string;
-  remember: boolean;
+  remember?: boolean;
   providerName?: string; // providerName | provider
 }
 
@@ -25,26 +28,52 @@ export default function Page(){
   // const { token } = theme.useToken();
   const translate = useTranslate();
   const authProvider = useActiveAuthProvider();
-  const { mutate: login, isLoading } = useLogin<any>({ 
+  const { mutate: login, isPending } = useLogin<any>({ 
     v3LegacyAuthProviderCompatible: !!authProvider?.isLegacy 
+  });
+
+  const schema = z.object({
+    // email: z.email(translate("error.invalid", { name: "Email" })), // "Invalid email address"
+    // email: z.email({
+    //   error: (issue) =>
+    //     issue.input === undefined
+    //       ? "Email is required"
+    //       : "Invalid email format",
+    // }),
+    email: z.email(),
+    // password: z
+    //   // .string() // translate("error.required", { name: "Password" })
+    //   .string({
+    //     error: (issue) =>
+    //       issue.input === undefined
+    //         ? translate("error.required", { name: "Password" })
+    //         : "Invalid email format",
+    //   })
+    //   .min(6,  translate("error.minLength", { v: 6 })),
+    password: z.string().min(6),
+    remember: z.boolean().optional(),
+    providerName: z.string().optional(),
   });
 
   const {
     formState: { errors },
     control,
     handleSubmit, 
-  } = useForm<IFormValues, HttpError, IFormValues>();
-
-  const disabledLink = (cls?: string) => ({
-    tabIndex: isLoading ? -1 : 0,
-    className: (isLoading ? "pe-none opacity-65 " : "") + "focus-visible_ring " + cls,
+  } = useForm<IFormValues, HttpError, IFormValues>({
+    resolver: zodResolver(schema),
   });
 
-  const doLogin = (values: any) => {
-    login({
-      ...values,
-      email: values.email.trim()
-    });
+  const disabledLink = (cls?: string) => ({
+    tabIndex: isPending ? -1 : 0,
+    className: (isPending ? "pe-none opacity-65 " : "") + "focus-visible_ring " + cls,
+  });
+
+  const doLogin = (values: IFormValues) => {
+    login(values);
+    // login({
+    //   ...values,
+    //   email: values.email.trim()
+    // });
   }
 
   return (
@@ -52,7 +81,7 @@ export default function Page(){
       title="Login"
       form={
         <Form
-          disabled={isLoading}
+          disabled={isPending}
           onSubmit={handleSubmit(doLogin)}
           fieldsetClass="space-y-6"
         >
@@ -65,7 +94,7 @@ export default function Page(){
                 <Input
                   {...field}
                   status={errors.email ? "error" : ""}
-                  disabled={isLoading}
+                  disabled={isPending}
                   id="eml"
                   className="mt-1"
                   inputMode="email"
@@ -75,13 +104,13 @@ export default function Page(){
                   size="large"
                 />
               )}
-              rules={{
-                required: true,
-                pattern: {
-                  value: emailRegExp,
-                  message: translate("error.invalid", { name: "Email" })
-                }
-              }}
+              // rules={{
+              //   required: true,
+              //   pattern: {
+              //     value: emailRegExp,
+              //     message: translate("error.invalid", { name: "Email" })
+              //   }
+              // }}
             />
             {errors.email && (
               <div className="mt-1 text-red-700 text-xs">
@@ -99,7 +128,7 @@ export default function Page(){
                 <Input.Password
                   {...field}
                   status={errors.password ? "error" : ""}
-                  disabled={isLoading}
+                  disabled={isPending}
                   id="pwd"
                   className="mt-1"
                   autoComplete="off"
@@ -109,17 +138,17 @@ export default function Page(){
                   size="large"
                 />
               )}
-              rules={{
-                required: true,
-                minLength: {
-                  value: 6,
-                  message: translate("error.minLength", { v: 6 })
-                },
-              }}
+              // rules={{
+              //   required: true,
+              //   minLength: {
+              //     value: 6,
+              //     message: translate("error.minLength", { v: 6 })
+              //   },
+              // }}
             />
             {errors.password && (
               <div className="mt-1 text-red-700 text-xs">
-                {errors.password.message || translate("error.required", { name: "Password" })}
+                {errors.password.message}
               </div>
             )}
           </div>
@@ -132,7 +161,7 @@ export default function Page(){
                 <Checkbox 
                   {...field} 
                   checked={field.value}
-                  disabled={isLoading}
+                  disabled={isPending}
                   className="mr-2"
                 >
                   {translate("pages.login.buttons.rememberMe")}
@@ -153,7 +182,7 @@ export default function Page(){
             type="primary"
             size="large"
             htmlType="submit"
-            loading={isLoading}
+            loading={isPending}
           >
             {translate("pages.login.signin")}
           </Button>

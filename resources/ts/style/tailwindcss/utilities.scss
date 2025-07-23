@@ -11,33 +11,18 @@
   //   background-color: #eee; // f5f5f5
   // }
 
-  .dark .bg-theme {
-    background-color: #001529; // 001529 | 141414
-  }
+  // .dark .bg-theme {
+  //   background-color: #001529; // 001529 | 141414
+  // }
 
-  .bg-main {
-    // rgba(3,31,31,.7)
-    background-color: var(--q-bg-main); // $main_color;
-  }
+  // .bg-main {
+  //   // rgba(3,31,31,.7)
+  //   background-color: var(--q-bg-main); // $main_color;
+  // }
+
   // :root.dark {
   //   --q-bg-main: #1f1f1f;
   // }
-
-  // Navbar main
-  .bg-nav {
-    background-color: var(--q-bg-nav);
-  }
-  :root.dark {
-    --q-bg-main: #1f1f1f;
-    --q-bg-nav: #1f1f1f;
-  }
-
-  .txt-main {
-    color: #212529;
-  }
-  .dark .txt-main {
-    color: #fff;
-  }
 
   // NOTE: Used fa svg icon compoonent (react-icons)
   .align--1px {

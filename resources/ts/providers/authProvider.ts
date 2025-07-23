@@ -1,10 +1,18 @@
 import { AuthProvider } from "@refinedev/core";
 import { api, httpRequest } from '@/providers/dataProvider';
 import { TOKEN_KEY, getToken, setToken, clearToken } from '@/utils/authToken';
-import { getAppLang } from '@/utils/setAppLang'; // setAppLang, 
 import { toggleLoaderApp } from '@/utils/dom';
 
-const HTTP_UNAUTHORIZED = [401, 419];
+const loginProccess = (token: string, expiresAt: string, user: any) => {
+  setToken(token, expiresAt);
+
+  // window.location.replace('/');
+
+  const lang = user.lang || APP.defaultLang;
+
+  localStorage.setItem("i18nextLng", lang);
+  document.documentElement.lang = lang;
+}
 
 export const authProvider: AuthProvider = {
   /** @OPTIONS : providerName | provider */
@@ -21,18 +29,37 @@ export const authProvider: AuthProvider = {
       /** @OPTION : For cross domain */
       // await api.get('sanctum/csrf-cookie');
 
-      const locale = getAppLang(); // setAppLang();
-
       const response: any = await httpRequest.post('register', {
-        searchParams: locale.obj, // setAppLang(),
         json 
       }).json();
+
       // console.log('response: ', response);
 
-      // if(response?.data){
+      if(response?.data){
+        return {
+          user: response.data.user, // <- Custom
+          success: true,
+          redirectTo: import.meta.env.VITE_LOGIN_PATH, // redirectPath || 
+          successNotification: {
+            message: response.message || "Registration Successful",
+            description: "You have successfully registered",
+          },
+        };
+      }
+
+      return errorResponse;
+
+      /** @OPTION : Auto login */
+      // if(!response?.errors){ // response?.data
+      //   let { token, expiresAt, user } = response.data;
+
+      //   loginProccess(token, expiresAt, user);
+
       //   return {
+      //     user, // <- Custom
       //     success: true,
-      //     redirectTo: redirectPath,
+      //     // redirectTo: "/app", // For admin
+      //     redirectTo: "/",
       //     successNotification: {
       //       message: response.message || "Registration Successful",
       //       description: "You have successfully registered",
@@ -41,32 +68,15 @@ export const authProvider: AuthProvider = {
       // }
 
       // return errorResponse;
-
-      /** @OPTION : Auto login */
-      if(response?.data){
-        // let { token, expiresAt } = response.data;
-        setToken(response.data.token, response.data.expiresAt);
-
-        return {
-          success: true,
-          redirectTo: "/app" + locale.str,
-          successNotification: {
-            message: response.data.message || "Registration Successful",
-            description: "You have successfully registered",
-          },
-        };
-      }
-
-      return errorResponse;
     } catch(e: any) {
-      const data = await e.response.json().catch(() => null);
+      // const data = await e.response.json().catch(() => null);
       // console.log('data: ', data);
 
-      if(data.message){
-        errorResponse.error.message = data.message;
-      }
+      // if(data.message){
+      //   errorResponse.error.message = data.message;
+      // }
 
-      return errorResponse;
+      return e;
     }
   },
   
@@ -75,7 +85,7 @@ export const authProvider: AuthProvider = {
     const errorResponse = {
       success: false,
       error: {
-        name: "LoginError",
+        name: "Login Error", // LoginError
         message: "Invalid username or password",
       },
     };
@@ -85,10 +95,11 @@ export const authProvider: AuthProvider = {
         /** @OPTION : For cross domain */
         // await api.get('sanctum/csrf-cookie');
 
-        const locale = getAppLang(); // setAppLang();
+        // Hack for Refine run check to get user authentication
+        sessionStorage.removeItem('LoginError');
 
         const response: any = await httpRequest.post('login', {
-          searchParams: locale.obj, // locale
+          // credentials: 'same-origin',
           json: provider 
             ? { provider, type: "spa" } 
             : { email, username, password, remember, type: "spa" }
@@ -96,32 +107,34 @@ export const authProvider: AuthProvider = {
 
         // console.log('response: ', response);
 
-        if(response?.data){
+        if(response?.data){ // !response?.errors
           let { token, expiresAt, user } = response.data;
-          setToken(token, expiresAt);
 
-          // window.location.replace('/');
+          loginProccess(token, expiresAt, user);
           
           return {
+            user, // <- Custom
             success: true,
-            // redirectTo: "/app" + locale.str,
-            redirectTo: "/" + locale.str,
-            user
+            // redirectTo: "/app", // For admin
+            redirectTo: "/"
           };
         }
 
         return errorResponse;
       }catch(e: any) { // (e: any)
-        const data = await e.response.json().catch(() => null);
-        // console.log('data: ', data);
+        // console.log('e: ', e);
+        // const data = await e.response.json().catch(() => null);
+        // // console.log('data: ', data);
 
-        if(data.message){
-          errorResponse.error.message = data.message;
+        if(e.message){
+          errorResponse.error.message = e.message;
         }
+
+        // Hack for Refine run check to get user authentication
+        sessionStorage.setItem('LoginError', '1');
 
         return errorResponse;
         // throw errorResponse;
-        // return Promise.reject(errorResponse);
       }
     }
 
@@ -143,11 +156,8 @@ export const authProvider: AuthProvider = {
       /** @OPTION : For cross domain */
       // await api.get('sanctum/csrf-cookie');
 
-      const locale = getAppLang(); // setAppLang();
-
       /** @OPTION : make sure logout api success */
       const response: any = await httpRequest.post('logout', {
-        searchParams: locale.obj, // locale
         keepalive: true
       })
       .json();
@@ -183,9 +193,13 @@ export const authProvider: AuthProvider = {
         const bc = new BroadcastChannel(import.meta.env.VITE_BC_NAME);
         bc.postMessage({ type: "LOGOUT" });
 
+        // Reset to default lang
+        localStorage.setItem("i18nextLng", APP.defaultLang);
+        document.documentElement.lang = APP.defaultLang;
+
         return {
           success: true,
-          redirectTo: import.meta.env.VITE_LOGIN_PATH + locale.str,
+          redirectTo: import.meta.env.VITE_LOGIN_PATH,
         };
       }
       return errorResponse;
@@ -197,6 +211,18 @@ export const authProvider: AuthProvider = {
   },
   
   check: async () => {
+    // Hack for Refine run check to get user authentication
+    const loginError = sessionStorage.getItem('LoginError');
+    if(loginError){
+      return { authenticated: false }
+    }
+    
+    // const persistIdentity = await authProvider.getIdentity?.();
+    // // console.log('persistIdentity: ', persistIdentity);
+    // if(persistIdentity){
+    //   return { ...persistIdentity, authenticated: true }
+    // }
+
     const errorResponse = {
       authenticated: false,
       logout: true,
@@ -208,7 +234,7 @@ export const authProvider: AuthProvider = {
     };
 
     try {
-      const response: any = await httpRequest('me', { searchParams: getAppLang().obj }).json();
+      const response: any = await httpRequest('me').json();
 
       // console.log('req: ', req);
 
@@ -250,12 +276,12 @@ export const authProvider: AuthProvider = {
 
     try { // send password reset link to the user's email address here
       // 'forgot-password/' + username
-      const response: any = await api.post('forgot-password', { searchParams: getAppLang().obj });
+      const response: any = await api.post('forgot-password');
       // console.log('response: ', response);
       if(response?.data){
         return {
           success: true,
-          redirectTo: import.meta.env.VITE_LOGIN_PATH + getAppLang().str, // "/auth/login"
+          redirectTo: import.meta.env.VITE_LOGIN_PATH, // "/auth/login"
         };
       }
       
@@ -275,12 +301,13 @@ export const authProvider: AuthProvider = {
 
     let statusCode = error?.response?.status;
     
-    if(statusCode && HTTP_UNAUTHORIZED.includes(statusCode)){
+    // const HTTP_UNAUTHORIZED = [401, 419];
+    if(statusCode && [401, 419].includes(statusCode)){
       return {
         error,
         authenticated: false,
         logout: true,
-        redirectTo: import.meta.env.VITE_LOGIN_PATH + getAppLang().str, // "/auth/login"
+        redirectTo: import.meta.env.VITE_LOGIN_PATH, // "/auth/login"
       }
     }
 

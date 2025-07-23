@@ -2,7 +2,6 @@ import { DataProvider } from "@refinedev/core";
 // import { httpRequest, generateSort, generateFilter } from "./utils";
 import { httpRequest } from "./utils/httpRequest";
 import i18n from "@/i18n";
-import { setAppLang } from '@/utils/setAppLang';
 
 class CustomError extends Error { // @ts-ignore
   constructor(name: string, message: string, cause?: any) {
@@ -11,8 +10,6 @@ class CustomError extends Error { // @ts-ignore
     this.cause = cause;
   }
 }
-
-const queryParamString = (searchParams: any) => new URLSearchParams({ ...setAppLang(), ...searchParams }).toString();
 
 type MethodTypes = "get" | "delete" | "head" | "options";
 type MethodTypesWithBody = "post" | "put" | "patch";
@@ -56,7 +53,7 @@ export const dataProvider = (
     try {
       const paginationOff = mode === "off"; // mode === "server"
 
-      let query: any = { ...setAppLang(), ...searchParams };
+      let query: any = { ...searchParams };
 
       if(!paginationOff){
         if(q){
@@ -117,7 +114,7 @@ export const dataProvider = (
           ...requestOptions,
           method: (method as MethodTypes) ?? "get",
           signal: queryContext?.signal, 
-          searchParams: { ...setAppLang(), ...searchParams, id: ids }, 
+          searchParams: { ...searchParams, id: ids }, 
         }
       )
       .json();
@@ -135,7 +132,7 @@ export const dataProvider = (
   create: async ({ 
     resource, 
     variables, 
-    meta: { method, body, searchParams, ...requestOptions } = {}
+    meta: { method, body, ...requestOptions } = {}
   }) => {
     // const { method, body, ...requestOptions } = meta ?? {}; // , queryContext
     const requestMethod = (method as MethodCommons) ?? "post"; // MethodTypesWithBody | MethodCommons
@@ -148,7 +145,6 @@ export const dataProvider = (
           method: requestMethod,
           body,
           json: requestMethod === 'get' || body ? undefined : variables,
-          searchParams: queryParamString(searchParams),
         }
       ).json();
 
@@ -177,7 +173,7 @@ export const dataProvider = (
     resource, 
     id, 
     variables, 
-    meta: { method, searchParams, ...requestOptions } = {}
+    meta: { method, ...requestOptions } = {}
   }) => {
     // const { method } = meta ?? {}; // , queryContext
 
@@ -188,7 +184,6 @@ export const dataProvider = (
           ...requestOptions,
           method: (method as MethodTypesWithBody) ?? "put",
           json: variables,
-          searchParams: queryParamString(searchParams),
         }
         /** @DEV : must check & test (use or not) */
         // { signal: queryContext?.signal, ...requestOptions }
@@ -226,7 +221,7 @@ export const dataProvider = (
   getOne: async ({ 
     resource, 
     id, 
-    meta: { method, queryContext, searchParams, ...requestOptions } = {}
+    meta: { method, queryContext, ...requestOptions } = {}
   }) => {
     // const { method, queryContext, ...requestOptions } = meta ?? {};
 
@@ -236,7 +231,6 @@ export const dataProvider = (
         { 
           ...requestOptions,
           method: (method as MethodTypes) ?? "get",
-          searchParams: queryParamString(searchParams),
           signal: queryContext?.signal,
         }
       ).json();
@@ -254,7 +248,7 @@ export const dataProvider = (
     resource, 
     id, 
     variables, 
-    meta: { method, searchParams, ...requestOptions } = {}
+    meta: { method, ...requestOptions } = {}
   }) => {
     // const { method } = meta ?? {}; // , queryContext
 
@@ -265,7 +259,6 @@ export const dataProvider = (
           ...requestOptions,
           method: (method as MethodTypesWithBody) ?? "delete",
           json: variables,
-          searchParams: queryParamString(searchParams),
         },
         /** @DEV : must check & test (use or not) */
         // { signal: queryContext?.signal }
@@ -283,7 +276,7 @@ export const dataProvider = (
   deleteMany: async ({ 
     resource, 
     ids, 
-    meta: { method, searchParams, ...requestOptions } = {}
+    meta: { method, ...requestOptions } = {}
     // variables
   }) => {
     // const { method } = meta ?? {}; // , queryContext
@@ -295,7 +288,6 @@ export const dataProvider = (
           ...requestOptions,
           method: (method as MethodTypesWithBody) ?? "delete",
           json: { ids },
-          searchParams: queryParamString(searchParams),
         }, // , variables
 
         /** @DEV : must check & test (use or not) */
@@ -340,7 +332,7 @@ export const dataProvider = (
     try {
       const paginationOff = mode === "off"; // mode === "server"
 
-      let query: any = { ...setAppLang(), ...searchParams };
+      let query: any = { ...searchParams };
 
       if(!paginationOff){
         if(q){
