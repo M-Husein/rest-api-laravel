@@ -37,33 +37,36 @@ export const dataProvider = (
 ): DataProvider => ({
   getList: async ({ 
     resource, 
-    pagination, 
+    pagination: { current = 1, pageSize = 10, mode = "server" } = {}, 
+    // pagination,
     filters, 
     sorters, 
     meta: { method, queryContext, searchParams, q, ...requestOptions } = {}
   }) => {
-    const {
-      current = 1,
-      pageSize = 10,
-      mode = "server",
-    } = pagination ?? {};
+    // const {
+    //   current = 1,
+    //   pageSize = 10,
+    //   mode = "server",
+    // } = pagination ?? {};
 
     // const { method, queryContext, searchParams, q, ...requestOptions } = meta ?? {};
 
     try {
       const paginationOff = mode === "off"; // mode === "server"
 
-      let query: any = { ...searchParams };
+      let query: any = searchParams;
 
       if(!paginationOff){
+        if(!query){
+          query = {};
+        }
+
         if(q){
           query.q = q;
         }
 
         query.page = current;
         query.perPage = pageSize;
-
-        // decodeURIComponent()
 
         parseFilters(filters, query);
         parseSorts(sorters, query);
@@ -81,12 +84,23 @@ export const dataProvider = (
       const data = response?.data;
 
       if(response?.errors){
-        throw new CustomError('ReadError', response?.message || i18n.t('error.unspecific'), response);
+        throw new CustomError(
+          'ReadError', 
+          response?.message || i18n.t('error.unspecific'), 
+          response
+        );
       }
 
       if(paginationOff){
         return data;
       }
+
+      // if (paginationOff) {
+      //   return {
+      //     data,
+      //     total: data.length,
+      //   };
+      // }
 
       const { total, ...otherData } = response;
 
@@ -120,7 +134,11 @@ export const dataProvider = (
       .json();
       
       if(response?.errors){
-        throw new CustomError('ReadError', response?.message || i18n.t('error.unspecific'), response);
+        throw new CustomError(
+          'ReadError', 
+          response?.message || i18n.t('error.unspecific'), 
+          response
+        );
       }
       return response;
     } catch(e){
@@ -148,7 +166,7 @@ export const dataProvider = (
         }
       ).json();
 
-      // console.log('req: ', req)
+      // console.log('response: ', response);
 
       // console.log('queryContext: ', queryContext)
       /** @DEV : signal not work if method get */
@@ -161,7 +179,11 @@ export const dataProvider = (
       // });
 
       if(response?.errors){
-        throw new CustomError('CreateError', response?.message || i18n.t('error.unspecific'), response);
+        throw new CustomError(
+          'CreateError', 
+          response?.message || i18n.t('error.unspecific'), 
+          response
+        );
       }
       return response;
     } catch(e) {
@@ -198,7 +220,11 @@ export const dataProvider = (
       // }
 
       if(response?.errors){
-        throw new CustomError('UpdateError', response?.message || i18n.t('error.unspecific'), response);
+        throw new CustomError(
+          'UpdateError', 
+          response?.message || i18n.t('error.unspecific'), 
+          response
+        );
       }
       
       return response; // response
@@ -236,7 +262,11 @@ export const dataProvider = (
       ).json();
 
       if(response?.errors){
-        throw new CustomError('ReadError', response?.message || i18n.t('error.unspecific'), response);
+        throw new CustomError(
+          'ReadError', 
+          response?.message || i18n.t('error.unspecific'), 
+          response
+        );
       }
       return response;
     } catch(e) {
@@ -265,7 +295,11 @@ export const dataProvider = (
       ).json();
 
       if(response?.errors){
-        throw new CustomError('DeleteError', response?.message || i18n.t('error.unspecific'), response);
+        throw new CustomError(
+          'DeleteError', 
+          response?.message || i18n.t('error.unspecific'), 
+          response
+        );
       }
       return response;
     } catch(e){
@@ -295,7 +329,11 @@ export const dataProvider = (
       ).json();
 
       if(response?.errors){
-        throw new CustomError('DeleteManyError', response?.message || i18n.t('error.unspecific'), response);
+        throw new CustomError(
+          'DeleteManyError', 
+          response?.message || i18n.t('error.unspecific'), 
+          response
+        );
       }
       return response;
     } catch(e) {
@@ -332,9 +370,13 @@ export const dataProvider = (
     try {
       const paginationOff = mode === "off"; // mode === "server"
 
-      let query: any = { ...searchParams };
+      let query: any = searchParams;
 
       if(!paginationOff){
+        if(!query){
+          query = {};
+        }
+        
         if(q){
           query.q = q;
         }
@@ -358,7 +400,11 @@ export const dataProvider = (
       const data = response?.data;
 
       if(response?.errors){
-        throw new CustomError('ReadError', response?.message || i18n.t('error.unspecific'), response);
+        throw new CustomError(
+          'ReadError', 
+          response?.message || i18n.t('error.unspecific'), 
+          response
+        );
       }
 
       if(paginationOff){

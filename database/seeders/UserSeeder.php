@@ -20,7 +20,7 @@ class UserSeeder extends Seeder{
       'password' => Hash::make('password'),
       'email_verified_at' => now(),
       'role' => $adminId,
-      'lang' => 'en',
+      'lang' => config('app.locale'),
       // 'theme' => 'light',
     ]);
 
@@ -30,7 +30,7 @@ class UserSeeder extends Seeder{
       'email' => 'editor@email.com',
       'password' => Hash::make('password'),
       'role' => $editorId,
-      'lang' => 'en',
+      'lang' => config('app.locale'),
     ]);
 
     User::create([
@@ -39,7 +39,7 @@ class UserSeeder extends Seeder{
       'email' => 'viewer@email.com',
       'password' => Hash::make('password'),
       'role' => $viewerId,
-      'lang' => 'en',
+      'lang' => config('app.locale'),
     ]);
   }
 }

@@ -2,7 +2,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use App\Http\Middleware\{SetLocale, HybridCsrf, Role};
+use App\Http\Middleware\{SetLocale, Role};
 
 return Application::configure(basePath: dirname(__DIR__))
   ->withRouting(
@@ -13,7 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
   )
   ->withMiddleware(function(Middleware $middleware): void{
     $middleware->web(append: [
-      SetLocale::class
+      SetLocale::class,
+      // \Illuminate\Session\Middleware\AuthenticateSession::class,
     ]);
 
     $middleware->api(prepend: [
@@ -21,16 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
       \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class // Keep this if your React SPA uses Sanctum's session-based authentication
     ]);
 
-    // If your React SPA uses Sanctum's session-based authentication (which is common),
-    // ensure EnsureFrontendRequestsAreStateful is in the 'web' group (it usually is by default).
-    // If your API is purely stateless (e.g., for mobile apps using only tokens),
-    // you might remove AuthenticateSession from the 'api' group if it's there.
-    // For a typical Laravel + React SPA setup, the default configuration is often fine.
-
     // Middleware aliases (for use in routes)
     $middleware->alias([
-      'role' => Role::class,
-      'hybrid.csrf' => HybridCsrf::class
+      'role' => Role::class
     ]);
 
     // $middleware->redirectUsersTo(function(Request $request){

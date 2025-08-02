@@ -47,7 +47,7 @@ html.dark {
 .load-spin {
   z-index: 1055;
   cursor: wait;
-  user-select: none;
+  // user-select: none;
 }
 
 // Define here cause blocklist in tailwind.config
@@ -114,7 +114,7 @@ html.dark {
   animation: .75s linear infinite spin;
 }
 
-// Define here cause blocklist in tailwind.config
+// Define here cause blocklist in tailwind.config (to override .spin-border width & height)
 .w-16 {
   width: 4rem;
 }

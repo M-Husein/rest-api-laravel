@@ -1,18 +1,60 @@
 import { useState } from "react";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
-// import { useCreate } from "@refinedev/core"; // HttpError, useOne, useNotification, useUpdate
-import { Breadcrumb, Card, Tabs, Grid } from 'antd';
-import { ToolOutlined, TranslationOutlined } from '@ant-design/icons';
+import { useParsed, useCreate } from "@refinedev/core"; // HttpError, useOne, useNotification, useUpdate
+// import { useSearchParams } from "react-router-dom";
+import { Breadcrumb, Card, Tabs, Grid, Modal } from 'antd';
+import { TranslationOutlined } from '@ant-design/icons'; // ToolOutlined, 
+import { Info } from '@/components/Info';
 import { ClearCache } from "@/components/ClearCache";
 import { Translations } from './parts/Translations';
+import { UserLogged } from './parts/UserLogged';
 
 export default function Page(){
   useDocumentTitle("Settings App - " + import.meta.env.VITE_APP_NAME);
 
   const breakpoint = Grid.useBreakpoint();
   const isSmallDevice = typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
+  const [modalApi, modalContextHolder] = Modal.useModal();
+  const { mutate: mutateCreate, isPending: isPendingCreate } = useCreate();
+  const { params } = useParsed<any>(); // : { current, pageSize, sorters, filters }
+  // const [searchParams, setSearchParams] = useSearchParams();
+  const [tabActive, setTabActive] = useState(params.tab || "0"); // searchParams.get('tab')
+  // const tabActive = searchParams.get('tab') || "0";
 
-  const [tabActive, setTabActive] = useState("0");
+  // console.log('tabActive: ', tabActive);
+
+  const revokeUserTokens = (row: any, refetch: any, cb: any) => {
+    const confirms = modalApi.confirm({
+      centered: true,
+      keyboard: false,
+      title: "Are you sure to revoke this user tokens?",
+      cancelButtonProps: { disabled: false },
+      onOk: () => new Promise((resolve, reject) => {
+        const updateConfirm = (disabled: boolean) => confirms.update({
+          cancelButtonProps: { disabled }
+        });
+
+        updateConfirm(true);
+
+        mutateCreate({
+          resource: "revoke-tokens",
+          values: {
+            user_id: row.id
+          },
+        }, {
+          onSuccess: (res) => {
+            refetch();
+            cb?.(null);
+            resolve(res);
+          },
+          onError: (e) => {
+            updateConfirm(false);
+            reject(e);
+          },
+        });
+      })
+    });
+  }
 
   return (
     <>
@@ -40,28 +82,52 @@ export default function Page(){
               minWidth: 200
             }
           }
+          className="tab-full"
           activeKey={tabActive}
-          onChange={setTabActive}
+          onChange={(tab) => {
+            setTabActive(tab);
+            // setSearchParams(prev => ({ ...prev, tab }));
+          }}
           items={[
-            // {
-            //   key: "0",
-            //   label: "",
-            //   children: "Select"
-            // },
+            {
+              key: "0",
+              label: <><b className="mr-4">ℹ️</b>Information</>,
+              className: "h-full",
+              children: (
+                <Info className="h-full">
+                  <h2>Information</h2>
+                </Info>
+              )
+            },
             {
               key: "1",
-              label: <><TranslationOutlined className="mr-4" />Translations</>,
-              // disabled: loadingUser,
+              label: <><b className="mr-4">👥</b>User logged</>,
               children: (
                 <div className="py-4 md_pr-4">
-                  <Translations fixedAction={!isSmallDevice} />
+                  <UserLogged 
+                    {...params} 
+                    onClickLogout={revokeUserTokens}
+                  />
+                </div>
+              )
+            },
+            {
+              key: "2",
+              label: <><TranslationOutlined className="mr-4" />Translations</>,
+              disabled: isPendingCreate,
+              children: (
+                <div className="py-4 md_pr-4">
+                  <Translations 
+                    {...params}
+                    fixedAction={!isSmallDevice}
+                  />
                 </div>
               ),
             },
             {
-              key: "2",
-              label: <><ToolOutlined className="mr-4" />Maintenance</>,
-              // disabled: loadingUser,
+              key: "3",
+              label: <><b className="mr-4">🛠️</b>Maintenance</>, // <ToolOutlined className="mr-4" />
+              disabled: isPendingCreate,
               className: "!p-0",
               children: (
                 // py-4 md_px-4 max-md_px-4
@@ -79,6 +145,8 @@ export default function Page(){
           ]}
         />
       </Card>
+
+      {modalContextHolder}
     </>
   );
 }

@@ -1,6 +1,8 @@
 {
   "guide": "Panduan",
   "nojs": "Anda harus mengaktifkan JavaScript untuk menjalankan aplikasi ini",
+  "logoutDevice": "Berhasil keluar dari perangkat yang dipilih",
+  "registerOk": "Registrasi Berhasil",
   "(and :count more error)": "(dan :count kesalahan lainnya)",
   "(and :count more errors)": "(dan :count kesalahan lainnya)|(dan :count kesalahan lainnya)|(dan :count kesalahan lainnya)",
   "A decryption key is required.": "Kunci dekripsi diperlukan.",

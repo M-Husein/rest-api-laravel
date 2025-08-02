@@ -1,6 +1,8 @@
 {
   "guide": "Guide",
   "nojs": "You need to enable JavaScript to run this app",
+  "registerOk": "Registration successful",
+  "logoutDevice": "Successfully logged out of the selected device",
   "(and :count more error)": "(and :count more error)",
   "(and :count more errors)": "(and :count more error)|(and :count more errors)|(and :count more errors)",
   "A decryption key is required.": "A decryption key is required.",

@@ -13,33 +13,31 @@ use App\Traits\RateLimit;
 class AuthController extends Controller{
   use RateLimit;
 
+  /**
+   * Login with token-based
+   */
   public function login(LoginRequest $req){
     $this->limitRequest($req, 'login');
 
-    $remember = $req->boolean('remember');
+    $remember = $req->filled('remember'); // $req->boolean('remember');
 
     if(Auth::attempt($req->only('email', 'password'), $remember)){
-      $user = $req->user(); // Get the authenticated user
+      $user = $req->user();
       $expiresAt = $remember ? now()->addWeeks(4) : now()->addHours(2);
 
       // ✅ Create token
       $token = $user->createToken(
-        $req->type.'-token',
-        ['*'],
-        $expiresAt
-      )->plainTextToken;
+        $req->type, // Token name: spa | native
+        ['*'],      // Token abilities: *
+        $expiresAt  // Token expiration: 4 weeks | 2 hours
+      );
 
-      $tokenModel = PersonalAccessToken::findToken($token) ?? $user->tokens()->latest()->first();
+      // $tokenModel = PersonalAccessToken::findToken($token) ?? $user->tokens()->latest()->first();
+      $tokenModel = $token->accessToken; // The PersonalAccessToken model instance
 
-      if($tokenModel){
-        $tokenModel->ip_address = $req->ip();
-        $tokenModel->user_agent = $req->userAgent();
-        $tokenModel->save();
-      }
-      
-      if($req->type === 'spa' && $req->hasSession() && $req->session()){
-        $req->session()->regenerate();
-      }
+      $tokenModel->ip_address = $req->ip();
+      $tokenModel->user_agent = $req->userAgent();
+      $tokenModel->save();
 
       $user->roles = [
         'key' => config('roles.keys.' . $user->role),
@@ -48,63 +46,150 @@ class AuthController extends Controller{
 
       return jsonSuccess([
         'user' => $user,
-        'token' => $token,
-        'expiresAt' => $expiresAt // expires_at
+        'token' => $token->plainTextToken,
+        'expiresAt' => $expiresAt
       ]);
     }
 
     return jsonError(__('auth.failed'), 401);
   }
 
+  /**
+   * Revoke token if it's a PersonalAccessToken (for token-based clients)
+   */
   public function logout(Request $req){
-    // ✅ Revoke current token (for token-based clients)
-    // $req->user()->currentAccessToken()->delete();
-
-    // ✅ Revoke token if it's a PersonalAccessToken
     $token = $req->user()?->currentAccessToken();
     if($token instanceof PersonalAccessToken){
       $token->delete();
     }
-
-    // ✅ Invalidate session (for SPA clients)
-    if($req->hasSession()){
-      Auth::guard('web')->logout();
-      $req->session()->invalidate();
-      $req->session()->regenerateToken();
-    }
-
-    // return response()->noContent();
     return jsonSuccess(1);
   }
 
-  public function logoutOthers(Request $req){
+  public function getActiveDevices(Request $req){
     $user = $req->user();
-    $token = $user->currentAccessToken();
-    if($token){
-      $user->tokens()->where('id', '!=', $token->id)->delete();
-      return response()->noContent();
-    }
-    return jsonError("Not Found"); // No active token found
+    $currenTokenId = $user->currentAccessToken()?->id;
+
+    // Retrieve all personal access tokens issued to the user.
+    // Filter out the current token if it was used for authentication.
+    $devices = $user->tokens->filter(function($token) use ($currenTokenId){
+      return $token->id !== $currenTokenId;
+    })->values()->map(fn($item) => [
+      'id' => $item->id,
+      'name' => $item->name,
+      'ip_address' => $item->ip_address,
+      'user_agent' => $item->user_agent,
+      'created_at' => $item->created_at,
+      'last_used_at' => $item->last_used_at,
+      'expires_at' => $item->expires_at
+    ]);
+
+    return jsonSuccess($devices);
+
+    // Get all persistent API tokens for the user
+    // $devices = $user->tokens()->get()->map(function (PersonalAccessToken $token) use ($req) {
+    //   $isCurrent = false;
+    //   $currentAccessToken = $req->user()->currentAccessToken();
+
+    //   // Determine if this token is the one currently being used for the request
+    //   if ($currentAccessToken instanceof PersonalAccessToken && $currentAccessToken->id === $token->id) {
+    //     $isCurrent = true;
+    //   }
+
+    //   return [
+    //     'id' => $token->id,
+    //     'name' => $token->name,
+    //     'last_used_at' => $token->last_used_at,
+    //     'created_at' => $token->created_at,
+    //     'expires_at' => $token->expires_at,
+    //     'ip_address' => $token->ip_address,
+    //     'user_agent' => $token->user_agent,
+    //     'is_current' => $isCurrent, // Flag to indicate the current token
+    //   ];
+    // });
   }
 
   /**
+   * Logs out all other devices for the authenticated user, except the current one.
+   * Requires current password for security.
+   * Expected Payload: { "email": "user@example.com", "password": "current_password" }
+   */
+  public function logoutOthers(Request $req){
+    $user = $req->user();
+
+    if(Auth::guard('web')->validate([
+      'email' => $user->email,
+      'password' => $req->password
+    ])){
+      $deletes = 0;
+      $currentToken = $user->currentAccessToken();
+
+      if($currentToken instanceof PersonalAccessToken){
+        // 2. Delete all tokens except the current one
+        // If currentTokenId is null (e.g., session-authenticated user), it won't exclude anything from personal access tokens
+        // For session-authenticated users, logoutOtherDevices() is for other web sessions.
+        // This is specifically for other *API tokens*.
+        $deletes = $user->tokens()
+          ->where('id', '!=', $currentToken->id) // Exclude current token
+          ->delete();
+      }else{
+        $deletes = $user->tokens()->delete();
+      }
+
+      return jsonSuccess($deletes, __("logoutDevice"));
+    }
+
+    return jsonError(__('auth.password'), 422);
+  }
+
+  /**
+   * Logs out a specific device (personal access token) for the authenticated user,
+   * requiring current password validation for security.
+   *
+   * Expected Payload: { "email": "user@example.com", "password": "current_password" }
+   * Expected Route: DELETE /api/v1/logout-specific-device/{id}
+   */
+  public function logoutDevice(Request $req, int|string $id){
+    $user = $req->user();
+
+    if(Auth::guard('web')->validate([
+      'email' => $user->email,
+      'password' => $req->password
+    ])){
+      $token = $user->tokens()->find($id);
+
+      if($token){
+        $currentToken = $user->currentAccessToken();
+        if($currentToken instanceof PersonalAccessToken && $currentToken->id === $token->id){
+          return jsonError(__("You cannot log out the device currently in use for this request. Please use the general logout endpoint."), 403);
+        }
+
+        $token->delete();
+
+        return jsonSuccess(1, __("logoutDevice"));
+      }
+
+      return jsonError("Device " . __("Not Found"), 404);
+    }
+
+    return jsonError(__('auth.password'), 422);
+  }
+
+  /**
+   * Option: simple version
    * Logout from a specific device using token ID.
    *
    * @param  \Illuminate\Http\Request $request
-   * @param  string $id = $deviceId
+   * @param  string $id $deviceId
    * @return \Illuminate\Http\JsonResponse
   */
-  public function logoutDevice(Request $req, int|string $id){
-    $token = $req->user()->tokens()->where('id', $id)->first();
-    if($token){
-      $token->delete();
-      return jsonSuccess('', 'Logged out from selected device');
-    }
-    return jsonError(__("Not Found")); // 'Device not found'
-  }
-
-  // Revoke All Tokens for a User
-  // PersonalAccessToken::where('tokenable_id', $userId)->delete();
+  // public function logoutDevice(Request $req, int|string $id){
+  //   $token = $req->user()->tokens()->find($id); // ->where('id', $id)->first()
+  //   if($token){
+  //     $token->delete();
+  //     return jsonSuccess(1, __("logoutDevice"));
+  //   }
+  //   return jsonError("Device " . __("Not Found"), 404);
+  // }
 
   public function forgotPassword(ForgotPasswordRequest $req){
     $this->limitRequest($req, 'forgot-password');
@@ -112,7 +197,7 @@ class AuthController extends Controller{
     $status = Password::sendResetLink($req->only('email'));
 
     return $status === Password::RESET_LINK_SENT 
-      ? jsonSuccess('', __("passwords.sent")) 
+      ? jsonSuccess(1, __("passwords.sent")) 
       : jsonError(__("Expectation Failed"));
   }
 
@@ -126,7 +211,7 @@ class AuthController extends Controller{
     );
 
     return $status === Password::PASSWORD_RESET 
-      ? jsonSuccess('', __("passwords.reset")) 
+      ? jsonSuccess(1, __("passwords.reset")) 
       : jsonError(__("passwords.token"));
   }
 }

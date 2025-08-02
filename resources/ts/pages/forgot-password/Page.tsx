@@ -2,6 +2,7 @@ import {
   ForgotPasswordPageProps,
   ForgotPasswordFormTypes,
   useForgotPassword,
+  useTranslate
 } from "@refinedev/core";
 import {
   Layout,
@@ -34,8 +35,9 @@ const ForgotPasswordPage: React.FC<ResetPassworProps> = () => {
   useDocumentTitle("Forgot Password - " + APP_NAME);
 
   // const { token } = theme.useToken();
+  const translate = useTranslate();
   const [form] = Form.useForm<ForgotPasswordFormTypes>();
-  const { mutate: forgotPassword, isLoading } = useForgotPassword<ForgotPasswordFormTypes>();
+  const { mutate: forgotPassword, isPending } = useForgotPassword<ForgotPasswordFormTypes>();
 
   return (
     <Layout>
@@ -56,7 +58,7 @@ const ForgotPasswordPage: React.FC<ResetPassworProps> = () => {
             className="text-center text-lg mb-4 pb-4"
             // style={{ color: token.colorPrimaryTextHover }}
           >
-            Forgot your password?
+            {translate('pages.forgotPassword.title')}
           </h2>
 
           <Form<ForgotPasswordFormTypes>
@@ -64,35 +66,35 @@ const ForgotPasswordPage: React.FC<ResetPassworProps> = () => {
             form={form}
             onFinish={(values) => forgotPassword(values)}
             requiredMark={false}
-            disabled={isLoading}
+            disabled={isPending}
           >
             <Form.Item
-              name="username"
-              label="Username"
+              name="email" // username
+              label="Email" // Username
               rules={[
                 { required: true },
                 { whitespace: true },
-                // {
-                //   type: "email",
-                //   message: translate("pages.forgotPassword.errors.validEmail")
-                // },
+                {
+                  type: "email",
+                  message: translate("pages.forgotPassword.errors.validEmail")
+                },
               ]}
             >
               <Input
                 size="large"
-                disabled={isLoading}
+                disabled={isPending}
                 spellCheck={false}
                 autoCapitalize="off"
               />
             </Form.Item>
 
             <div className="text-right">
-              Have an account?
+              {translate('haveAccount')}
               {" "}
               <Link
                 to="/auth/login"
-                className={"focus_ring font-medium" + (isLoading ? " pe-none opacity-60" : "")}
-                tabIndex={isLoading ? -1 : 0}
+                className={"focus_ring font-medium" + (isPending ? " pe-none opacity-60" : "")}
+                tabIndex={isPending ? -1 : 0}
                 // style={{ color: token.colorPrimaryTextHover }}
               >
                 Login
@@ -110,9 +112,9 @@ const ForgotPasswordPage: React.FC<ResetPassworProps> = () => {
                 type="primary"
                 size="large"
                 htmlType="submit"
-                loading={isLoading}
+                loading={isPending}
               >
-                Send reset instructions
+                {translate('pages.forgotPassword.buttons.submit')}
               </Button>
             </Form.Item>
           </Form>

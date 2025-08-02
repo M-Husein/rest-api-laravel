@@ -2,8 +2,8 @@ import type { MenuProps } from "antd";
 import { Dropdown, Avatar, Button } from 'antd';
 import { useGetLocale, useSetLocale, useTranslate, useUpdate } from "@refinedev/core"; // 
 import { useTranslation } from "react-i18next";
-import dayjs from 'dayjs';
-import { setZodLocale } from '@/utils/locale/setZodLocale';
+// import dayjs from 'dayjs';
+// import { setZodLocale } from '@/utils/locale/setZodLocale';
 
 const renderFlag = (lang: string | undefined, size: number) => (
   <Avatar
@@ -41,10 +41,10 @@ export const LanguageMenu = ({
       }); 
     }
 
-    dayjs.locale(lang);
+    // dayjs.locale(lang);
     changeLanguage(lang);
     document.documentElement.lang = lang;
-    await setZodLocale(lang);
+    // await setZodLocale(lang);
   }
 
   const languageOptions: MenuProps["items"] = [...(i18n.languages || [])]
@@ -69,6 +69,8 @@ export const LanguageMenu = ({
       overlayStyle={overlayStyle}
     >
       <Button
+        // className="flex items-center px-1"
+        // type="text"
         className="flex items-center px-1"
         title={translate("language")}
         disabled={isPending}

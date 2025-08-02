@@ -3,28 +3,28 @@ import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { useGetLocale } from "@refinedev/core";
 import { ConfigProvider, App as AntdApp, theme as AntdTheme } from "antd";
 // import { StyleProvider } from '@ant-design/cssinjs';
-import dayjs from 'dayjs';
+// import dayjs from 'dayjs';
+import { setDayjsLocale } from '@/utils/locale/setDayjsLocale';
 import { getAntdLocale } from '@/utils/locale/getAntdLocale';
-import { setZodLocale } from '@/utils/locale/setZodLocale';
+import { zodConfig } from '@/utils/locale/validation';
+// import { setZodLocale } from '@/utils/locale/setZodLocale';
 // import enUS from 'antd/locale/en_US';
 // import idID from 'antd/locale/id_ID';
 import { toggleLoaderApp } from '@/utils/dom';
-import 'dayjs/locale/en';
+// import 'dayjs/locale/en';
 
 // const htmlLang = document.documentElement.lang;
 const currentLang = localStorage.getItem("i18nextLng") || document.documentElement.lang; // APP.defaultLang;
 
 // console.log('currentLang: ', currentLang);
 
-dayjs.locale(currentLang); // Initial value for locale date
+// dayjs.locale(currentLang); // Initial value for locale date
 document.documentElement.lang = currentLang;
+zodConfig();
 
-// Hack for Refine run check to get user authentication
-sessionStorage.removeItem('LoginError');
-
-if(currentLang !== APP.defaultLang){
-  (async () => await setZodLocale(currentLang))();
-}
+// if(currentLang !== APP.defaultLang){
+//   (async () => await setZodLocale(currentLang))();
+// }
 
 /** @OPTION : For toggle color scheme */
 const toggleTheme = (theme: string) => { // isDark: string
@@ -103,7 +103,11 @@ export const AppContextProvider = ({ children }: PropsWithChildren) => {
         // const dayjsCode = defaultLocaleCode;
         // const antdCode = currentLocale === 'en' ? 'en_US' : 'id_ID';
 
-        const loadedAntdLocale = await getAntdLocale(currentLocale || 'en');
+        let fixLocale = currentLocale || 'en';
+
+        await setDayjsLocale(fixLocale);
+
+        const loadedAntdLocale = await getAntdLocale(fixLocale);
         setAntdState(loadedAntdLocale || undefined);
 
       } catch (error) {

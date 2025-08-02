@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useCreate } from "@refinedev/core"; // HttpError, useOne, useNotification, useUpdate
 import { Button, Checkbox, Modal } from 'antd';
-import { ClearOutlined } from '@ant-design/icons';
+// import { ClearOutlined } from '@ant-design/icons';
 import type { CheckboxProps } from 'antd';
 
 const label = "Clear Cache";
@@ -58,8 +58,8 @@ export const ClearCache = () => {
     <>
       <Button 
         danger
-        type="primary"
-        icon={<ClearOutlined />}
+        // type="primary"
+        icon={<b>🧹</b>} // <ClearOutlined />
         onClick={toggleOpen}
       >
         {label}

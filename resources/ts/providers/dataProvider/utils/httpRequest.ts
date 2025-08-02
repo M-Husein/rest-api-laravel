@@ -3,17 +3,30 @@
  */
 // import { HttpError } from "@refinedev/core";
 import ky from 'ky';
-import { getCsrfToken, getToken } from '@/utils/authToken'; // , clearToken
-// import { useNotificationProvider } from '@/providers/notificationProvider';
+import { getCsrfToken, getToken } from '@/utils/authToken';
 
-// const notif = useNotificationProvider();
+const MUTATING_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
 
 export const api = ky.create({
+  // "http://localhost:8000", // 
   prefixUrl: APP.api, // import.meta.env.VITE_API
   retry: 0,
-  // Default = 10000 (10 seconds)
-  timeout: APP.timeout,
+  timeout: APP.timeout, // Default = 10000 (10 seconds)
   hooks: {
+    beforeRequest: [
+      request => {
+        let lang = localStorage.getItem('i18nextLng');
+        if(lang){ //  && lang !== APP.defaultLang
+          request.headers.set('Accept-Language', lang);
+        }
+
+        /** For csrf token */
+        if(request.credentials !== "omit" && MUTATING_METHODS.includes(request.method)){
+          let csrfToken = getCsrfToken();
+          csrfToken && request.headers.set('X-XSRF-TOKEN', csrfToken); // decodeURIComponent(csrfToken)
+        }
+      }
+    ],
     beforeError: [
       async (error: any) => {
         const { response } = error;
@@ -26,11 +39,12 @@ export const api = ky.create({
           const contentType = response.headers.get('content-type');
 
           if (contentType?.includes('application/json')) {
-            const body = await response.json();
+            let body = await response.json();
             // error.name = 'HttpError';
             error.message = body.message || response.statusText;
             error.status = response.status;
-            error.statusCode =  body.errors || response.status;
+            // error.statusCode =  typeof body.errors === 'number' ? body.errors : response.status;
+            error.statusCode =  response.status;
             error.data = body;
             // error.error = {
             //   // name: 'HttpError',
@@ -65,30 +79,6 @@ export const api = ky.create({
 
     //     console.log('afterResponse jsonResponse: ', jsonResponse);
 
-    //     // Example: show success or error based on response
-    //     // if (response.ok && data?.message) {
-    //     //   notificationProvider.open?.({
-    //     //     type: 'success',
-    //     //     message: data.message,
-    //     //     description: data.details || '',
-    //     //   });
-    //     // } else if (!response.ok) {
-    //     //   notificationProvider.open?.({
-    //     //     type: 'error',
-    //     //     message: data?.error || 'Request failed',
-    //     //     description: data?.details || '',
-    //     //   });
-    //     // }
-
-    //     // if(response){
-    //     //   notif.open?.({
-    //     //     type: "success", // @ts-ignore
-    //     //     message: jsonResponse?.message,
-    //     //   });
-    //     // }
-
-    //     // console.log('useNotificationProvider: ', useNotificationProvider);
-
     //     // Or return a `Response` instance to overwrite the response.
     //     // return new Response('A different response', {status: 200});
     //     // @ts-ignore
@@ -119,8 +109,6 @@ export const api = ky.create({
   }
 });
 
-const MUTATING_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
-
 export const httpRequest = api.extend({
   credentials: "include",
 	hooks: {
@@ -128,19 +116,8 @@ export const httpRequest = api.extend({
 			request => {
         // console.log('request: ', request);
 
-        /** @OPTION : For csrf token */
-        // request.credentials === "include" && 
-        if(MUTATING_METHODS.includes(request.method)){
-          const csrfToken = getCsrfToken();
-          if(csrfToken){
-            request.headers.set('X-XSRF-TOKEN', csrfToken); // decodeURIComponent(csrfToken)
-          }
-        }
-
-        const token = getToken();
-        if(token){
-          request.headers.set('Authorization', 'Bearer ' + token);
-        }
+        let token = getToken();
+        token && request.headers.set('Authorization', 'Bearer ' + token);
 			}
 		],
 	},

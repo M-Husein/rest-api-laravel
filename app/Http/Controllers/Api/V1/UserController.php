@@ -46,17 +46,6 @@ class UserController extends Controller{
     // return jsonSuccess(User::all()); // User::lazy() | $data
   }
 
-  public function lazy(Request $req){
-    $this->authorize('manage-users'); // Only admin
-
-    return $this->simplePaginate(
-      query: User::class, // User::query(),
-      request: $req,
-      searches: ['name'],
-      // Optional: filters, sorts, includes like `paginate`
-    );
-  }
-
   public function show(User $user){
     // $this->authorize('manage-users'); // Only admins can view specific user details
     return jsonSuccess($user);
@@ -168,6 +157,17 @@ class UserController extends Controller{
     return response()->noContent();
   }
 
+  public function lazy(Request $req){
+    $this->authorize('manage-users'); // Only admin
+
+    return $this->simplePaginate(
+      query: User::class, // User::query(),
+      request: $req,
+      searches: ['name'],
+      // Optional: filters, sorts, includes like `paginate`
+    );
+  }
+
   public function deletes(Request $req){
     $this->authorize('manage-users'); // Only admin
 
@@ -223,22 +223,6 @@ class UserController extends Controller{
     }
 
     return response()->noContent();
-  }
-
-  public function listDevices(Request $req){
-    $tokens = $req->user()->tokens->map(fn($item) => [
-      'id' => $item->id,
-      'name' => $item->name,
-      // 'abilities' => $item->abilities,
-      'user_id' => $item->user_id,
-      // 'platform' => $item->platform,
-      'ip_address' => $item->ip_address,
-      'user_agent' => $item->user_agent,
-      'created_at' => $item->created_at, // $item->created_at->toDateTimeString()
-      'last_used_at' => $item->last_used_at,
-      'expires_at' => $item->expires_at
-    ]);
-    return jsonSuccess($tokens);
   }
 
   /**

@@ -40,3 +40,30 @@ export const Table = ({
     />
   )
 }
+
+/*
+export const Table = <T extends object>({
+  pagination,
+  rowKey = "id",
+  ...etc
+}: AntTableProps<T> & { rowKey?: string }) => {
+  return (
+    <AntTable<T>
+      size="small"
+      bordered
+      rowKey={rowKey}
+      {...etc}
+      pagination={
+        pagination
+          ? {
+              showSizeChanger: true,
+              showTotal: (total, [range1, range2]) =>
+                `${range1}-${range2} of ${total} items`,
+              ...pagination,
+            }
+          : false
+      }
+    />
+  );
+}
+*/

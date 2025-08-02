@@ -3,6 +3,8 @@ import { api, httpRequest } from '@/providers/dataProvider';
 import { TOKEN_KEY, getToken, setToken, clearToken } from '@/utils/authToken';
 import { toggleLoaderApp } from '@/utils/dom';
 
+const authErrors: any = {};
+
 const loginProccess = (token: string, expiresAt: string, user: any) => {
   setToken(token, expiresAt);
 
@@ -27,7 +29,7 @@ export const authProvider: AuthProvider = {
 
     try {
       /** @OPTION : For cross domain */
-      // await api.get('sanctum/csrf-cookie');
+      // await api.get('sanctum/csrf-cookie', { retry: 1 });
 
       const response: any = await httpRequest.post('register', {
         json 
@@ -58,8 +60,7 @@ export const authProvider: AuthProvider = {
       //   return {
       //     user, // <- Custom
       //     success: true,
-      //     // redirectTo: "/app", // For admin
-      //     redirectTo: "/",
+      //     redirectTo: "/", // "/app", // For admin
       //     successNotification: {
       //       message: response.message || "Registration Successful",
       //       description: "You have successfully registered",
@@ -72,11 +73,11 @@ export const authProvider: AuthProvider = {
       // const data = await e.response.json().catch(() => null);
       // console.log('data: ', data);
 
-      // if(data.message){
-      //   errorResponse.error.message = data.message;
-      // }
+      if(e.message){
+        errorResponse.error.message = e.message;
+      }
 
-      return e;
+      return errorResponse;
     }
   },
   
@@ -93,30 +94,41 @@ export const authProvider: AuthProvider = {
     if( ((username || email) && password) || provider ){
       try {
         /** @OPTION : For cross domain */
-        // await api.get('sanctum/csrf-cookie');
+        // await api.get('sanctum/csrf-cookie', { retry: 1 });
 
-        // Hack for Refine run check to get user authentication
-        sessionStorage.removeItem('LoginError');
+        const json = provider 
+          ? { provider, type: "spa" } 
+          : { email, username, password, remember, type: "spa" };
 
-        const response: any = await httpRequest.post('login', {
-          // credentials: 'same-origin',
-          json: provider 
-            ? { provider, type: "spa" } 
-            : { email, username, password, remember, type: "spa" }
+        // const response: any = await httpRequest.post('login', {
+        //   // credentials: 'same-origin',
+        //   json
+        // }).json();
+
+        const response: any = await httpRequest.post('login-spa', { 
+          json, 
+          // prefixUrl: window.location.origin + '/v1'
         }).json();
 
         // console.log('response: ', response);
+        // console.log('loginSpa: ', loginSpa);
 
         if(response?.data){ // !response?.errors
           let { token, expiresAt, user } = response.data;
 
           loginProccess(token, expiresAt, user);
+
+          // Hack for Refine run check to get user authentication
+          authErrors.login = 0; // sessionStorage.removeItem('LoginError');
+
+          // After successfully logging in and setting the auth token,
+          // re-fetch the CSRF cookie to ensure it's up-to-date with the new session
+          // await api.get('sanctum/csrf-cookie', { retry: 1 });
           
           return {
             user, // <- Custom
             success: true,
-            // redirectTo: "/app", // For admin
-            redirectTo: "/"
+            redirectTo: "/" // "/app", // For admin
           };
         }
 
@@ -131,7 +143,7 @@ export const authProvider: AuthProvider = {
         }
 
         // Hack for Refine run check to get user authentication
-        sessionStorage.setItem('LoginError', '1');
+        authErrors.login = 1; // sessionStorage.setItem('LoginError', '1');
 
         return errorResponse;
         // throw errorResponse;
@@ -154,14 +166,16 @@ export const authProvider: AuthProvider = {
 
     try {
       /** @OPTION : For cross domain */
-      // await api.get('sanctum/csrf-cookie');
+      // await api.get('sanctum/csrf-cookie', { retry: 1 });
 
       /** @OPTION : make sure logout api success */
-      const response: any = await httpRequest.post('logout', {
-        keepalive: true
-      })
-      .json();
+      // , { keepalive: true}
+      // const response: any = await httpRequest.post('logout').json();
       // console.log('response: ', response);
+
+      // , { prefixUrl: window.location.origin + '/v1' }
+      const response: any = await httpRequest.post('logout-spa').json();
+      // console.log('logoutSpa: ', logoutSpa);
 
       // httpRequest.post('logout', {
       //   keepalive: true,
@@ -187,22 +201,25 @@ export const authProvider: AuthProvider = {
       // };
 
       /** @OPTION : make sure logout api success */
-      if(!response?.errors){ // response?.data
-        clearToken(); // Clear data
-
-        const bc = new BroadcastChannel(import.meta.env.VITE_BC_NAME);
-        bc.postMessage({ type: "LOGOUT" });
-
-        // Reset to default lang
-        localStorage.setItem("i18nextLng", APP.defaultLang);
-        document.documentElement.lang = APP.defaultLang;
-
-        return {
-          success: true,
-          redirectTo: import.meta.env.VITE_LOGIN_PATH,
-        };
+      if(response?.errors){ //  && logoutSpa?.erros
+        return errorResponse;
       }
-      return errorResponse;
+
+      clearToken(); // Clear data
+
+      const bc = new BroadcastChannel(import.meta.env.VITE_BC_NAME);
+      bc.postMessage({ type: "LOGOUT" });
+
+      // Reset to default lang
+      localStorage.setItem("i18nextLng", APP.defaultLang);
+      document.documentElement.lang = APP.defaultLang;
+
+      // window.location.replace(import.meta.env.VITE_LOGIN_PATH);
+
+      return {
+        success: true,
+        redirectTo: import.meta.env.VITE_LOGIN_PATH,
+      };
     } catch { // (e)
       return errorResponse;
     } finally {
@@ -212,8 +229,7 @@ export const authProvider: AuthProvider = {
   
   check: async () => {
     // Hack for Refine run check to get user authentication
-    const loginError = sessionStorage.getItem('LoginError');
-    if(loginError){
+    if(authErrors.login){ // sessionStorage.getItem('LoginError');
       return { authenticated: false }
     }
     
@@ -236,17 +252,24 @@ export const authProvider: AuthProvider = {
     try {
       const response: any = await httpRequest('me').json();
 
-      // console.log('req: ', req);
-
       if(response?.data){
-        sessionStorage.setItem(TOKEN_KEY, JSON.stringify(response.data));
-        return { ...response.data, authenticated: true }
+        let datas = { ...response.data, authenticated: true };
+        sessionStorage.setItem(TOKEN_KEY, JSON.stringify(datas));
+        return datas;
       }
 
       clearToken(); // Clear data
-
       return errorResponse;
-    } catch { // (e)
+    } catch(e: any) {
+      // const identity = await authProvider.getIdentity?.();
+      
+      if(e.status === 401 && sessionStorage.getItem(TOKEN_KEY)){
+        clearToken(); // Clear data
+
+        httpRequest.post('logout-spa'); // , { prefixUrl: window.location.origin + '/v1' }
+        // // console.log('logoutSpa: ', logoutSpa);
+      }
+
       return errorResponse;
     }
   },
@@ -264,8 +287,8 @@ export const authProvider: AuthProvider = {
     return null;
   },
 
-  /** @DEV_OPTIONS : email */
-  forgotPassword: async ({ username }) => {
+  /** @DEV_OPTIONS : username | email */
+  forgotPassword: async (json) => {
     const errorResponse = {
       success: false,
       error: {
@@ -274,14 +297,18 @@ export const authProvider: AuthProvider = {
       },
     };
 
-    try { // send password reset link to the user's email address here
-      // 'forgot-password/' + username
-      const response: any = await api.post('forgot-password');
+    try {
+      const response: any = await api.post('forgot-password', { json }).json();
       // console.log('response: ', response);
+
       if(response?.data){
         return {
           success: true,
           redirectTo: import.meta.env.VITE_LOGIN_PATH, // "/auth/login"
+          successNotification: {
+            message: response.message,
+            // description: 
+          }
         };
       }
       
@@ -303,6 +330,9 @@ export const authProvider: AuthProvider = {
     
     // const HTTP_UNAUTHORIZED = [401, 419];
     if(statusCode && [401, 419].includes(statusCode)){
+      // sessionStorage.removeItem(TOKEN_KEY);
+      // authErrors.login = 0;
+
       return {
         error,
         authenticated: false,

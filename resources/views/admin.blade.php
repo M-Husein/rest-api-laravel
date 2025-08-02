@@ -46,7 +46,6 @@ const APP=Object.freeze({
 <div id="loaderApp" class="load-spin fixed inset-0 cwait">
 	<img draggable="false" src="/logo-32x32.png?v={{ $ver }}" alt="" class="fixed inset-0 m-auto"/>
 	<b class="spin-border w-16 h-16" role="status" aria-label="Loading"></b>
-  {{-- <img class="spin-border" width="64" height="64" role="status"/> --}}
 
   {{-- To use this loader change 'resources/css/app.css' to 'resources/css/app-2.css' --}}
 	{{-- <svg role="status" aria-label="Loading" stroke-width="2" viewBox="0 0 32 32" width="87" height="87" fill="none" stroke="#1677ff">
@@ -60,9 +59,9 @@ const APP=Object.freeze({
 <noscript>
 	<style>#loaderApp{display:none}.nojs{font-family:Arial}</style>
 	<div class="fixed inset-0 nojs text-base">
-    <div class="text-5xl">⚠️</div>
+    <b class="text-5xl">⚠️</b>
 		<p>{{__('nojs')}}.</p>
-		<a class="underline-offset-4 m-auto" rel="noopener noreferrer nofollow" target="_blank" href="https://www.enablejavascript.io/{{ $lang }}">{{__('guide')}}</a>
+		<a class="underline-offset-4 m-auto" rel="noopener noreferrer" target="_blank" href="https://www.enablejavascript.io/{{ $lang }}">{{__('guide')}}</a>
 	</div>
 </noscript>
 </body></html>

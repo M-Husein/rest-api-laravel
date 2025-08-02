@@ -52,7 +52,7 @@ class RegisterController extends Controller{
       'name' => config('roles.names.' . $user->role)
     ];
 
-    return jsonSuccess($user, 'Registered successfully');
+    return jsonSuccess($user, __("registerOk"));
 
     // // Option auto login
     // // Token Generation (Similar to AuthController's login)
@@ -62,7 +62,7 @@ class RegisterController extends Controller{
 
     // // ✅ Create token
     // $token = $user->createToken(
-    //   $req->type.'-token',
+    //   $req->type,
     //   ['*'],
     //   $expiresAt
     // )->plainTextToken;
@@ -95,7 +95,7 @@ class RegisterController extends Controller{
     //     'token' => $token,
     //     'expiresAt' => $expiresAt
     //   ],
-    //   'Registered successfully'
+    //   __("registerOk")
     // );
   }
 }

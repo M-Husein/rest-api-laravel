@@ -1,11 +1,12 @@
 import type { TableColumnsType } from 'antd'; // TableProps
-import { useState } from 'react';
-import { HttpError, useTranslate, useGetIdentity, useParsed, useDelete, useDeleteMany } from "@refinedev/core"; // useCreate, useOne, useNotification, useUpdate
+import { useState, useEffect } from 'react';
+import { HttpError, useTranslate, useGetIdentity, useDelete, useDeleteMany } from "@refinedev/core";
 import { useTable, getDefaultSortOrder } from "@refinedev/antd";
 import { useForm } from "@refinedev/react-hook-form"; // useModalForm
 // import { useForm } from '@/utils/hooks/useForm';
 import { Button, Modal } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons'; // CheckOutlined
+// import { EditOutlined, DeleteOutlined } from '@ant-design/icons'; // CheckOutlined
+import isEqual from 'react-fast-compare';
 import { Table } from '@/components/table/Table';
 import { Header } from '@/components/table/Header';
 import { getColumnSearchProps } from '@/components/table/utils'; // setOrders, getFilterItem, 
@@ -15,10 +16,11 @@ import { FormModal } from './FormModal';
 const API = "app-translations";
 
 export const Translations = ({
+  current, pageSize, sorters, filters,
   fixedAction,
 }: any) => {
   const { data: currentUser } = useGetIdentity<any>();
-  const { params: { current, pageSize, sorters, filters } } = useParsed<any>();
+  // const { params: { current, pageSize, sorters, filters } } = useParsed<any>();
   const translate = useTranslate();
   const { mutate: mutateDelete, isPending: isLoadingDelete } = useDelete();
   const { mutate: mutateDeleteMany, isPending: isLoadingDeleteMany } = useDeleteMany();
@@ -85,13 +87,43 @@ export const Translations = ({
     },
   });
 
+  useEffect(() => {
+    reset(dataForm || {});
+  }, [dataForm]);
+
   const doCancel = () => {
     setDataForm(null);
     reset({});
   }
 
   const doSubmit = (newValues: any) => {
-    onFinish({ ...newValues, is_custom: true });
+    // console.log('newValues: ', newValues);
+    // console.log('dataForm: ', dataForm);
+
+    if(dataForm){
+      // let fixValues = { ...newValues };
+
+      // if(dataForm?.is_custom){
+      //   fixValues.is_custom = !!dataForm.is_custom;
+      // }
+
+      // console.log('fixValues: ', fixValues);
+
+      if(
+        // newValues.group !== dataForm.group
+        // || 
+        // newValues.key !== dataForm.key
+        // || 
+        // JSON.stringify(newValues.text) !== JSON.stringify(dataForm.text)
+        !isEqual(newValues, dataForm)
+      ){
+        onFinish(newValues);
+      }else{
+        doCancel();
+      }
+    }else{
+      onFinish(newValues);
+    }
   }
 
   const confirmModal = (title: any, callback: (fn: any) => void): void => {
@@ -162,7 +194,7 @@ export const Translations = ({
       title: 'Group',
       dataIndex: 'group',
       key: 'group',
-      width: 215,
+      width: 155,
       sorter: (a: any, b: any) => a.group - b.group,
       sortOrder: getDefaultSortOrder('group', sorter),
       ...getColumnSearchProps('group'),
@@ -171,7 +203,7 @@ export const Translations = ({
       title: 'Key',
       dataIndex: 'key',
       key: 'key',
-      width: 195,
+      width: 255,
       sorter: (a: any, b: any) => a.key - b.key,
       sortOrder: getDefaultSortOrder('key', sorter),
       ...getColumnSearchProps('key'),
@@ -182,7 +214,7 @@ export const Translations = ({
       key: 'is_custom',
       width: 45,
       align: 'center',
-      render: (txt: any) => !!txt && "✅" // txt ? "✅" : "❌"
+      render: (txt: any) => !!txt && "✔️" // ✅
     },
     {
       title: '',
@@ -200,7 +232,7 @@ export const Translations = ({
               ghost
               type="primary"
               disabled={formLoading}
-              icon={<EditOutlined />}
+              icon={<b>🖊️</b>} // 🖋️ ✏️ <EditOutlined />
               onClick={() => setDataForm(row)} // push('/settings/users/' + row.id)
             />
             {' '}
@@ -212,7 +244,7 @@ export const Translations = ({
                 ghost
                 danger
                 disabled={formLoading}
-                icon={<DeleteOutlined />}
+                icon={<b>❌</b>} // 🗑️  <DeleteOutlined />
                 onClick={() => clickDelete(row)}
               />
             )}

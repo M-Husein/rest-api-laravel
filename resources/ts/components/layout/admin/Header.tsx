@@ -135,7 +135,11 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = () => {
             ],
           }}
         >
-          <Button className="!p-0 border-gray-400">
+          <Button 
+            type="text"
+            // className="!p-0 border-gray-400"
+            className="flex items-center h-full !p-0"
+          >
             <Avatar
               size={30}
               shape="square"

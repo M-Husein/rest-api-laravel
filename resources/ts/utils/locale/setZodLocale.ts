@@ -1,15 +1,25 @@
 import * as z from "zod";
 
-const localeManifest = import.meta.glob('../../../../node_modules/zod/v4/locales/*.js');
+// const localeManifest = import.meta.glob('../../../../node_modules/zod/v4/locales/*.js');
+
+const localeManifest: { [key: string]: any } = {
+  id: () => import("zod/v4/locales/id.js"),
+  en: () => import("zod/v4/locales/en.js"),
+};
+// console.log('localeManifest: ', localeManifest);
 
 export const setZodLocale = async (localeCode: string): Promise<void> => {
   try {
     // Find the dynamic import function from the manifest
-    const importLocale = localeManifest[`../../../../node_modules/zod/v4/locales/${localeCode}.js`];
+    // const importLocale = localeManifest[`../../../../node_modules/zod/v4/locales/${localeCode}.js`];
+    const importLocale = localeManifest[localeCode];
 
     if (importLocale) {
       // Execute the function to get the module and set the locale
       const { default: locale }: any = await importLocale();
+
+      // console.log('locale: ', locale);
+
       if(locale){
         z.config(locale());
       }
@@ -20,3 +30,13 @@ export const setZodLocale = async (localeCode: string): Promise<void> => {
     console.warn(`Failed to load locale '${localeCode}'. Error:`, error);
   }
 }
+
+// export const setZodLocale = async (localeCode: string): Promise<void> => {
+//   const { default: locale }: any = await import(`zod/v4/locales/${localeCode}.js`);
+
+//   console.log('locale: ', locale);
+
+//   if(locale){
+//     z.config(locale());
+//   }
+// };

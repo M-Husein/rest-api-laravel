@@ -1,6 +1,6 @@
 // import { Fragment, useState } from "react";
 // import { useTranslation } from "react-i18next";
-import { useTranslate } from "@refinedev/core"; // , useSetLocale, useGetLocale
+// import { useTranslate } from "@refinedev/core"; // , useSetLocale, useGetLocale
 import { Controller } from 'react-hook-form';
 import { Modal, Input } from 'antd'; // Tabs
 import { Form } from '@/components/forms/Form';
@@ -14,7 +14,7 @@ export const FormModal = ({
   onSubmit,
   ...etc
 }: any) => {
-  const translate = useTranslate();
+  // const translate = useTranslate();
   // const { i18n } = useTranslation();
   // const locale = useGetLocale();
   // const currentLocale = locale();
@@ -26,15 +26,15 @@ export const FormModal = ({
   // console.log('i18n: ', i18n);
 
   const VALIDATIONS: any = {
-    required: translate('error.required'),
+    required: t('error.required'),
     minLength: {
       value: 2,
-      message: translate('error.required', { v: 2 })
+      message: t('error.minLength', { v: 2 })
     },
     pattern: {
       // value: /^\S(.*\S)?$/, // Allow enter in middle or not start/end
       value: /^\S(?:[\s\S]*\S)?$/,
-      message: translate('error.trim')
+      message: t('error.trim')
     },
   };
 
@@ -117,7 +117,7 @@ export const FormModal = ({
             <div key={locale} className="mb-4">
               <label htmlFor={`ts${locale}`}>{locale.toUpperCase()}</label>
               <Controller
-                name={`text.${locale}`} // Nested name for react-hook-form: text.en, text.id, etc.
+                name={`text.${locale}`}
                 control={control}
                 render={({ field }) => (
                   <Input.TextArea
@@ -128,6 +128,9 @@ export const FormModal = ({
                     // placeholder="Enter translation"
                     disabled={disabled}
                     status={errors.text?.[locale] ? "error" : ""}
+                    allowClear
+                    showCount
+                    // maxLength={100}
                   />
                 )}
                 rules={VALIDATIONS}

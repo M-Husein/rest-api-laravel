@@ -9,14 +9,18 @@ export default {
   content: [
     // "./src/**/*.{js,ts,jsx,tsx}",
     // "./index.html",
-    "./tailwind_always_compile.html", // For always compile some class
+    // "./tailwind_always_compile.html", // For always compile some class
 
     './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
     './storage/framework/views/*.php',
     './resources/views/**/*.blade.php',
     './resources/ts/**/*.tsx',
   ],
-  blocklist: ['fixed', 'inset-0', 'm-auto', 'w-16', 'h-16', 'text-base', 'text-5xl', 'underline-offset-4'],
+  blocklist: [
+    'fixed', 'inset-0', 'm-auto', 'w-16', 'h-16', 
+    'text-base', 'text-5xl', 'underline-offset-4'
+  ],
+  // safelist: ['bg-red-500'],
   theme: {
     extend: {
       zIndex: {
@@ -45,11 +49,11 @@ export default {
         '.content-v-hide': {
           'content-visibility': 'hidden',
         },
-        '.content-v-visible': {
-          'content-visibility': 'visible',
-        },
         '.content-v-auto': {
           'content-visibility': 'auto',
+        },
+        '.content-v-visible': {
+          'content-visibility': 'visible',
         },
       });
     }),

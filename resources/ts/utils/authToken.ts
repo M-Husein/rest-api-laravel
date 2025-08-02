@@ -8,17 +8,13 @@ export const TOKEN_KEY = import.meta.env.VITE_TOKEN_KEY;
  * Get auth token
  * @returns string token | undefined | null
  */
-export const getToken = (): cookieResult => {
-  // let token = Cookies.get(TOKEN_KEY);
-  // // console.log('token: ', token)
+export const getToken = (): cookieResult => Cookies.get(TOKEN_KEY);
 
-  // if(token){
-  //   return token;
-  // }
-
-  return Cookies.get(TOKEN_KEY);
-}
-
+/**
+ * Set token in cookie
+ * @param token string
+ * @param expiresAt string date iso
+ */
 export const setToken = (token: string, expiresAt: string): void => {
   Cookies.set(
     TOKEN_KEY, 
@@ -27,7 +23,7 @@ export const setToken = (token: string, expiresAt: string): void => {
       sameSite: "Lax", // Lax | Strict
       secure: window.location.protocol === "https:",
       // expires: +import.meta.env.VITE_TOKEN_EXP, // new Date(new Date().getTime() + 3 * 60 * 1000)
-      expires: expiresAt ? new Date(expiresAt) : new Date(Date.now() + 2 * 60 * 60 * 1000), 
+      expires: new Date(expiresAt || Date.now() + 2 * 60 * 60 * 1000), 
     }
   );
 }
@@ -41,4 +37,9 @@ export const clearToken = (): void => {
   sessionStorage.removeItem(TOKEN_KEY);
 }
 
-export const getCsrfToken = (tokenName: string = 'XSRF-TOKEN'): cookieResult => Cookies.get(tokenName);
+/**
+ * 
+ * @param tokenKey string
+ * @returns string CSRF token | undefined | null
+ */
+export const getCsrfToken = (tokenKey: string = 'XSRF-TOKEN'): cookieResult => Cookies.get(tokenKey);

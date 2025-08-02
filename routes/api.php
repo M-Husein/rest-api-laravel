@@ -6,17 +6,19 @@ use App\Http\Controllers\Api\V1\{
   RegisterController,
   EmailVerificationController,
   UserController,
+  ProfileController,
   AppTranslationController,
-  ArticleController,
   // SocialLoginController,
-  ClearCacheController
+  ClearCacheController,
+  UserTokensController,
+  ArticleController
 };
 
 // const ROLE_ADMIN = 'admin';
 // const ROLE_EDITOR = 'editor';
 // const ROLE_VIEWER = 'viewer';
 
-Route::prefix('v1')->middleware(['web','hybrid.csrf'])->group(function(){
+Route::prefix('v1')->group(function(){
   Route::middleware('guest')->group(function(){
     Route::post('login', [AuthController::class, 'login']);
     Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
@@ -28,28 +30,21 @@ Route::prefix('v1')->middleware(['web','hybrid.csrf'])->group(function(){
   // Route::get('/login/{provider}/callback', [SocialLoginController::class, 'callback']);
 
   Route::middleware('auth:sanctum')->group(function(){
-  // Route::middleware(['web','auth:sanctum','hybrid.csrf'])->group(function(){
-    // Verification link callback
-    // Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify']);
-      // ->middleware('signed'); // ->name('verification.verify');
-
     // Resend verification email
     Route::post('verification/{type}', [EmailVerificationController::class, 'send'])
-      ->middleware('throttle:6,1')->name('verification.send');
+      ->middleware('throttle:6,1')
+      ->name('verification.send');
 
     Route::post('logout', [AuthController::class, 'logout']);
-    Route::post('logout-others', [AuthController::class, 'logoutOthers']);
+    Route::post('logout-others', [AuthController::class, 'logoutOthers'])
+      ->middleware('throttle:6,1');
+
+    Route::get('active-devices', [AuthController::class, 'getActiveDevices']);
     Route::delete('logout-device/{id}', [AuthController::class, 'logoutDevice']);
-    Route::get('device-logs', [UserController::class, 'listDevices']);
-    // /user
-    Route::get('me', function(){
-      $user = auth()->user();
-      $user->roles = [
-        'key' => config('roles.keys.' . $user->role),
-        'name' => config('roles.names.' . $user->role)
-      ];
-      return jsonSuccess($user);
-    });
+
+    // user
+    Route::get('me', [ProfileController::class, 'me']);
+    Route::put('profile/change-password', [ProfileController::class, 'changePassword']);
 
     // Route::get('users/lazy', [UserController::class, 'lazy']);
     // Route::delete('users/deletes', [UserController::class, 'deletes']);
@@ -60,13 +55,18 @@ Route::prefix('v1')->middleware(['web','hybrid.csrf'])->group(function(){
     Route::middleware(['role:admin','verified'])->group(function(){
       Route::get('users/lazy', [UserController::class, 'lazy']);
       Route::delete('users/deletes', [UserController::class, 'deletes']);
-      Route::put('users/language', [UserController::class, 'language']); // updateLanguage
-      Route::put('users/theme', [UserController::class, 'theme']); // updateTheme
+      Route::put('users/language', [UserController::class, 'language']);
+      Route::put('users/theme', [UserController::class, 'theme']);
 
       Route::delete('app-translations/deletes', [AppTranslationController::class, 'deletes']);
       Route::apiResource('app-translations', AppTranslationController::class);
 
       Route::post('clear-cache', ClearCacheController::class);
+
+      Route::get('user-tokens', [UserTokensController::class, 'index']);
+      Route::get('user-tokens/{user}', [UserTokensController::class, 'show']);
+      Route::delete('user-tokens/{user}/{tokenId}', [UserTokensController::class, 'destroy']);
+      Route::post('revoke-tokens', [UserTokensController::class, 'revokes']);
     });
 
     Route::apiResource('users', UserController::class);

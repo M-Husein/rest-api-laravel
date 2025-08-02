@@ -21,11 +21,13 @@ const Home = lazy(() => import('@/pages/home/Page'));
 const Login = lazy(() => import('@/pages/login/Page'));
 const Register = lazy(() => import('@/pages/register/Page'));
 const ForgotPassword = lazy(() => import('@/pages/forgot-password/Page'));
+const ResetPassword = lazy(() => import('@/pages/reset-password/Page'));
 const EmailVerification = lazy(() => import('@/pages/verification/email/Page'));
 // Admin
 const AdminHome = lazy(() => import('@/pages/admin/home/Page'));
 
 // Settings
+const Settings = lazy(() => import('@/pages/settings/Page'));
 const AppSettings = lazy(() => import('@/pages/admin/settings/app/Page'));
 // const UserManagement = lazy(() => import('@/pages/admin/settings/users/Page'));
 // const ShowUser = lazy(() => import('@/pages/admin/settings/users/Show'));
@@ -115,10 +117,19 @@ const RefineProvider = () => {
   );
 }
 
-const LayoutPrivate = () => (
+// const LayoutPrivate = () => (
+//   <Authenticated
+//     key="authenticated-inner"
+//     // fallback={<CatchAllNavigate to="/auth/login" />}
+//     fallback={<CatchAllNavigate to={import.meta.env.VITE_LOGIN_PATH} />}
+//   >
+//     <Outlet />
+//   </Authenticated>
+// );
+
+const LayoutAdminApp = () => (
   <Authenticated
     key="authenticated-inner"
-    // fallback={<CatchAllNavigate to="/auth/login" />}
     fallback={<CatchAllNavigate to={import.meta.env.VITE_LOGIN_PATH} />}
   >
     {lazyApp(
@@ -147,10 +158,18 @@ const router = createBrowserRouter([
         element: <Layout><Outlet /></Layout>,
         children: [
           { index: true, element: lazyComponent(Home, <SplashScreen />) },
+          { path: "settings", element: lazyComponent(Settings, <SplashScreen />) },
           // { path: "/ordering-status", element: lazyComponent(OrderingStatus, <SplashScreen />) },
           // { path: "/menu/:id", element: lazyComponent(Menu, <SplashScreen />) },
         ],
       },
+      // {
+      //   path: "/",
+      //   element: <LayoutPrivate />,
+      //   children: [
+      //     { path: "settings", element: lazyComponent(Settings, <SplashScreen />) },
+      //   ],
+      // },
       {
         path: "verification", // email/verify/:id/:hash
         // element: <Layout><Outlet /></Layout>,
@@ -160,7 +179,7 @@ const router = createBrowserRouter([
       },
       {
         path: "app", // /admin
-        element: <LayoutPrivate />,
+        element: <LayoutAdminApp />,
         children: [
           { index: true, element: lazyComponent(AdminHome) },
           // {
@@ -234,6 +253,7 @@ const router = createBrowserRouter([
           { path: "login", element: lazyComponent(Login, <SplashScreen />) },
           { path: "register", element: lazyComponent(Register, <SplashScreen />) },
           { path: "forgot-password", element: lazyComponent(ForgotPassword, <SplashScreen />) },
+          { path: "reset-password", element: lazyComponent(ResetPassword, <SplashScreen />) },
         ],
       },
       { path: "*", Component: ErrorComponent },

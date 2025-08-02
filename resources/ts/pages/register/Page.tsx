@@ -6,10 +6,12 @@ import { useForm } from "@refinedev/react-hook-form";
 import { Controller } from 'react-hook-form'; // useForm, 
 // import { MailOutlined, LockOutlined, PhoneOutlined } from '@ant-design/icons';
 // import { FaRegUser } from "react-icons/fa";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Layout } from '@/components/layout/auth/Layout';
 import { Form } from '@/components/forms/Form';
 import { socialsProvider } from '@/providers/socialsProvider';
-import { email as emailRegExp } from '@/utils/regExp';
+// import { email as emailRegExp } from '@/utils/regExp';
 
 type IFormValues = {
   name: string;
@@ -28,14 +30,34 @@ export default function Page(){
     v3LegacyAuthProviderCompatible: !!authProvider?.isLegacy 
   });
 
+  const stringRequired = z.string(translate("error.required"));
+
   const {
     formState: { errors },
     control,
     handleSubmit, 
-    watch,
-  } = useForm<IFormValues, HttpError, IFormValues>();
+    // watch,
+  } = useForm<IFormValues, HttpError, IFormValues>({
+    resolver: zodResolver(
+      z.object({
+        name: stringRequired.refine((val) => val === val.trim(), {
+          message: translate("error.trim"),
+        }),
+        email: z.email(translate("error.invalid")),
+        password: stringRequired.min(6, translate("error.minLength", { v: 6 })),
+        password_confirmation: stringRequired, // .min(6)
+      })
+      .refine(
+        (data) => data.password === data.password_confirmation,
+        {
+          message: "Passwords don't match",
+          path: ["password_confirmation"],
+        }
+      )
+    ),
+  });
 
-  const password = watch('password');
+  // const password = watch('password');
 
   const doRegister = (values: any) => {
     // console.log('values: ', values);
@@ -70,21 +92,21 @@ export default function Page(){
                   spellCheck={false}
                 />
               )}
-              rules={{ 
-                required: true,
-                minLength: {
-                  value: 2,
-                  message: translate("error.minLength", { v: 6 })
-                },
-                pattern: {
-                  value: /^\S(.*\S)?$/,
-                  message: translate("error.trim")
-                },
-              }}
+              // rules={{ 
+              //   required: true,
+              //   minLength: {
+              //     value: 2,
+              //     message: translate("error.minLength", { v: 6 })
+              //   },
+              //   pattern: {
+              //     value: /^\S(.*\S)?$/,
+              //     message: translate("error.trim")
+              //   },
+              // }}
             />
             {errors.name && (
               <div className="mt-1 text-red-700 text-xs">
-                {errors.name.message || translate("error.required", { name: "Name" })}
+                {errors.name.message} {/*  || translate("error.required") */}
               </div>
             )}
           </div>
@@ -107,17 +129,17 @@ export default function Page(){
                   spellCheck={false}
                 />
               )}
-              rules={{ 
-                required: true, 
-                pattern: {
-                  value: emailRegExp,
-                  message: translate("error.invalid", { name: "Email" })
-                }
-              }}
+              // rules={{ 
+              //   required: true, 
+              //   pattern: {
+              //     value: emailRegExp,
+              //     message: translate("error.invalid")
+              //   }
+              // }}
             />
             {errors.email && (
               <div className="mt-1 text-red-700 text-xs">
-                {errors.email.message || translate("error.required", { name: "Email" })}
+                {errors.email.message} {/*  || translate("error.required") */}
               </div>
             )}
           </div>
@@ -141,17 +163,17 @@ export default function Page(){
                   spellCheck={false}
                 />
               )}
-              rules={{
-                required: true,
-                minLength: {
-                  value: 6,
-                  message: translate("error.minLength", { v: 6 })
-                },
-              }}
+              // rules={{
+              //   required: true,
+              //   minLength: {
+              //     value: 6,
+              //     message: translate("error.minLength", { v: 6 })
+              //   },
+              // }}
             />
             {errors.password && (
               <div className="mt-1 text-red-700 text-xs">
-                {errors.password.message || translate("error.required", { name: "Password" })}
+                {errors.password.message} {/*  || translate("error.required") */}
               </div>
             )}
           </div>
@@ -175,14 +197,15 @@ export default function Page(){
                   spellCheck={false}
                 />
               )}
-              rules={{ 
-                required: true,
-                validate: (val: any) => val === password || "Konfirmasi password harus sama dengan password"
-              }}
+              // rules={{ 
+              //   required: true,
+              //   validate: (val: any) => val === password || "Konfirmasi password harus sama dengan password"
+              // }}
             />
             {errors.password_confirmation && (
               <div className="mt-1 text-red-700 text-xs">
-                {errors.password_confirmation.message || translate("error.required", { name: "Confirm password" })}
+                {errors.password_confirmation.message}
+                {/*  || translate("error.required") */}
               </div>
             )}
           </div>

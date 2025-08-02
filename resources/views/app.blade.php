@@ -46,8 +46,9 @@ const APP=Object.freeze({
 <noscript>
 	<style>#loaderApp{display:none}.nojs{font-family:Arial}</style>
 	<div data-nosnippet class="fixed inset-0 nojs text-base">
+    <b class="text-5xl">⚠️</b>
 		<p>{{__('nojs')}}.</p>
-		<a class="underline-offset-4 m-auto" rel="noopener noreferrer nofollow" target="_blank" href="https://www.enablejavascript.io/{{ $lang }}">{{__('guide')}}</a>
+		<a class="underline-offset-4 m-auto" rel="noopener noreferrer" target="_blank" href="https://www.enablejavascript.io/{{ $lang }}">{{__('guide')}}</a>
 	</div>
 </noscript>
 </body></html>

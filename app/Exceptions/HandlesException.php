@@ -30,8 +30,15 @@ class HandlesException{
     $exceptions->render(fn(NotFoundHttpException $e, Request $req) => self::handleError(
       $req,
       "Not Found",
-      404
-      // $e->getMessage()
+      404,
+      $e->getMessage()
+    ));
+
+    $exceptions->render(fn(AuthenticationException $e, Request $req) => self::handleError(
+      $req,
+      "Unauthorized",
+      401,
+      $e->getMessage()
     ));
   }
 

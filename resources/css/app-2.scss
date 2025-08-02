@@ -29,7 +29,7 @@
 
 #loaderApp,
 .nojs {
-  position: fixed;
+  // position: fixed;
   background-color: var(--q-bg-main);
 }
 
@@ -42,7 +42,7 @@
 
 .load-spin {
   z-index: 1055;
-  user-select: none
+  // user-select: none;
 }
 
 // Define here cause blocklist in tailwind.config

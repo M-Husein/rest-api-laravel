@@ -1,3 +1,4 @@
+import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { HttpError, useTranslate, useActiveAuthProvider, useLogin } from "@refinedev/core";
 import { Input, Button, Checkbox } from "antd";
 import { Link } from "react-router-dom";
@@ -19,11 +20,15 @@ type IFormValues = {
   providerName?: string; // providerName | provider
 }
 
+const TITLE_PAGE = "Login";
+
 /**
  * **refine** has a default login page form which is served on `/login` route when the `authProvider` configuration is provided.
  * @see {@link https://refine.dev/docs/ui-frameworks/antd/components/antd-auth-page/#login} for more details.
  */
 export default function Page(){
+  useDocumentTitle(TITLE_PAGE + " • " + import.meta.env.VITE_APP_NAME);
+
   // const navigate = useNavigate();
   // const { token } = theme.useToken();
   const translate = useTranslate();
@@ -32,35 +37,25 @@ export default function Page(){
     v3LegacyAuthProviderCompatible: !!authProvider?.isLegacy 
   });
 
-  const schema = z.object({
-    // email: z.email(translate("error.invalid", { name: "Email" })), // "Invalid email address"
-    // email: z.email({
-    //   error: (issue) =>
-    //     issue.input === undefined
-    //       ? "Email is required"
-    //       : "Invalid email format",
-    // }),
-    email: z.email(),
-    // password: z
-    //   // .string() // translate("error.required", { name: "Password" })
-    //   .string({
-    //     error: (issue) =>
-    //       issue.input === undefined
-    //         ? translate("error.required", { name: "Password" })
-    //         : "Invalid email format",
-    //   })
-    //   .min(6,  translate("error.minLength", { v: 6 })),
-    password: z.string().min(6),
-    remember: z.boolean().optional(),
-    providerName: z.string().optional(),
-  });
-
   const {
     formState: { errors },
     control,
     handleSubmit, 
   } = useForm<IFormValues, HttpError, IFormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(
+      z.object({
+        // email: z.email({
+        //   error: (issue) =>
+        //     issue.input === undefined
+        //       ? "Email is required"
+        //       : "Invalid email format",
+        // }),
+        email: z.email(translate("error.invalid")),
+        password: z.string(translate("error.required")).min(6, translate("error.minLength", { v: 6 })),
+        remember: z.boolean().optional(),
+        providerName: z.string().optional(),
+      })
+    ),
   });
 
   const disabledLink = (cls?: string) => ({
@@ -78,7 +73,7 @@ export default function Page(){
 
   return (
     <Layout
-      title="Login"
+      title={TITLE_PAGE}
       form={
         <Form
           disabled={isPending}
