@@ -23,7 +23,7 @@ return new class extends Migration{
 
       /**
        * Why 6 ??
-       * Just use 'system', 'dark', or 'light'
+       * Just using 'system', 'dark', or 'light'
        * 
        * Why 20 ??
        * 'high-contrast' (15 characters)
@@ -33,8 +33,8 @@ return new class extends Migration{
       $table->string('theme', 6)->default('light'); // system, dark, light
 
       // Add generic columns for social login
-      // $table->string('provider')->nullable(); // provider_name
-      // $table->string('provider_id')->nullable();
+      $table->string('provider')->nullable(); // provider_name
+      $table->string('provider_id')->nullable();
 
       $table->softDeletes(); // Added for soft delete support
 
@@ -43,7 +43,7 @@ return new class extends Migration{
 
       // Add a unique constraint for the provider and provider_id combination
       // This ensures a user can only have one social login from a given provider linked this way.
-      // $table->unique(['provider', 'provider_id']);
+      $table->unique(['provider', 'provider_id']);
     });
 
     Schema::create('password_reset_tokens', function(Blueprint $table){

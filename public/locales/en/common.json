@@ -137,5 +137,40 @@
   "deactivate": "Deactivate",
   "download": "Download",
   "toProcess": "to process",
-  "haveAccount": "Have an account?"
+  "haveAccount": "Have an account?",
+  "z": {
+    "char": "characters",
+    "toHave": "to have",
+    "bytes": "bytes",
+    "items": "items",
+    "email": "email address",
+    "datetime": "ISO datetime",
+    "date": "ISO date",
+    "time": "ISO time",
+    "duration": "ISO duration",
+    "ipv4": "IPv4 address",
+    "ipv6": "IPv6 address",
+    "cidrv4": "IPv4 range",
+    "cidrv6": "IPv6 range",
+    "base64": "base64-encoded string",
+    "base64url": "base64url-encoded string",
+    "json_string": "JSON string",
+    "e164": "E.164 number",
+    "invalid_input": "Invalid input: expected {{v}}",
+    "invalid_option": "Invalid option: expected one of {{v}}",
+    "invalid_format": {
+      "starts_with": "Invalid string: must start with {{v}}",
+      "ends_with": "Invalid string: must end with {{v}}",
+      "includes": "Invalid string: must include {{v}}",
+      "regex": "Invalid string: must match pattern {{v}}",
+      "format": "Invalid {{v}}"
+    },
+    "too_big1": "Too big: expected {{e}} to have {{v}} {{u}}",
+    "too_big2": "Too big: expected {{e}} to be {{v}}",
+    "not_multiple_of": "Invalid number: must be a multiple of {{v}}",
+    "unrecognized_keys": "Some keys are unknown: {{v}}",
+    "invalid_key": "Invalid key in {{v}}",
+    "invalid_union": "Invalid input",
+    "invalid_element": "Invalid value in {{v}}"
+  }
 }

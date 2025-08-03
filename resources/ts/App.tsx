@@ -15,6 +15,7 @@ import { SplashScreen } from '@/components/SplashScreen';
 import { Layout } from '@/components/layout/main/Layout';
 import { lazyComponent } from '@/utils/components';
 import { RESOURCES } from '@/routes/resources';
+import { useSocialAuth } from '@/utils/hooks/useSocialAuth';
 
 // Pages:
 const Home = lazy(() => import('@/pages/home/Page'));
@@ -23,6 +24,7 @@ const Register = lazy(() => import('@/pages/register/Page'));
 const ForgotPassword = lazy(() => import('@/pages/forgot-password/Page'));
 const ResetPassword = lazy(() => import('@/pages/reset-password/Page'));
 const EmailVerification = lazy(() => import('@/pages/verification/email/Page'));
+const AuthSocial = lazy(() => import('@/pages/auth-social/Page'));
 // Admin
 const AdminHome = lazy(() => import('@/pages/admin/home/Page'));
 
@@ -66,6 +68,8 @@ const RefineProvider = () => {
     changeLocale: (lang: string) => i18n.changeLanguage(lang),
     getLocale: () => i18n.language,
   };
+
+  useSocialAuth();
 
   return (
     <AppTheme>
@@ -178,6 +182,12 @@ const router = createBrowserRouter([
         ],
       },
       {
+        path: "auth/social/callback/:provider",
+        children: [
+          { index: true, element: lazyComponent(AuthSocial, <SplashScreen />) },
+        ],
+      },
+      {
         path: "app", // /admin
         element: <LayoutAdminApp />,
         children: [
@@ -269,7 +279,7 @@ const router = createBrowserRouter([
   },
 });
 
-export function App(){
+export const App = () => {
 	return (
 		<RouterProvider
 			future={{

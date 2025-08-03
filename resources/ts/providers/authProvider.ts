@@ -2,18 +2,16 @@ import { AuthProvider } from "@refinedev/core";
 import { api, httpRequest } from '@/providers/dataProvider';
 import { TOKEN_KEY, getToken, setToken, clearToken } from '@/utils/authToken';
 import { toggleLoaderApp } from '@/utils/dom';
+import i18n from "@/i18n";
+
+// console.log('i18n: ', i18n);
 
 const authErrors: any = {};
 
-const loginProccess = (token: string, expiresAt: string, user: any) => {
-  setToken(token, expiresAt);
-
-  // window.location.replace('/');
-
-  const lang = user.lang || APP.defaultLang;
-
+const setLang = (lang: string): void => {
   localStorage.setItem("i18nextLng", lang);
   document.documentElement.lang = lang;
+  i18n.changeLanguage(lang);
 }
 
 export const authProvider: AuthProvider = {
@@ -55,7 +53,9 @@ export const authProvider: AuthProvider = {
       // if(!response?.errors){ // response?.data
       //   let { token, expiresAt, user } = response.data;
 
-      //   loginProccess(token, expiresAt, user);
+      // setToken(token, expiresAt);
+      // // window.location.replace('/');
+      // setLang(user.lang || APP.defaultLang);
 
       //   return {
       //     user, // <- Custom
@@ -96,9 +96,10 @@ export const authProvider: AuthProvider = {
         /** @OPTION : For cross domain */
         // await api.get('sanctum/csrf-cookie', { retry: 1 });
 
-        const json = provider 
-          ? { provider, type: "spa" } 
-          : { email, username, password, remember, type: "spa" };
+        // const json = provider 
+        //   ? { provider, type: "spa" } 
+        //   : { email, username, password, remember, type: "spa" };
+        const json = { email, username, password, remember, type: "spa" };
 
         // const response: any = await httpRequest.post('login', {
         //   // credentials: 'same-origin',
@@ -116,7 +117,9 @@ export const authProvider: AuthProvider = {
         if(response?.data){ // !response?.errors
           let { token, expiresAt, user } = response.data;
 
-          loginProccess(token, expiresAt, user);
+          setToken(token, expiresAt);
+          // window.location.replace('/');
+          setLang(user.lang || APP.defaultLang);
 
           // Hack for Refine run check to get user authentication
           authErrors.login = 0; // sessionStorage.removeItem('LoginError');
@@ -170,11 +173,11 @@ export const authProvider: AuthProvider = {
 
       /** @OPTION : make sure logout api success */
       // , { keepalive: true}
-      // const response: any = await httpRequest.post('logout').json();
+      const response: any = await httpRequest.post('logout').json();
       // console.log('response: ', response);
 
       // , { prefixUrl: window.location.origin + '/v1' }
-      const response: any = await httpRequest.post('logout-spa').json();
+      // const response: any = await httpRequest.post('logout-spa').json();
       // console.log('logoutSpa: ', logoutSpa);
 
       // httpRequest.post('logout', {
@@ -211,8 +214,7 @@ export const authProvider: AuthProvider = {
       bc.postMessage({ type: "LOGOUT" });
 
       // Reset to default lang
-      localStorage.setItem("i18nextLng", APP.defaultLang);
-      document.documentElement.lang = APP.defaultLang;
+      setLang(APP.defaultLang);
 
       // window.location.replace(import.meta.env.VITE_LOGIN_PATH);
 
@@ -251,6 +253,7 @@ export const authProvider: AuthProvider = {
 
     try {
       const response: any = await httpRequest('me').json();
+      // console.log('response: ', response);
 
       if(response?.data){
         let datas = { ...response.data, authenticated: true };

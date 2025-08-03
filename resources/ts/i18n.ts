@@ -1,28 +1,31 @@
 import i18n from 'i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
-import HttpApi, { HttpBackendOptions } from 'i18next-http-backend';
+// import LanguageDetector from 'i18next-browser-languagedetector';
+import HttpBackend, { HttpBackendOptions } from 'i18next-http-backend';
 import { initReactI18next } from "react-i18next";
 
-const LANGS = Object.keys(APP.locales); // ["id", "en"];
+// const LANGS = Object.keys(APP.locales); // ["id", "en"];
+const lng = localStorage.getItem("i18nextLng") || document.documentElement.lang; // APP.defaultLang
 
 i18n
-  .use(HttpApi)
+  .use(HttpBackend)
   /** @DOCS : https://github.com/i18next/i18next-browser-languageDetector */
-  .use(LanguageDetector) // if not use this lng not store in localStorage
+  // .use(LanguageDetector) // if not use this lng not store in localStorage
   .use(initReactI18next)
   .init<HttpBackendOptions>({
     // debug: import.meta.env.DEV, // !import.meta.env.PROD, // import.meta.env.MODE === 'development',
     // if use `lng` lng not store in localStorage
     // lng: 'en', // if using a language detector, do not define the lng option
-    // lng: document.documentElement.lang,
-    lng: localStorage.getItem("i18nextLng") || document.documentElement.lang, // APP.defaultLang
-    supportedLngs: LANGS,
+    lng, 
+    fallbackLng: lng, // LANGS
+    supportedLngs: Object.keys(APP.locales),
     backend: {
       loadPath: "/locales/{{lng}}/{{ns}}.json",
     },
     ns: ["common"],
     defaultNS: "common",
-    fallbackLng: LANGS,
+    react: {
+      useSuspense: true,
+    },
     // partialBundledLanguages: true, // CUSTOM
     // resources: {}, // CUSTOM
   });

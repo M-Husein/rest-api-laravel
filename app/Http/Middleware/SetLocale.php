@@ -12,7 +12,7 @@ class SetLocale{
    * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
    */
   public function handle(Request $req, Closure $next): Response{
-    $lang = config('app.locale'); // app.fallback_locale
+    $lang = config('app.fallback_locale'); // app.locale
 
     if(Auth::check()){
       $lang = Auth::user()->lang ?? $lang;

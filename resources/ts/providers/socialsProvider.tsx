@@ -1,4 +1,4 @@
-import { GoogleOutlined, FacebookFilled } from '@ant-design/icons';
+import { GoogleOutlined } from '@ant-design/icons'; // , FacebookFilled
 
 const style = {
   fontSize: 18,
@@ -15,13 +15,13 @@ export const socialsProvider = [
       />
     ),
   },
-  {
-    name: "facebook",
-    label: "Sign in with Facebook",
-    icon: (
-      <FacebookFilled
-        style={style}
-      />
-    ),
-  },
+  // {
+  //   name: "facebook",
+  //   label: "Sign in with Facebook",
+  //   icon: (
+  //     <FacebookFilled
+  //       style={style}
+  //     />
+  //   ),
+  // },
 ];

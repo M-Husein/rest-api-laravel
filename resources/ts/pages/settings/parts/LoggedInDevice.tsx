@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { HttpError, useList, useCreate, useOne } from "@refinedev/core"; // useTranslate, 
+import { HttpError, useList } from "@refinedev/core"; // useCreate, useTranslate, 
 import { useModalForm } from "@refinedev/react-hook-form";
 import { Controller } from 'react-hook-form';
 import { Button, Input, Modal } from 'antd';
@@ -16,7 +16,7 @@ export const LoggedInDevice = ({
   t,
 }: any) => {
   // const translate = useTranslate();
-  const { mutate: mutateCreate, isPending: isPendingCreate } = useCreate();
+  // const { mutate: mutateCreate, isPending: isPendingCreate } = useCreate();
   const [selectedRow, setSelectedRow] = useState<any>();
 
   const {
@@ -36,20 +36,20 @@ export const LoggedInDevice = ({
   let loadingActiveDevices = isLoading || isFetching || isRefetching;
   // console.log('data: ', data);
 
-  const {
-    data: dataSessions,
-    // isLoading: isLoadingSessions,
-    // isFetching: isFetchingSessions,
-    // isRefetching: isRefetchingSessions,
-    // refetch: refetchSessions,
-  } = useOne({
-    resource: "test",
-    id: "test-remember", // active-sessions
-    // meta: {
-    //   prefixUrl: window.location.origin
-    // }
-  });
-  console.log('test-remember: ', dataSessions);
+  // const {
+  //   data: dataSessions,
+  //   // isLoading: isLoadingSessions,
+  //   // isFetching: isFetchingSessions,
+  //   // isRefetching: isRefetchingSessions,
+  //   // refetch: refetchSessions,
+  // } = useOne({
+  //   resource: "test",
+  //   id: "test-remember", // active-sessions
+  //   // meta: {
+  //   //   prefixUrl: window.location.origin
+  //   // }
+  // });
+  // console.log('test-remember: ', dataSessions);
 
   const {
     formState: { errors },
@@ -222,16 +222,16 @@ export const LoggedInDevice = ({
         okButtonProps={{ 
           htmlType: "submit", 
           form: "formModal",
-          loading: formLoading || isPendingCreate
+          loading: formLoading // || isPendingCreate
         }}
-        cancelButtonProps={{ disabled: formLoading || isPendingCreate }}
+        cancelButtonProps={{ disabled: formLoading }} //  || isPendingCreate
         onCancel={doCancel}
         afterOpenChange={(isOpen: boolean) => isOpen && document.getElementById('pwd')?.focus()}
       >
         <Form
           id="formModal"
           className="mt-6"
-          disabled={formLoading || isPendingCreate}
+          disabled={formLoading} //  || isPendingCreate
           onSubmit={handleSubmit(doSubmit)} // onFinish
         >
           <label htmlFor="pwd">Password</label>

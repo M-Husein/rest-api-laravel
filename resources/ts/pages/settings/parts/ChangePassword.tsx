@@ -26,7 +26,7 @@ export const ChangePassword = ({
       disabled={loading}
       onSubmit={onSubmit}
     >
-      <Col md={11} xs={24} className="space-y-4 py-2 mx-auto">
+      <Col md={11} xs={24} className="space-y-4 p-4 mx-auto">
         <div>
           <label htmlFor="cp">Current Password</label>
           <Controller

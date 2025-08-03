@@ -43,7 +43,7 @@ const languageMenu = (user: any) => ({
 });
 
 export const Nav = ({ loading, user }:  any) => {
-  const { user: currentUser } = useApp(); // , setUser
+  const { user: currentUser, setUser } = useApp();
   const { data, isLoading } = useGetIdentity<any>(); // IUser
   const userData = currentUser || data || user;
   const location = useLocation();
@@ -82,7 +82,7 @@ export const Nav = ({ loading, user }:  any) => {
       ];
     }
 
-    if(userData && user?.authenticated){
+    if(userData?.authenticated){ // userData && user?.authenticated
       let userMenus = [
         {
           key: "/settings",
@@ -90,7 +90,10 @@ export const Nav = ({ loading, user }:  any) => {
         },
         {
           label: "Log Out",
-          onClick: logout,
+          onClick: () => {
+            setUser(null)
+            logout()
+          },
         },
       ];
 

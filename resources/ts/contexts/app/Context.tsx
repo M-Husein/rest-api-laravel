@@ -22,15 +22,9 @@ const currentLang = localStorage.getItem("i18nextLng") || document.documentEleme
 document.documentElement.lang = currentLang;
 zodConfig();
 
-// if(currentLang !== APP.defaultLang){
-//   (async () => await setZodLocale(currentLang))();
-// }
-
 /** @OPTION : For toggle color scheme */
 const toggleTheme = (theme: string) => { // isDark: string
   let html = document.documentElement;
-
-  // html.classList.toggle("dark", isDark);
 
   html.classList.remove(
     (theme === 'dark' ? 'light' : 'dark'),
@@ -77,7 +71,6 @@ export const useApp = () => {
 // AppLocale
 export const AppContextProvider = ({ children }: PropsWithChildren) => {
   const [antdLocale, setAntdState] = useState<any>();
-  // const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const locale = useGetLocale();
   const currentLocale = locale();
@@ -95,14 +88,8 @@ export const AppContextProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     (async () => {
-      // setIsLoading(true);
       toggleLoaderApp();
       try {
-        // Mapping for each library's locale naming convention
-        // const zodCode = defaultLocaleCode;
-        // const dayjsCode = defaultLocaleCode;
-        // const antdCode = currentLocale === 'en' ? 'en_US' : 'id_ID';
-
         let fixLocale = currentLocale || 'en';
 
         await setDayjsLocale(fixLocale);
@@ -110,11 +97,12 @@ export const AppContextProvider = ({ children }: PropsWithChildren) => {
         const loadedAntdLocale = await getAntdLocale(fixLocale);
         setAntdState(loadedAntdLocale || undefined);
 
+        localStorage.setItem("i18nextLng", fixLocale);
+
       } catch (error) {
         console.error("Error loading locales:", error);
       } 
       finally {
-        // setIsLoading(false);
         setTimeout(toggleLoaderApp, 250);
       }
     })()
@@ -127,10 +115,6 @@ export const AppContextProvider = ({ children }: PropsWithChildren) => {
       // componentDisabled={isLoading}
     >
       <AppContext.Provider
-        // value={{
-        //   user,
-        //   setUser: setupUser,
-        // }}
         value={value}
       >
         {children}

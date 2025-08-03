@@ -5,7 +5,7 @@ $ver = config('app.version');
 $baseUrl = url('');
 @endphp
 <!DOCTYPE html>
-<html lang="{{ $lang }}" class="{{ $user?->theme }}" data-nosnippet>
+<html lang="{{ $lang }}" class="{{ $user?->theme }}" data-nosnippet="true">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -30,8 +30,9 @@ $baseUrl = url('');
 <script>
 const APP=Object.freeze({
   name:"{{$appName}}",
-  api:"{{ $baseUrl }}/api/v1",
-  timeout:<?php echo config('app.timeout');?>,
+  version:{{ $ver }},
+  api:"{{ $baseUrl }}/api/v{{ $ver }}",
+  timeout:{{ config('app.timeout') }},
   defaultLang:"{{ config('app.fallback_locale') }}",
   locales:{
     id:"Indonesia",
@@ -42,9 +43,9 @@ const APP=Object.freeze({
 @viteReactRefresh
 @vite(['resources/css/app.scss','resources/ts/main.tsx'])
 </head>
-<body class="antialiased min-h-fullscreen bg-main admin" data-nosnippet>
+<body data-nosnippet class="antialiased min-h-fullscreen bg-main admin">
 <div id="loaderApp" class="load-spin fixed inset-0 cwait">
-	<img draggable="false" src="/logo-32x32.png?v={{ $ver }}" alt="" class="fixed inset-0 m-auto"/>
+	<img src="/logo-32x32.png?v={{ $ver }}" alt="" class="fixed inset-0 m-auto" draggable="false"/>
 	<b class="spin-border w-16 h-16" role="status" aria-label="Loading"></b>
 
   {{-- To use this loader change 'resources/css/app.css' to 'resources/css/app-2.css' --}}

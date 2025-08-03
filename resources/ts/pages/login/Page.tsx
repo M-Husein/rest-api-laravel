@@ -1,3 +1,4 @@
+// import { useEffect } from "react";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { HttpError, useTranslate, useActiveAuthProvider, useLogin } from "@refinedev/core";
 import { Input, Button, Checkbox } from "antd";
@@ -11,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Layout } from '@/components/layout/auth/Layout';
 import { Form } from '@/components/forms/Form';
 import { socialsProvider } from '@/providers/socialsProvider';
+import { openWindow } from '@/utils/browser';
 // import { email as emailRegExp } from '@/utils/regExp';
 
 type IFormValues = {
@@ -44,31 +46,45 @@ export default function Page(){
   } = useForm<IFormValues, HttpError, IFormValues>({
     resolver: zodResolver(
       z.object({
-        // email: z.email({
-        //   error: (issue) =>
-        //     issue.input === undefined
-        //       ? "Email is required"
-        //       : "Invalid email format",
-        // }),
-        email: z.email(translate("error.invalid")),
-        password: z.string(translate("error.required")).min(6, translate("error.minLength", { v: 6 })),
+        email: z.email(), // translate("error.invalid")
+        password: z.string().min(6), // translate("error.minLength", { v: 6 })
         remember: z.boolean().optional(),
         providerName: z.string().optional(),
       })
     ),
   });
 
+  const inputProps: any = {
+    size: "large",
+    disabled: isPending,
+    className: "mt-1",
+    spellCheck: false,
+    autoCorrect: "off",
+    autoCapitalize: "off",
+  };
+
   const disabledLink = (cls?: string) => ({
     tabIndex: isPending ? -1 : 0,
     className: (isPending ? "pe-none opacity-65 " : "") + "focus-visible_ring " + cls,
   });
 
-  const doLogin = (values: IFormValues) => {
-    login(values);
-    // login({
-    //   ...values,
-    //   email: values.email.trim()
-    // });
+  const doLogin = (values: any) => { // IFormValues
+    if(values.providerName){
+      // const windowOpen = window.open(
+      //   `/api/v${APP.version}/auth/social/redirect/${values.providerName}`,
+      //   '_blank',
+      //   'width=600,height=700'
+      // );
+      const windowOpen = openWindow(
+        `/api/v${APP.version}/auth/social/redirect/${values.providerName}`,
+        'Auth ' + values.providerName, 
+        500, 
+        650
+      );
+
+    }else{
+      login(values);
+    }
   }
 
   return (
@@ -88,28 +104,16 @@ export default function Page(){
               render={({ field }) => (
                 <Input
                   {...field}
+                  {...inputProps}
                   status={errors.email ? "error" : ""}
-                  disabled={isPending}
                   id="eml"
-                  className="mt-1"
                   inputMode="email"
-                  spellCheck={false}
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  size="large"
                 />
               )}
-              // rules={{
-              //   required: true,
-              //   pattern: {
-              //     value: emailRegExp,
-              //     message: translate("error.invalid", { name: "Email" })
-              //   }
-              // }}
             />
             {errors.email && (
               <div className="mt-1 text-red-700 text-xs">
-                {errors.email.message || translate("error.required", { name: "Email" })}
+                {errors.email.message}
               </div>
             )}
           </div>
@@ -122,24 +126,12 @@ export default function Page(){
               render={({ field }) => (
                 <Input.Password
                   {...field}
+                  {...inputProps}
                   status={errors.password ? "error" : ""}
-                  disabled={isPending}
                   id="pwd"
-                  className="mt-1"
                   autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  spellCheck={false}
-                  size="large"
                 />
               )}
-              // rules={{
-              //   required: true,
-              //   minLength: {
-              //     value: 6,
-              //     message: translate("error.minLength", { v: 6 })
-              //   },
-              // }}
             />
             {errors.password && (
               <div className="mt-1 text-red-700 text-xs">
@@ -193,7 +185,7 @@ export default function Page(){
                   icon={item.icon}
                   title={item.label}
                   className="mr-1"
-                  onClick={() => login({ providerName: item.name })}
+                  onClick={() => doLogin({ providerName: item.name })}
                 />
               )}
             </div>

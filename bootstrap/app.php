@@ -27,8 +27,8 @@ return Application::configure(basePath: dirname(__DIR__))
       'role' => Role::class
     ]);
 
-    // $middleware->redirectUsersTo(function(Request $request){
-    //   return $request->user()->isAdmin() ? '/admin' : '/';
+    // $middleware->redirectUsersTo(function(Request $req){
+    //   return $req->user()->isAdmin() ? '/admin' : '/';
     // });
   })
   ->withExceptions(function(Exceptions $exceptions): void{

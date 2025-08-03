@@ -1,9 +1,7 @@
 import type { MenuProps } from "antd";
 import { Dropdown, Avatar, Button } from 'antd';
-import { useGetLocale, useSetLocale, useTranslate, useUpdate } from "@refinedev/core"; // 
-import { useTranslation } from "react-i18next";
-// import dayjs from 'dayjs';
-// import { setZodLocale } from '@/utils/locale/setZodLocale';
+import { useGetLocale, useSetLocale, useTranslate, useUpdate } from "@refinedev/core";
+// import { useTranslation } from "react-i18next";
 
 const renderFlag = (lang: string | undefined, size: number) => (
   <Avatar
@@ -18,14 +16,14 @@ export const LanguageMenu = ({
   user,
   overlayStyle,
 }: any) => {
-  const { i18n } = useTranslation();
+  // const { i18n } = useTranslation();
   const locale = useGetLocale();
   const currentLocale = locale();
   const changeLanguage = useSetLocale();
   const translate = useTranslate();
   const { mutate, isPending } = useUpdate();
 
-  // console.log('user: ', user);
+  // console.log('i18n: ', i18n);
 
   const changeLocale = async (lang: string) => {
     // Only hit by user logged.
@@ -41,14 +39,13 @@ export const LanguageMenu = ({
       }); 
     }
 
-    // dayjs.locale(lang);
     changeLanguage(lang);
     document.documentElement.lang = lang;
-    // await setZodLocale(lang);
   }
 
-  const languageOptions: MenuProps["items"] = [...(i18n.languages || [])]
-    .sort()
+  // (i18n.languages || [])
+  const languageOptions: MenuProps["items"] = Object.keys(APP.locales)
+    // .toSorted()
     .map((lang: string) => ({
       key: lang,
       icon: renderFlag(lang, 16),
@@ -69,8 +66,6 @@ export const LanguageMenu = ({
       overlayStyle={overlayStyle}
     >
       <Button
-        // className="flex items-center px-1"
-        // type="text"
         className="flex items-center px-1"
         title={translate("language")}
         disabled={isPending}

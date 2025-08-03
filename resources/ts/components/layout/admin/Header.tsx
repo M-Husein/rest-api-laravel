@@ -1,10 +1,11 @@
+// import { useMemo } from "react";
 import type { RefineThemedLayoutV2HeaderProps } from "@refinedev/antd";
 // import type { IUser } from '@/types/Types';
 import { useGetIdentity, useWarnAboutChange, useTranslate, useLogout, useUpdate } from "@refinedev/core";
 import { Layout, Dropdown, Button, Switch, Avatar, Modal } from "antd"; // Badge,
 import { UserOutlined } from '@ant-design/icons'; // , MoonFilled, SunFilled, SettingOutlined
 import { useLocation, NavLink } from "react-router-dom";
-import { useAppTheme } from "@/contexts/app/Context";
+import { useAppTheme, useApp } from "@/contexts/app/Context";
 import { LanguageMenu } from '@/components/LanguageMenu';
 import { useLogoutAlert } from '@/utils/hooks/useLogoutAlert';
 
@@ -15,13 +16,15 @@ const overlayStyle = {
 
 export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = () => {
   const { data: currentUser } = useGetIdentity<any>(); // IUser
-  const { mutate: mutateLogout } = useLogout();
+  const { setUser } = useApp();
+  const { mutate: mutateLogout, isPending: isPendingLogout } = useLogout();
   const { warnWhen, setWarnWhen } = useWarnAboutChange();
   const [modalApi, modalContextHolder] = Modal.useModal();
   const translate = useTranslate();
   const { mutate, isPending } = useUpdate();
 
-  const { name, username, email, avatar } = currentUser || {};
+  // const userData = useMemo(() => currentUser || {}, [currentUser]);
+  const { name, username, email, avatar } = currentUser || {}; // userData
   const fixName = name || username;
 
   const { theme, setTheme } = useAppTheme();
@@ -34,9 +37,11 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = () => {
       if (window.confirm(translate("warnWhenUnsavedChanges"))) {
         setWarnWhen(false);
         mutateLogout();
+        setUser(null);
       }
     } else {
       mutateLogout();
+      setUser(null);
     }
   }
 
@@ -130,6 +135,7 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = () => {
               {
                 key: 2,
                 label: "Logout",
+                disabled: isPendingLogout,
                 onClick: doLogout
               }
             ],
@@ -145,7 +151,9 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = () => {
               shape="square"
               icon={<UserOutlined />}
               src={avatar}
+              // src="https://api.dicebear.com/7.x/miniavs/svg?seed=1"
               alt={fixName}
+              // crossOrigin="anonymous"
               style={{ display: 'flex' }}
             />
           </Button>

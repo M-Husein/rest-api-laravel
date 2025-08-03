@@ -58,11 +58,32 @@ class AuthController extends Controller{
    * Revoke token if it's a PersonalAccessToken (for token-based clients)
    */
   public function logout(Request $req){
-    $token = $req->user()?->currentAccessToken();
-    if($token instanceof PersonalAccessToken){
-      $token->delete();
+    $user = $req->user();
+
+    if($user){
+      $token = $user->currentAccessToken();
+      if($token instanceof PersonalAccessToken){
+        $token->delete();
+      }
+
+      // if($req->hasSession()){
+        
+      // }
+
+      Auth::guard('web')->logout(); // Auth::logout();
+      $req->session()->invalidate();
+      $req->session()->regenerateToken();
+      return jsonSuccess(1);
     }
-    return jsonSuccess(1);
+
+    return jsonError(__('auth.failed'), 401);
+    
+    // Only token-based
+    // $token = $req->user()?->currentAccessToken();
+    // if($token instanceof PersonalAccessToken){
+    //   $token->delete();
+    // }
+    // return jsonSuccess(1);
   }
 
   public function getActiveDevices(Request $req){

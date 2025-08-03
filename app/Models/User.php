@@ -21,12 +21,20 @@ class User extends Authenticatable implements MustVerifyEmail{
 		'username',
     'role',
     'lang',
-    'theme'
+    'theme',
+
+    'provider',
+    'provider_id',
+    'avatar',
+    'email_verified_at', // Add if set it in controller
 	];
 
 	protected $hidden = [
 		'password',
-		'remember_token'
+		'remember_token',
+    'provider_id', // Often hidden as it's an internal provider ID
+    'provider', // Can be hidden if expose it differently
+    // Keep 'api_token' if used that instead of Sanctum
 	];
 
   protected $casts = [

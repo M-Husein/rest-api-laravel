@@ -8,7 +8,6 @@ use App\Http\Controllers\Api\V1\{
   UserController,
   ProfileController,
   AppTranslationController,
-  // SocialLoginController,
   ClearCacheController,
   UserTokensController,
   ArticleController
@@ -18,7 +17,7 @@ use App\Http\Controllers\Api\V1\{
 // const ROLE_EDITOR = 'editor';
 // const ROLE_VIEWER = 'viewer';
 
-Route::prefix('v1')->group(function(){
+Route::prefix('v'.config('app.version'))->group(function(){
   Route::middleware('guest')->group(function(){
     Route::post('login', [AuthController::class, 'login']);
     Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
@@ -55,8 +54,6 @@ Route::prefix('v1')->group(function(){
     Route::middleware(['role:admin','verified'])->group(function(){
       Route::get('users/lazy', [UserController::class, 'lazy']);
       Route::delete('users/deletes', [UserController::class, 'deletes']);
-      Route::put('users/language', [UserController::class, 'language']);
-      Route::put('users/theme', [UserController::class, 'theme']);
 
       Route::delete('app-translations/deletes', [AppTranslationController::class, 'deletes']);
       Route::apiResource('app-translations', AppTranslationController::class);
@@ -69,6 +66,8 @@ Route::prefix('v1')->group(function(){
       Route::post('revoke-tokens', [UserTokensController::class, 'revokes']);
     });
 
+    Route::put('users/language', [UserController::class, 'language']);
+    Route::put('users/theme', [UserController::class, 'theme']);
     Route::apiResource('users', UserController::class);
 
     // Admin or Editor routes

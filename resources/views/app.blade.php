@@ -1,9 +1,9 @@
 @php
-$appName = config('app.name', 'App2U');
+$appName = config('app.name', 'Restapi');
 $lang = $user?->lang ?? str_replace('_', '-', app()->getLocale());
 $ver = config('app.version');
 $baseUrl = url('');
-$urlCurrent = url()->current();
+# $urlCurrent = url()->current();
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $lang }}" class="{{ $user?->theme }}">
@@ -25,8 +25,9 @@ $urlCurrent = url()->current();
 <script>
 const APP=Object.freeze({
   name:"{{$appName}}",
-  api:"{{ $baseUrl }}/api/v1",
-  timeout:<?php echo config('app.timeout');?>,
+  version:{{ $ver }},
+  api:"{{ $baseUrl }}/api/v{{ $ver }}",
+  timeout:{{ config('app.timeout') }},
   defaultLang:"{{ config('app.fallback_locale') }}",
   locales:{
     id:"Indonesia",
@@ -38,14 +39,14 @@ const APP=Object.freeze({
 @vite(['resources/css/app.scss','resources/ts/main.tsx'])
 </head>
 <body class="antialiased min-h-fullscreen bg-main">
-<div data-nosnippet id="loaderApp" class="load-spin fixed inset-0 cwait">
-	<img draggable="false" src="/logo-32x32.png?v={{ $ver }}" alt="" class="fixed inset-0 m-auto"/>
+<div data-nosnippet="true" id="loaderApp" class="load-spin fixed inset-0 cwait">
+	<img src="/logo-32x32.png?v={{ $ver }}" alt="" class="fixed inset-0 m-auto" draggable="false"/>
 	<b class="spin-border w-16 h-16" role="status" aria-label="Loading"></b>
 </div>
 <div id="app"></div>
 <noscript>
 	<style>#loaderApp{display:none}.nojs{font-family:Arial}</style>
-	<div data-nosnippet class="fixed inset-0 nojs text-base">
+	<div data-nosnippet="true" class="fixed inset-0 nojs text-base">
     <b class="text-5xl">⚠️</b>
 		<p>{{__('nojs')}}.</p>
 		<a class="underline-offset-4 m-auto" rel="noopener noreferrer" target="_blank" href="https://www.enablejavascript.io/{{ $lang }}">{{__('guide')}}</a>

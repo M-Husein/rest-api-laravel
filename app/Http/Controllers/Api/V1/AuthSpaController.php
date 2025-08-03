@@ -53,10 +53,9 @@ class AuthSpaController extends Controller{
         'user' => $user,
         'token' => $token->plainTextToken,
         'expiresAt' => $expiresAt,
-
-        'via_remember' => Auth::viaRemember(),
-        'remember_works' => $req->session()->get('auth.via_remember'),
-        'session' => session()->all(),
+        // 'viaRemember' => Auth::viaRemember(),
+        // 'remember_works' => $req->session()->get('auth.via_remember'),
+        // 'session' => session()->all(),
       ]);
     }
 
@@ -70,12 +69,18 @@ class AuthSpaController extends Controller{
    * Invalidate session (for SPA clients)
    */
   public function logout(Request $req){
-    $token = $req->user()?->currentAccessToken();
-    if($token instanceof PersonalAccessToken){
-      $token->delete();
-    }
+    $user = $req->user();
 
-    if($req->hasSession()){
+    if($user){
+      $token = $user->currentAccessToken();
+      if($token instanceof PersonalAccessToken){
+        $token->delete();
+      }
+
+      // if($req->hasSession()){
+        
+      // }
+
       Auth::guard('web')->logout(); // Auth::logout();
       $req->session()->invalidate();
       $req->session()->regenerateToken();

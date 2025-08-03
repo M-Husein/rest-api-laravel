@@ -2,7 +2,9 @@
 // use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\EmailVerificationController;
-use App\Http\Controllers\Api\V1\AuthSpaController;
+use App\Http\Controllers\Api\V1\{AuthSpaController, SocialAuthController};
+
+define('APP_VERSION', config('app.version'));
 
 Route::middleware('guest')->group(function(){
   Route::get('auth/login', fn() => view('app', ['user' => null]))->name('login');
@@ -10,8 +12,12 @@ Route::middleware('guest')->group(function(){
   Route::get('auth/forgot-password', fn() => view('app', ['user' => null]))->name('password.email');
   Route::get('auth/reset-password', fn() => view('app', ['user' => auth()->user()]))->name('password.reset');
 
-  Route::prefix('api/v1')->group(function(){
+  Route::prefix('api/v' . APP_VERSION)->group(function(){
     Route::post('login-spa', [AuthSpaController::class, 'login']);
+    // Redirect to provider's OAuth page
+    Route::get('auth/social/redirect/{provider}', [SocialAuthController::class, 'redirectToProvider']);
+    // Handle callback from provider
+    Route::get('auth/social/callback/{provider}', [SocialAuthController::class, 'handleProviderCallback']);
   });
 });
 
@@ -37,7 +43,7 @@ Route::middleware(['auth','auth.session'])->group(function(){
     ]);
   })->where('any','.*')->name('app');
 
-  Route::prefix('api/v1')->group(function(){
+  Route::prefix('api/v' . APP_VERSION)->group(function(){
     Route::post('logout-spa', [AuthSpaController::class, 'logout']);
     Route::post('logout-others-spa', [AuthSpaController::class, 'logoutOthers'])
       ->middleware('throttle:6,1');
@@ -48,17 +54,17 @@ Route::middleware(['auth','auth.session'])->group(function(){
   });
 });
 
-Route::get('api/v1/test/test-remember', function(){
-  // Manually test remember functionality
-  if (auth()->check()) {
-    return jsonSuccess([
-      'remembered' => auth()->viaRemember(),
-      'user' => auth()->user(),
-      'session' => session()->all()
-    ]);
-  }
-  return jsonError("Not authenticated");
-})->middleware('auth');
+// Route::get('api/v1/test/test-remember', function(){
+//   // Manually test remember functionality
+//   if (auth()->check()) {
+//     return jsonSuccess([
+//       'remembered' => auth()->viaRemember(),
+//       'user' => auth()->user(),
+//       'session' => session()->all()
+//     ]);
+//   }
+//   return jsonError("Not authenticated");
+// })->middleware('auth');
 
 // All route
 Route::get('/{any}', function(){

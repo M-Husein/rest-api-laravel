@@ -137,5 +137,40 @@
   "deactivate": "Menonaktifkan",
   "download": "Unduh",
   "toProcess": "memproses",
-  "haveAccount": "Punya akun?"
+  "haveAccount": "Punya akun?",
+  "z": {
+    "char": "karakter",
+    "toHave": "memiliki",
+    "bytes": "byte",
+    "items": "item",
+    "email": "alamat email",
+    "datetime": "tanggal dan waktu format ISO",
+    "date": "tanggal format ISO",
+    "time": "jam format ISO",
+    "duration": "durasi format ISO",
+    "ipv4": "alamat IPv4",
+    "ipv6": "alamat IPv6",
+    "cidrv4": "rentang alamat IPv4",
+    "cidrv6": "rentang alamat IPv6",
+    "base64": "string dengan enkode base64",
+    "base64url": "string dengan enkode base64url",
+    "json_string": "string JSON",
+    "e164": "angka E.164",
+    "invalid_input": "Input tidak valid: diharapkan {{v}}",
+    "invalid_option": "Pilihan tidak valid: diharapkan salah satu dari {{v}}",
+    "invalid_format": {
+      "starts_with": "String tidak valid: harus dimulai dengan {{v}}",
+      "ends_with": "String tidak valid: harus berakhir dengan {{v}}",
+      "includes": "String tidak valid: harus menyertakan {{v}}",
+      "regex": "String tidak valid: harus sesuai pola {{v}}",
+      "format": "{{v}} tidak valid"
+    },
+    "too_big1": "Terlalu besar: diharapkan {{e}} memiliki {{v}} {{u}}",
+    "too_big2": "Terlalu besar: diharapkan {{e}} menjadi {{v}}",
+    "not_multiple_of": "Angka tidak valid: harus kelipatan dari {{v}}",
+    "unrecognized_keys": "Kunci tidak dikenali: {{v}}",
+    "invalid_key": "Kunci tidak valid di {{v}}",
+    "invalid_union": "Input tidak valid",
+    "invalid_element": "Nilai tidak valid di {{v}}"
+  }
 }
