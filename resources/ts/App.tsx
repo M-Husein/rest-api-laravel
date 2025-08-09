@@ -175,19 +175,6 @@ const router = createBrowserRouter([
       //   ],
       // },
       {
-        path: "verification", // email/verify/:id/:hash
-        // element: <Layout><Outlet /></Layout>,
-        children: [
-          { index: true, element: lazyComponent(EmailVerification, <SplashScreen />) },
-        ],
-      },
-      {
-        path: "auth/social/callback/:provider",
-        children: [
-          { index: true, element: lazyComponent(AuthSocial, <SplashScreen />) },
-        ],
-      },
-      {
         path: "app", // /admin
         element: <LayoutAdminApp />,
         children: [
@@ -257,13 +244,30 @@ const router = createBrowserRouter([
         ]
       },
       {
-        path: '/auth', // import.meta.env.VITE_LOGIN_PATH
+        path: "verification", // email/verify/:id/:hash
+        // element: <Layout><Outlet /></Layout>,
+        children: [
+          { index: true, element: lazyComponent(EmailVerification, <SplashScreen />) },
+        ],
+      },
+      {
+        path: "auth/reset-password",
+        element: lazyComponent(ResetPassword, <SplashScreen />)
+      },
+      {
+        path: "auth/social/callback/:provider",
+        children: [
+          { index: true, element: lazyComponent(AuthSocial, <SplashScreen />) },
+        ],
+      },
+      {
+        path: 'auth', // import.meta.env.VITE_LOGIN_PATH
         element: <LayoutAuth />,
         children: [
           { path: "login", element: lazyComponent(Login, <SplashScreen />) },
           { path: "register", element: lazyComponent(Register, <SplashScreen />) },
           { path: "forgot-password", element: lazyComponent(ForgotPassword, <SplashScreen />) },
-          { path: "reset-password", element: lazyComponent(ResetPassword, <SplashScreen />) },
+          // { path: "reset-password", element: lazyComponent(ResetPassword, <SplashScreen />) },
         ],
       },
       { path: "*", Component: ErrorComponent },

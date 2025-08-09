@@ -13,12 +13,29 @@ return new class extends Migration{
       $table->string('name');
       $table->string('email')->unique();
       $table->timestamp('email_verified_at')->nullable();
-      $table->string('password');
+
+      /**
+       * Default Laravel
+       */
+      // $table->string('password');
+
+      /**
+       * Implement social auth can register/login without password, 
+       * and can set password later.
+       */
+      $table->string('password')->nullable();
 
       $table->string('username')->unique();
-      $table->string('avatar')->nullable(); // ->default('/user.svg')
 
-      // Add a string column for the language code
+      /**
+       * User avatar / profile picture
+       * Option: ->default('/user.svg') to set default
+       */
+      $table->string('avatar')->nullable();
+
+      /**
+       * Add a string column for the language code
+       */
       $table->string('lang', 10)->nullable();
 
       /**
@@ -30,19 +47,40 @@ return new class extends Migration{
        * 'corporate-blue' (15 characters)
        * 'solarized-light' (16 characters)
        */
-      $table->string('theme', 6)->default('light'); // system, dark, light
+      $table->string('theme', 6)->default('light');
 
-      // Add generic columns for social login
-      $table->string('provider')->nullable(); // provider_name
+      /**
+       * E.164 standard (recommended for storage)
+       * The international ITU-T E.164 standard allows:
+       * - Up to 15 digits max
+       * - Including country code
+       * - No spaces, dashes, or symbols (just + prefix optionally, though not counted in the 15-digit limit)
+       * 
+       * Example:
+       * +14155552671       -> 11 digits (US number)
+       * +628123456789012   -> 15 digits (longest in Indonesia)
+       */
+      $table->string('phone', 16)->nullable();
+
+      /**
+       * Add generic columns for social login.
+       * provider (provider_name)
+       */
+      $table->string('provider')->nullable();
       $table->string('provider_id')->nullable();
 
-      $table->softDeletes(); // Added for soft delete support
+      /**
+       * Added for soft delete support
+       */
+      $table->softDeletes();
 
       $table->rememberToken();
       $table->timestamps();
 
-      // Add a unique constraint for the provider and provider_id combination
-      // This ensures a user can only have one social login from a given provider linked this way.
+      /**
+       * Add a unique constraint for the provider and provider_id combination
+       * This ensures a user can only have one social login from a given provider linked this way.
+       */
       $table->unique(['provider', 'provider_id']);
     });
 

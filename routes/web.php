@@ -10,7 +10,7 @@ Route::middleware('guest')->group(function(){
   Route::get('auth/login', fn() => view('app', ['user' => null]))->name('login');
   Route::get('auth/register', fn() => view('app', ['user' => null]))->name('register');
   Route::get('auth/forgot-password', fn() => view('app', ['user' => null]))->name('password.email');
-  Route::get('auth/reset-password', fn() => view('app', ['user' => auth()->user()]))->name('password.reset');
+  // Route::get('auth/reset-password', fn() => view('app', ['user' => auth()->user()]))->name('password.reset');
 
   Route::prefix('api/v' . APP_VERSION)->group(function(){
     Route::post('login-spa', [AuthSpaController::class, 'login']);
@@ -20,6 +20,8 @@ Route::middleware('guest')->group(function(){
     Route::get('auth/social/callback/{provider}', [SocialAuthController::class, 'handleProviderCallback']);
   });
 });
+
+Route::get('auth/reset-password', fn() => view('app', ['user' => auth()->user()]))->name('password.reset');
 
 // No login
 // This is the route a user clicks from their email.

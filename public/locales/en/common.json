@@ -162,8 +162,7 @@
       "starts_with": "Invalid string: must start with {{v}}",
       "ends_with": "Invalid string: must end with {{v}}",
       "includes": "Invalid string: must include {{v}}",
-      "regex": "Invalid string: must match pattern {{v}}",
-      "format": "Invalid {{v}}"
+      "regex": "Invalid string: must match pattern {{v}}"
     },
     "too_big1": "Too big: expected {{e}} to have {{v}} {{u}}",
     "too_big2": "Too big: expected {{e}} to be {{v}}",

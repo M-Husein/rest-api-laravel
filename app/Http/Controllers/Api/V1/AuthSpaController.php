@@ -157,7 +157,8 @@ class AuthSpaController extends Controller{
         'name' => $token->name, // The name you gave the token (e.g., 'spa')
         'ip_address' => $token->ip_address,
         'user_agent' => $token->user_agent,
-        'last_activity' => $token->last_used_at ? $token->last_used_at->diffForHumans() : 'Never',
+        'expires_at' => $token->expires_at,
+        'last_activity' => $token->last_used_at ? $token->last_used_at->diffForHumans() : '',
         'created_at' => $token->created_at, // ->diffForHumans(),
       ];
     }

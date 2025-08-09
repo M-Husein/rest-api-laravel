@@ -162,8 +162,7 @@
       "starts_with": "String tidak valid: harus dimulai dengan {{v}}",
       "ends_with": "String tidak valid: harus berakhir dengan {{v}}",
       "includes": "String tidak valid: harus menyertakan {{v}}",
-      "regex": "String tidak valid: harus sesuai pola {{v}}",
-      "format": "{{v}} tidak valid"
+      "regex": "String tidak valid: harus sesuai pola {{v}}"
     },
     "too_big1": "Terlalu besar: diharapkan {{e}} memiliki {{v}} {{u}}",
     "too_big2": "Terlalu besar: diharapkan {{e}} menjadi {{v}}",

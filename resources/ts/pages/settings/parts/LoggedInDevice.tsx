@@ -2,7 +2,8 @@ import { useState } from "react";
 import { HttpError, useList } from "@refinedev/core"; // useCreate, useTranslate, 
 import { useModalForm } from "@refinedev/react-hook-form";
 import { Controller } from 'react-hook-form';
-import { Button, Input, Modal } from 'antd';
+import { Button, Input, Modal, Card } from 'antd';
+import Bowser from "bowser";
 import { Table } from '@/components/table/Table';
 import { Header } from '@/components/table/Header';
 import { ButtonReload } from '@/components/ButtonReload';
@@ -141,16 +142,85 @@ export const LoggedInDevice = ({
 
   const columns: any = [
     {
+      title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
+      width: 65,
+    },
+    {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      width: 55,
+      width: 95,
+    },
+    // {
+    //   title: 'User agent',
+    //   dataIndex: 'user_agent',
+    //   key: 'user_agent',
+    //   width: 115,
+    //   render: renderUserAgent,
+    // },
+    {
+      title: 'Platform',
+      dataIndex: 'p',
+      key: 'p',
+      width: 115,
+      render: (val: any, row: any) => {
+        const platform = Bowser.getParser(row.user_agent).getPlatformType();
+        return platform.charAt(0).toUpperCase() + platform.slice(1);
+      },
     },
     {
-      title: 'User agent',
-      dataIndex: 'user_agent',
-      key: 'user_agent',
-      width: 75,
+      title: 'OS',
+      dataIndex: 'os',
+      key: 'os',
+      width: 115,
+      render: (val: any, row: any) => {
+        const os: any = Bowser.getParser(row.user_agent).getOS();
+        return (
+          <div className="flex items-center">
+            <img 
+              src={`/media/img/os/${os.name.toLowerCase().replace(' ', '-')}.svg`} 
+              alt={os.name}
+              loading="lazy"
+              decoding="async"
+              width={35}
+              height={35}
+            />
+            <div className="text-xs ml-2">
+              <b>{os.name}</b>
+              <br />
+              Version {os.version}
+            </div>
+          </div>
+        )
+      },
+    },
+    {
+      title: 'Browser',
+      dataIndex: 'browser',
+      key: 'browser',
+      width: 115,
+      render: (val: any, row: any) => {
+        const browser: any = Bowser.getParser(row.user_agent).getBrowser();
+        return (
+          <div className="flex items-center">
+            <img 
+              src={`/media/img/browsers/${browser.name.toLowerCase().replace(' ', '-')}.svg`} 
+              alt={browser.name}
+              loading="lazy"
+              decoding="async"
+              width={35}
+              height={35}
+            />
+            <div className="text-xs ml-2">
+              <b>{browser.name}</b>
+              <br />
+              Version {browser.version}
+            </div>
+          </div>
+        )
+      },
     },
     {
       title: 'Ip address',
@@ -171,10 +241,10 @@ export const LoggedInDevice = ({
       width: 75,
     },
     {
-      title: 'Last used',
-      dataIndex: 'last_used_at',
-      key: 'last_used_at',
-      width: 75,
+      title: 'Last activity',
+      dataIndex: 'last_activity', // last_used_at
+      key: 'last_used_at', // last_used_at
+      width: 135,
     },
     {
       title: '',
@@ -271,3 +341,52 @@ export const LoggedInDevice = ({
     </>
   );
 }
+
+// const renderUserAgent = (val: string) => {
+//   if(val){
+//     const parseItem = (key: string, value: any) => {
+//       switch(key){
+//         case "browser":
+//           return (
+//             <div className="flex items-center">
+//               <img 
+//                 src={`/media/img/browsers/${value.name.toLowerCase().replace(' ', '-')}.svg`} 
+//                 alt={value.name}
+//                 loading="lazy"
+//                 decoding="async"
+//                 // width={45}
+//                 height={35}
+//               />
+//               <div className="text-xs ml-2">
+//                 <b>{value.name}</b>
+//                 <br />
+//                 Version {value.version}
+//               </div>
+//             </div>
+//           );
+//         case "os":
+//           return (
+//             <div className="text-xs ml-2">
+//               <b>{value.name}</b> {value.versionName}
+//               <br />
+//               Version {value.version}
+//             </div>
+//           );
+//         default:
+//           return;
+//       }
+//     }
+
+//     return Object.entries(Bowser.parse(val)).map(([key, value]: any, index: number) => (
+//       <Card
+//         key={key}
+//         title={key}
+//         type="inner"
+//         size="small"
+//         className={"shadow" + (index ? " mt-2" : "")}
+//       >
+//         {parseItem(key, value)}
+//       </Card>
+//     ))
+//   }
+// }

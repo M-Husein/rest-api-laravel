@@ -2,9 +2,10 @@ import i18n from 'i18next';
 // import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpBackend, { HttpBackendOptions } from 'i18next-http-backend';
 import { initReactI18next } from "react-i18next";
+import { zodConfig } from '@/utils/locale/validation';
 
 // const LANGS = Object.keys(APP.locales); // ["id", "en"];
-const lng = localStorage.getItem("i18nextLng") || document.documentElement.lang; // APP.defaultLang
+const lng = localStorage.getItem("i18nextLng") || document.documentElement.lang || APP.defaultLang;
 
 i18n
   .use(HttpBackend)
@@ -29,6 +30,8 @@ i18n
     // partialBundledLanguages: true, // CUSTOM
     // resources: {}, // CUSTOM
   });
+
+zodConfig(i18n);
 
 export default i18n;
 

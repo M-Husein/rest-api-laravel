@@ -9,6 +9,7 @@ const renderFlag = (lang: string | undefined, size: number) => (
     shape="square"
     alt={lang}
     src={`/media/img/flags/lang-${lang}.svg`}
+    // className="ring-1 ring-gray-400 rounded"
   />
 );
 
@@ -49,7 +50,6 @@ export const LanguageMenu = ({
     .map((lang: string) => ({
       key: lang,
       icon: renderFlag(lang, 16),
-      // @ts-ignore
       label: APP.locales[lang],
       onClick: () => changeLocale(lang),
     }));
@@ -72,6 +72,14 @@ export const LanguageMenu = ({
       >
         {renderFlag(currentLocale, 22)}
       </Button>
+
+      {/* <Button
+        type="text"
+        className="flex h-full px-1" // px-2 !text-white
+        title={translate("language")}
+      >
+        {renderFlag(currentLocale, 22)}
+      </Button> */}
     </Dropdown>
   );
 }

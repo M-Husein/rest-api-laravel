@@ -19,10 +19,17 @@ class AuthController extends Controller{
   public function login(LoginRequest $req){
     $this->limitRequest($req, 'login');
 
-    $remember = $req->filled('remember'); // $req->boolean('remember');
+    // Check if a user with this email exists and has no password set
+    $user = User::where('email', $req->email)->first();
+
+    if($user && is_null($user->password)){
+      return jsonError('It looks like you registered with a social account and have not set a password yet. Please use social login or set a password for your account.', 403);
+    }
+
+    $remember = $req->boolean('remember');
 
     if(Auth::attempt($req->only('email', 'password'), $remember)){
-      $user = $req->user();
+      // $user = $req->user(); // Use variable above
       $expiresAt = $remember ? now()->addWeeks(4) : now()->addHours(2);
 
       // ✅ Create token

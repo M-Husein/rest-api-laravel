@@ -75,13 +75,17 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = () => {
           defaultChecked={theme === "dark"}
           loading={isPending}
         />
-        
-        <div className="relative mx-3">
+
+        <div className="h-full flex items-center relative mx-3">
           <LanguageMenu
             overlayStyle={overlayStyle}
             user={currentUser}
           />
         </div>
+        
+        {/* <div className="relative mx-3">
+          
+        </div> */}
 
         <Dropdown
           getPopupContainer={(triggerNode: any) => triggerNode.parentElement}

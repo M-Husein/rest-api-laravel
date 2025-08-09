@@ -6,7 +6,6 @@ import { useForm } from "@refinedev/react-hook-form";
 import { Controller } from 'react-hook-form';
 // import { yupResolver } from '@hookform/resolvers/yup';
 import { zodResolver } from "@hookform/resolvers/zod";
-// import * as yup from 'yup';
 import { z } from "zod";
 // import { useSearchParams } from 'react-router-dom'; // Link, Navigate
 import { Layout } from '@/components/layout/auth/Layout';
@@ -34,7 +33,7 @@ const ResetPassword: React.FC<any> = () => {
   // const email = searchParams.get("email");
   // const [ok, setOk] = useState<string>('');
 
-  const stringRequired = z.string(translate("error.required"));
+  // const stringRequired = z.string(translate("error.required"));
 
   const {
     refineCore: { onFinish, formLoading },
@@ -43,24 +42,14 @@ const ResetPassword: React.FC<any> = () => {
     control,
     formState: { errors },
   } = useForm<IPost, HttpError, IPost>({ // @ts-ignore
-    // resolver: yupResolver(
-    //   yup.object({
-    //     email: yup.string().required().email(),
-    //     token: yup.string().required(),
-    //     password: yup.string().required(), // "Password is required"
-    //     password_confirmation: yup.string()
-    //       .required() // "Confirm Password is required"
-    //       .oneOf([yup.ref('password')], 'Passwords must match'),
-    //   })
-    // ),
     resolver: zodResolver(
       z.object({
-        email: z.email(translate("error.invalid")),
-        token: stringRequired.refine((val) => val === val.trim(), {
+        email: z.email(), // translate("error.invalid")
+        token: z.string().refine((val) => val === val.trim(), {
           message: translate("error.trim"),
         }),
-        password: stringRequired.min(6, translate("error.minLength", { v: 6 })),
-        password_confirmation: stringRequired, // .min(6)
+        password: z.string().min(6), // , translate("error.minLength", { v: 6 })
+        password_confirmation: z.string(), // .min(6)
       })
       .refine(
         (data) => data.password === data.password_confirmation,

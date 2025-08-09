@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 // use Illuminate\Auth\Notifications\VerifyEmail;
 // use Illuminate\Support\Facades\URL;
 // use Illuminate\Support\Carbon;
@@ -19,13 +20,12 @@ class User extends Authenticatable implements MustVerifyEmail{
 		'email',
 		'password',
 		'username',
+    'avatar',
     'role',
     'lang',
     'theme',
-
     'provider',
     'provider_id',
-    'avatar',
     'email_verified_at', // Add if set it in controller
 	];
 
@@ -42,6 +42,22 @@ class User extends Authenticatable implements MustVerifyEmail{
     'password' => 'hashed',
     'role' => 'integer' // Cast role to integer
   ];
+
+  /**
+   * This accessor will be appended to the user JSON response
+   */
+  protected $appends = [
+    'has_password'
+  ];
+
+  /**
+   * Determines if the user has a traditional password set.
+   */
+  protected function hasPassword(): Attribute{
+    return Attribute::make(
+      get: fn() => !is_null($this->password)
+    );
+  }
 
   /**
    * Check if the user has a specific role by its programmatic key.
@@ -61,7 +77,7 @@ class User extends Authenticatable implements MustVerifyEmail{
    */
   public function hasAnyRole(array $roleKeys): bool{
     $allowedRoleIds = [];
-    foreach ($roleKeys as $key){
+    foreach($roleKeys as $key){
       $id = array_search($key, config('roles.keys'));
       if($id !== false){
         $allowedRoleIds[] = $id;

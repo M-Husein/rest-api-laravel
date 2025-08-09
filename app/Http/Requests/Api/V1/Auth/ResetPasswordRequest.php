@@ -9,10 +9,9 @@ class ResetPasswordRequest extends FormRequest{
 
   public function rules(): array{
     return [
+      'token' => 'bail|required|string',
       'email' => 'bail|required|email|exists:users,email',
-      'token' => 'required|string',
-      'password' => 'bail|required|string|min:6|confirmed',
-      'password_confirmation' => 'required'
+      'password' => 'bail|required|string|min:6|confirmed'
     ];
   }
 }

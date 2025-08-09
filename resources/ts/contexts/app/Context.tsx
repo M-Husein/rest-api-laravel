@@ -2,28 +2,15 @@ import type { PropsWithChildren } from "react";
 import { createContext, useContext, useState, useEffect, useMemo } from 'react'; // , useDebugValue
 import { useGetLocale } from "@refinedev/core";
 import { ConfigProvider, App as AntdApp, theme as AntdTheme } from "antd";
-// import { StyleProvider } from '@ant-design/cssinjs';
-// import dayjs from 'dayjs';
 import { setDayjsLocale } from '@/utils/locale/setDayjsLocale';
 import { getAntdLocale } from '@/utils/locale/getAntdLocale';
-import { zodConfig } from '@/utils/locale/validation';
-// import { setZodLocale } from '@/utils/locale/setZodLocale';
-// import enUS from 'antd/locale/en_US';
-// import idID from 'antd/locale/id_ID';
+// import { zodConfig } from '@/utils/locale/validation';
 import { toggleLoaderApp } from '@/utils/dom';
-// import 'dayjs/locale/en';
 
-// const htmlLang = document.documentElement.lang;
-const currentLang = localStorage.getItem("i18nextLng") || document.documentElement.lang; // APP.defaultLang;
-
-// console.log('currentLang: ', currentLang);
-
-// dayjs.locale(currentLang); // Initial value for locale date
-document.documentElement.lang = currentLang;
-zodConfig();
+// zodConfig();
 
 /** @OPTION : For toggle color scheme */
-const toggleTheme = (theme: string) => { // isDark: string
+const toggleTheme = (theme: string) => {
   let html = document.documentElement;
 
   html.classList.remove(
@@ -38,11 +25,6 @@ const toggleTheme = (theme: string) => { // isDark: string
     metaTheme.content = getComputedStyle(html).getPropertyValue('--q-bg-nav'); // --q-bg-main
   }
 }
-
-// const AntLanguages: { [key: string]: any } = {
-//   id: idID,
-//   en: enUS,
-// };
 
 type AppThemeType = {
   theme: string;
@@ -90,7 +72,7 @@ export const AppContextProvider = ({ children }: PropsWithChildren) => {
     (async () => {
       toggleLoaderApp();
       try {
-        let fixLocale = currentLocale || 'en';
+        let fixLocale = currentLocale || document.documentElement.lang || localStorage.getItem("i18nextLng") || APP.defaultLang;
 
         await setDayjsLocale(fixLocale);
 
@@ -110,7 +92,6 @@ export const AppContextProvider = ({ children }: PropsWithChildren) => {
 
   return (
     <ConfigProvider
-      // locale={AntLanguages[currentLocale || currentLang]}
       locale={antdLocale}
       // componentDisabled={isLoading}
     >
@@ -123,14 +104,13 @@ export const AppContextProvider = ({ children }: PropsWithChildren) => {
   );
 }
 
-// const isSystemPreferenceDark = window?.matchMedia("(prefers-color-scheme: dark)").matches;
-const themeLocalStorage = localStorage.getItem("theme");
-
 export const AppTheme: React.FC<PropsWithChildren> = ({
   children,
 }) => {
+  // const isSystemPreferenceDark = window?.matchMedia("(prefers-color-scheme: dark)").matches;
+  const initTheme = JSON.parse(sessionStorage.getItem(import.meta.env.VITE_TOKEN_KEY) as any)?.theme || localStorage.getItem("theme");
   // const systemPreference = isSystemPreferenceDark ? "dark" : "light";
-  const [theme, setTheme] = useState(themeLocalStorage || "light"); //  || systemPreference
+  const [theme, setTheme] = useState(initTheme || "light"); //  || systemPreference
 
   const isDark = theme === "dark";
 

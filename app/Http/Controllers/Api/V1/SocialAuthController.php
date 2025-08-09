@@ -3,14 +3,12 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-// use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\{Auth, Storage, Http};
+// use Illuminate\Support\Facades\Hash;
 // use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Http;
 
 class SocialAuthController extends Controller{
   /**
@@ -39,13 +37,11 @@ class SocialAuthController extends Controller{
    * @param  string  $provider
    * @return \Illuminate\Http\RedirectResponse
    */
-	public function handleProviderCallback(string $provider){
+	public function handleProviderCallback(Request $req, string $provider){
 		if(in_array($provider, $this->allowedProviders)){
 			try {
 				$socialiteUser = Socialite::driver($provider)->user();
         $userId = $socialiteUser->getId();
-				$userAvatar = $socialiteUser->getAvatar();
-				// \Log::info('Raw Avatar URL from Socialite: '.($userAvatar ?? 'NULL_AVATAR_FROM_SOCIALITE'));
 
 				// --- Start: User Fetch/Creation Logic (Existing and New Users) ---
 				// This block needs to run first to get the $user object and its ID
@@ -87,11 +83,15 @@ class SocialAuthController extends Controller{
 							'provider_id' => $userId,
 							'lang' => config('app.locale'),
 							'email_verified_at' => now(),
-							'password' => Hash::make(Str::random(24)),
+              'password' => null // for social users
+							// 'password' => Hash::make(Str::random(24)),
 						]);
 						// \Log::info("New user {$user->id} registered via {$provider} with username: {$generatedUsername}");
 					}
 				}
+
+        $userAvatar = $socialiteUser->getAvatar();
+				// \Log::info('Raw Avatar URL from Socialite: '.($userAvatar ?? 'NULL_AVATAR_FROM_SOCIALITE'));
 
 				// --- START: MODIFIED AVATAR DOWNLOAD AND STORE LOGIC ---
 				if($userAvatar && $user && $user->id){ // Ensure user and user ID exist
@@ -107,7 +107,6 @@ class SocialAuthController extends Controller{
 							}
 
 							// Generate filename using user ID
-							// $fileName = $user->id.'-'.Str::uuid().'.'.$extension; // <-- CHANGED HERE
 							$filePath = 'avatars/u_'.$user->id.'-'.Str::uuid().'.'.$extension;
 
 							Storage::disk('public')->put($filePath, $response->body());
@@ -139,14 +138,24 @@ class SocialAuthController extends Controller{
         $expiresAt = now()->addWeek();
 
 				$token = $user->createToken(
-					'social-auth-token-'.$provider,
+					'social-auth-'.$provider,
 					['*'],
-					now()->addWeek()
-				)->plainTextToken;
+					$expiresAt
+				);
+
+        $tokenModel = $token->accessToken; // The PersonalAccessToken model instance
+        $tokenModel->ip_address = $req->ip();
+        $tokenModel->user_agent = $req->userAgent();
+        $tokenModel->save();
+
+        // $user->roles = [
+        //   'key' => config('roles.keys.' . $user->role),
+        //   'name' => config('roles.names.' . $user->role)
+        // ];
 
 				// Redirect to SPA's callback URL with token and user data
         $spaCallbackUrl = config('app.frontend_url').'/auth/social/callback/'.$provider;
-        return redirect($spaCallbackUrl.'?token='.$token.'&user='.json_encode($user).'&provider='.$provider.'&exp='.$expiresAt);
+        return redirect($spaCallbackUrl.'?token='.$token->plainTextToken.'&user='.json_encode($user).'&provider='.$provider.'&exp='.$expiresAt);
 			}
 			catch(\Exception $e){
 				// \Log::error("Social authentication failed for {$provider}: ".$e->getMessage()." Stack: ".$e->getTraceAsString());

@@ -1,8 +1,8 @@
 import * as z from "zod";
 // import { z } from "zod";
-import i18n from "@/i18n";
+// import i18n from "@/i18n";
 
-const error = () => {
+const error = (i18n: any) => {
   const toHave = i18n.t('z.toHave');
   const items = i18n.t('z.items');
 
@@ -111,8 +111,9 @@ const error = () => {
           // return `Invalid string: must match pattern ${_issue.pattern}`;
           return i18n.t('z.invalid_format.regex', { v: _issue.pattern });
         }
-        // return `Invalid ${Nouns[_issue.format] ?? issue.format}`;
-        return i18n.t('z.invalid_format.format', { v: _issue.format });
+
+        return `Invalid ${Nouns[_issue.format] ?? issue.format}`;
+        // return i18n.t('z.invalid_format.format', { v: _issue.format });
       }
 
       case "not_multiple_of":
@@ -179,8 +180,8 @@ const joinValues = (array: any, separator = "|") => {
 //   return t;
 // };
 
-export const zodConfig = () => z.config({
-  localeError: error()
+export const zodConfig = (i18n: any) => z.config({
+  localeError: error(i18n)
 });
 
 // export default function validation(){

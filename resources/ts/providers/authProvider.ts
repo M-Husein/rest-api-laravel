@@ -4,8 +4,6 @@ import { TOKEN_KEY, getToken, setToken, clearToken } from '@/utils/authToken';
 import { toggleLoaderApp } from '@/utils/dom';
 import i18n from "@/i18n";
 
-// console.log('i18n: ', i18n);
-
 const authErrors: any = {};
 
 const setLang = (lang: string): void => {
@@ -269,7 +267,8 @@ export const authProvider: AuthProvider = {
       if(e.status === 401 && sessionStorage.getItem(TOKEN_KEY)){
         clearToken(); // Clear data
 
-        httpRequest.post('logout-spa'); // , { prefixUrl: window.location.origin + '/v1' }
+        // 'logout-spa'
+        httpRequest.post('logout'); // , { prefixUrl: window.location.origin + '/v1' }
         // // console.log('logoutSpa: ', logoutSpa);
       }
 

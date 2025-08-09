@@ -5,7 +5,7 @@ interface AppConfig {
   timeout: number,
   defaultLang: string,
   locales: {
-    [string]: string
+    [key: string]: string
   }
 }
 

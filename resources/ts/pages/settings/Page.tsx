@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { HttpError, useTranslate } from "@refinedev/core";
+import { HttpError, useTranslate, useCreate } from "@refinedev/core";
 import { useForm } from "@refinedev/react-hook-form";
 import { Card, Grid, Tabs, Modal } from 'antd';
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +9,7 @@ import * as z from "zod";
 // import { Info } from '@/components/Info';
 import { General } from './parts/General';
 import { LoggedInDevice } from './parts/LoggedInDevice';
-import { ChangePassword } from './parts/ChangePassword';
+import { PasswordManagement } from './parts/PasswordManagement';
 
 const title = "Settings";
 
@@ -21,6 +21,7 @@ export default function Page(){
   const isSmallDevice = typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
 
   const translate = useTranslate();
+  const { mutate: mutateCreate, isPending: isPendinfCreate } = useCreate();
   // const passwordValidation = z.string(translate("error.required")).min(6, translate("error.minLength", { v: 6 }));
   const passwordValidation = z.string().min(6);
 
@@ -87,6 +88,40 @@ export default function Page(){
     clearErrors();
   }
 
+  const requestSetPassword = () => {
+    const confirms = modalApi.confirm({
+      keyboard: false,
+      closable: false,
+      cancelButtonProps: { disabled: false },
+      title: "Are you sure to request set password?",
+      // content: "Login on other devices will be logged out automatically",
+      onOk: async () => new Promise((resolve, reject) => {
+        const updateConfirms = (disabled: boolean) => {
+          confirms.update({ cancelButtonProps: { disabled } })
+        }
+
+        updateConfirms(true);
+
+        mutateCreate({
+          resource: "password/request-set-link",
+          values: {},
+          successNotification: (res: any) => ({
+            type: "success",
+            message: res?.message
+          })
+        }, {
+          onSuccess: (res) => {
+            resolve(res)
+          },
+          onError: (e) => {
+            updateConfirms(false);
+            reject(e);
+          },
+        });
+      })
+    });
+  }
+
   return (
     <div className="xl_max-w-screen-xl mx-auto p-2">
       <Card 
@@ -129,12 +164,13 @@ export default function Page(){
               disabled: formLoading,
               children: (
                 <div className="py-4 md_pr-4">
-                  <ChangePassword 
+                  <PasswordManagement 
                     t={translate}
                     control={control}
                     errors={errors}
-                    loading={formLoading}
+                    loading={formLoading || isPendinfCreate}
                     onSubmit={handleSubmit(doSubmit)}
+                    onClick={requestSetPassword}
                   />
                 </div>
               ),

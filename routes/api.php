@@ -21,12 +21,14 @@ Route::prefix('v'.config('app.version'))->group(function(){
   Route::middleware('guest')->group(function(){
     Route::post('login', [AuthController::class, 'login']);
     Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
-    Route::post('reset-password', [AuthController::class, 'resetPassword']);
     Route::post('register', RegisterController::class);
+    // Route::post('reset-password', [AuthController::class, 'resetPassword']);
   });
 
   // Route::get('/login/{provider}', [SocialLoginController::class, 'redirect']);
   // Route::get('/login/{provider}/callback', [SocialLoginController::class, 'callback']);
+
+  Route::post('reset-password', [AuthController::class, 'resetPassword']);
 
   Route::middleware('auth:sanctum')->group(function(){
     // Resend verification email
@@ -44,6 +46,9 @@ Route::prefix('v'.config('app.version'))->group(function(){
     // user
     Route::get('me', [ProfileController::class, 'me']);
     Route::put('profile/change-password', [ProfileController::class, 'changePassword']);
+
+    Route::post('password/request-set-link', [ProfileController::class, 'requestPasswordSetLink']);
+    // Route::post('password/set', [ProfileController::class, 'setPassword']);
 
     // Route::get('users/lazy', [UserController::class, 'lazy']);
     // Route::delete('users/deletes', [UserController::class, 'deletes']);

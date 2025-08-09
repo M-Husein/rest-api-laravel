@@ -1,6 +1,5 @@
 <?php
 namespace App\Http\Requests\Api\V1\Auth;
-
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Hash;
 
@@ -35,9 +34,8 @@ class ChangePasswordRequest extends FormRequest{
         'string',
         'min:6', // Or whatever minimum length you enforce
         'confirmed', // Requires a 'password_confirmation' field
-        'different:current_password', // Ensure new password is not the same as old
-      ],
-      'password_confirmation' => ['bail', 'required', 'string'], // Matched by 'confirmed' rule above
+        'different:current_password' // Ensure new password is not the same as old
+      ]
     ];
   }
 
@@ -47,7 +45,7 @@ class ChangePasswordRequest extends FormRequest{
    */
   public function messages(): array{
     return [
-      'password.different' => 'The new password must be different from the current password.',
+      'password.different' => 'The new password must be different from the current password.'
     ];
   }
 }
