@@ -8,15 +8,14 @@ export const useSocialAuth = () => {
 
   useEffect(() => {
     // Define the channel name. Make it unique to your app/purpose.
-    const LOGIN_CHANNEL_NAME = 'social_login_channel';
-    const loginChannel = new BroadcastChannel(LOGIN_CHANNEL_NAME);
+    const loginChannel = new BroadcastChannel('social_auth_channel');
     
     const handleBroadcastMessage = (e: any) => {
       const data = e.data;
-      if(data.source === 'social-login-broadcast'){
+      if(data.source === 'SOCIAL_AUTH_BC'){
         if (data.ok) {
           // console.log('Main Window: Social login successful:', data.user);
-          setToken(data.token, data.expiresAt || 7);
+          setToken(data.token, data.expiresAt || 395);
 
           localStorage.setItem("i18nextLng", data.user.lang);
           document.documentElement.lang = data.user.lang;

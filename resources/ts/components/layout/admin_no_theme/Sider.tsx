@@ -19,7 +19,6 @@ import { recursiveFilter } from '@/utils/recursive';
 
 const width = 235;
 const collapsedWidth = 60;
-const appName = import.meta.env.VITE_APP_NAME;
 
 export const Sider = ({
   theme: colorScheme,
@@ -288,12 +287,12 @@ export const Sider = ({
               width={24} 
               height={24} 
               src="/logo-36x36.png" 
-              alt={appName} 
+              alt={APP.name} 
               className="mr-2"
               loading="lazy"
               decoding="async"
             />
-            {appName}
+            {APP.name}
           </Link>
         </div>
       </>

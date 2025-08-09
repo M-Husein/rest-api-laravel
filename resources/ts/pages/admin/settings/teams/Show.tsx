@@ -106,7 +106,7 @@ const Content = ({ title }: { title: string }) => {
 export default function Show() {
   const TITLE_PAGE = "Team Detail";
 
-  useDocumentTitle(TITLE_PAGE + " • " + import.meta.env.VITE_APP_NAME); 
+  useDocumentTitle(TITLE_PAGE + " • " + APP.name); 
 
   const { data: accessControl } = useCan({
     resource: "team",

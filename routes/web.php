@@ -12,8 +12,9 @@ Route::middleware('guest')->group(function(){
   Route::get('auth/forgot-password', fn() => view('app', ['user' => null]))->name('password.email');
   // Route::get('auth/reset-password', fn() => view('app', ['user' => auth()->user()]))->name('password.reset');
 
+  // Dev Option check again
   Route::prefix('api/v' . APP_VERSION)->group(function(){
-    Route::post('login-spa', [AuthSpaController::class, 'login']);
+    // Route::post('login-spa', [AuthSpaController::class, 'login']);
     // Redirect to provider's OAuth page
     Route::get('auth/social/redirect/{provider}', [SocialAuthController::class, 'redirectToProvider']);
     // Handle callback from provider
@@ -45,10 +46,11 @@ Route::middleware(['auth','auth.session'])->group(function(){
     ]);
   })->where('any','.*')->name('app');
 
+  // Dev Option check again
   Route::prefix('api/v' . APP_VERSION)->group(function(){
-    Route::post('logout-spa', [AuthSpaController::class, 'logout']);
-    Route::post('logout-others-spa', [AuthSpaController::class, 'logoutOthers'])
-      ->middleware('throttle:6,1');
+    // Route::post('logout-spa', [AuthSpaController::class, 'logout']);
+    // Route::post('logout-others-spa', [AuthSpaController::class, 'logoutOthers'])
+    //   ->middleware('throttle:6,1');
 
     Route::get('devices', [AuthSpaController::class, 'listDevices']);
     Route::post('logout-all-other', [AuthSpaController::class, 'logoutAllOtherDevices']);

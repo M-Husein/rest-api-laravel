@@ -7,11 +7,10 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash; // {Auth, Hash}
 // use Laravel\Sanctum\PersonalAccessToken;
 use App\Models\User;
-use App\Traits\RateLimit;
-// use Illuminate\Validation\ValidationException;
+use App\Traits\{RateLimit,ParseUsername};
 
 class RegisterController extends Controller{
-  use RateLimit;
+  use RateLimit,ParseUsername;
   
   public function __invoke(RegisterRequest $req){
     $this->limitRequest($req, 'register');
@@ -26,7 +25,7 @@ class RegisterController extends Controller{
 
     // If username is not provided, use email as username
     if(empty($validated['username'])){
-      $validated['username'] = $validated['email'];
+      $validated['username'] = $this->generateUsername($validated['email']); // $validated['email']
     }
 
     /**
@@ -46,11 +45,6 @@ class RegisterController extends Controller{
     $user = User::create($validated);
 
     event(new Registered($user));
-
-    $user->roles = [
-      'key' => config('roles.keys.' . $user->role),
-      'name' => config('roles.names.' . $user->role)
-    ];
 
     return jsonSuccess($user, __("registerOk"));
 
@@ -82,12 +76,6 @@ class RegisterController extends Controller{
     // // End Token Generation
 
     // event(new Registered($user));
-
-    // // Prepare the response user object, including derived 'role_key' and 'role_display_name'
-    // $user->roles = [
-    //   'key' => config('roles.keys.' . $user->role),
-    //   'name' => config('roles.names.' . $user->role)
-    // ];
 
     // return jsonSuccess(
     //   [

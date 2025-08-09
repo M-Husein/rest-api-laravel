@@ -54,7 +54,7 @@ const Content = ({ title }: { title: string }) => {
 export default function Page() {
   const TITLE_PAGE = "Create User";
 
-  useDocumentTitle(TITLE_PAGE + " - " + import.meta.env.VITE_APP_NAME);
+  useDocumentTitle(TITLE_PAGE + " - " + APP.name);
 
   const { data: accessControl } = useCan({
     resource: "application_user",

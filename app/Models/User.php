@@ -26,14 +26,14 @@ class User extends Authenticatable implements MustVerifyEmail{
     'theme',
     'provider',
     'provider_id',
-    'email_verified_at', // Add if set it in controller
+    'email_verified_at' // Add if set it in controller
 	];
 
 	protected $hidden = [
 		'password',
 		'remember_token',
     'provider_id', // Often hidden as it's an internal provider ID
-    'provider', // Can be hidden if expose it differently
+    'provider' // Can be hidden if expose it differently
     // Keep 'api_token' if used that instead of Sanctum
 	];
 
@@ -47,8 +47,21 @@ class User extends Authenticatable implements MustVerifyEmail{
    * This accessor will be appended to the user JSON response
    */
   protected $appends = [
+    'roles',
     'has_password'
   ];
+
+  /**
+   * Get the roles attribute (computed).
+   *
+   * @return array
+   */
+  public function getRolesAttribute(){
+    return [
+      'key'  => config('roles.keys.' . $this->role),
+      'name' => config('roles.names.' . $this->role)
+    ];
+  }
 
   /**
    * Determines if the user has a traditional password set.

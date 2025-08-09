@@ -2,7 +2,7 @@ import { useState } from "react";
 import { HttpError, useList } from "@refinedev/core"; // useCreate, useTranslate, 
 import { useModalForm } from "@refinedev/react-hook-form";
 import { Controller } from 'react-hook-form';
-import { Button, Input, Modal, Card } from 'antd';
+import { Button, Input, Modal } from 'antd';
 import Bowser from "bowser";
 import { Table } from '@/components/table/Table';
 import { Header } from '@/components/table/Header';
@@ -15,6 +15,8 @@ interface IFormValues {
 
 export const LoggedInDevice = ({
   t,
+  user,
+  onClickSetPassword,
 }: any) => {
   // const translate = useTranslate();
   // const { mutate: mutateCreate, isPending: isPendingCreate } = useCreate();
@@ -109,6 +111,11 @@ export const LoggedInDevice = ({
     // });
   }
 
+  const clickSetPassword = () => {
+    close();
+    onClickSetPassword();
+  }
+
   const renderTitle = () => (
     <Header
       title="Logged in device" // {title}
@@ -140,6 +147,29 @@ export const LoggedInDevice = ({
     />
   );
 
+  const renderDeviceInfo = (getBy: 'getOS' | 'getBrowser') => (val: any, row: any) => {
+    const info: any = Bowser.getParser(row.user_agent)[getBy]();
+    return (
+      <div className="flex items-center">
+        <img 
+          src={`/media/img/${getBy === 'getOS' ? 'os' : 'browsers'}/${info.name.toLowerCase().replace(' ', '-')}.svg`} 
+          alt={info.name}
+          loading="lazy"
+          decoding="async"
+          width={35}
+          height={35}
+        />
+        <div className="text-xs ml-2">
+          <b>{info.name}</b>
+          <br />
+          Version {info.version}
+          {/* <br />
+          {info.versionName} */}
+        </div>
+      </div>
+    )
+  }
+
   const columns: any = [
     {
       title: 'Type',
@@ -153,74 +183,27 @@ export const LoggedInDevice = ({
       key: 'name',
       width: 95,
     },
-    // {
-    //   title: 'User agent',
-    //   dataIndex: 'user_agent',
-    //   key: 'user_agent',
-    //   width: 115,
-    //   render: renderUserAgent,
-    // },
     {
       title: 'Platform',
-      dataIndex: 'p',
-      key: 'p',
+      dataIndex: 'user_agent',
+      key: 'user_agent',
       width: 115,
-      render: (val: any, row: any) => {
-        const platform = Bowser.getParser(row.user_agent).getPlatformType();
-        return platform.charAt(0).toUpperCase() + platform.slice(1);
-      },
+      className: "capitalize",
+      render: (val: any) => Bowser.getParser(val).getPlatformType(),
     },
     {
       title: 'OS',
       dataIndex: 'os',
       key: 'os',
       width: 115,
-      render: (val: any, row: any) => {
-        const os: any = Bowser.getParser(row.user_agent).getOS();
-        return (
-          <div className="flex items-center">
-            <img 
-              src={`/media/img/os/${os.name.toLowerCase().replace(' ', '-')}.svg`} 
-              alt={os.name}
-              loading="lazy"
-              decoding="async"
-              width={35}
-              height={35}
-            />
-            <div className="text-xs ml-2">
-              <b>{os.name}</b>
-              <br />
-              Version {os.version}
-            </div>
-          </div>
-        )
-      },
+      render: renderDeviceInfo('getOS'),
     },
     {
       title: 'Browser',
       dataIndex: 'browser',
       key: 'browser',
       width: 115,
-      render: (val: any, row: any) => {
-        const browser: any = Bowser.getParser(row.user_agent).getBrowser();
-        return (
-          <div className="flex items-center">
-            <img 
-              src={`/media/img/browsers/${browser.name.toLowerCase().replace(' ', '-')}.svg`} 
-              alt={browser.name}
-              loading="lazy"
-              decoding="async"
-              width={35}
-              height={35}
-            />
-            <div className="text-xs ml-2">
-              <b>{browser.name}</b>
-              <br />
-              Version {browser.version}
-            </div>
-          </div>
-        )
-      },
+      render: renderDeviceInfo('getBrowser'),
     },
     {
       title: 'Ip address',
@@ -282,61 +265,67 @@ export const LoggedInDevice = ({
       />
 
       <Modal
+        centered
         open={visible}
         keyboard={false}
         maskClosable={false}
         closeIcon={null}
         // title={t(`buttons.${hasId ? 'edit' : 'create'}`) + " Translation" + (values?.is_custom || !hasId ? "" : " (Default)")}
         title="Logout device"
-        // okText={t('buttons.save')}
+        okText={user?.has_password ? void 0 : "Request set password"} // t('buttons.save')
         okButtonProps={{ 
-          htmlType: "submit", 
+          htmlType: user?.has_password ? "submit" : void 0, 
           form: "formModal",
-          loading: formLoading // || isPendingCreate
+          loading: formLoading, // || isPendingCreate
+          onClick: user?.has_password ? void 0 : clickSetPassword
         }}
         cancelButtonProps={{ disabled: formLoading }} //  || isPendingCreate
         onCancel={doCancel}
-        afterOpenChange={(isOpen: boolean) => isOpen && document.getElementById('pwd')?.focus()}
+        afterOpenChange={(isOpen: boolean) => isOpen && user?.has_password && document.getElementById('pwd')?.focus()}
       >
-        <Form
-          id="formModal"
-          className="mt-6"
-          disabled={formLoading} //  || isPendingCreate
-          onSubmit={handleSubmit(doSubmit)} // onFinish
-        >
-          <label htmlFor="pwd">Password</label>
-          <Controller
-            name="password"
-            control={control}
-            render={({ field }) => (
-              <Input.Password
-                {...field}
-                id="pwd"
-                className="mt-1"
-                disabled={formLoading}
-                readOnly={formLoading}
-                autoComplete="current-password" //  | off
-                autoCapitalize="off"
-                autoCorrect="off"
-                spellCheck={false}
-                size="large"
-                status={errors.password ? "error" : ""}
-              />
+        {user?.has_password ? 
+          <Form
+            id="formModal"
+            className="mt-6"
+            disabled={formLoading} //  || isPendingCreate
+            onSubmit={handleSubmit(doSubmit)} // onFinish
+          >
+            <label htmlFor="pwd">Password</label>
+            <Controller
+              name="password"
+              control={control}
+              render={({ field }) => (
+                <Input.Password
+                  {...field}
+                  id="pwd"
+                  className="mt-1"
+                  disabled={formLoading}
+                  readOnly={formLoading}
+                  autoComplete="current-password" //  | off
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  size="large"
+                  status={errors.password ? "error" : ""}
+                />
+              )}
+              rules={{
+                required: t('error.required'),
+                minLength: {
+                  value: 2,
+                  message: t('error.minLength', { v: 6 })
+                }
+              }}
+            />
+            {errors.password && (
+              <div className="mt-1 text-red-600 text-xs">
+                {errors.password.message}
+              </div>
             )}
-            rules={{
-              required: t('error.required'),
-              minLength: {
-                value: 2,
-                message: t('error.minLength', { v: 6 })
-              }
-            }}
-          />
-          {errors.password && (
-            <div className="mt-1 text-red-600 text-xs">
-              {errors.password.message}
-            </div>
-          )}
-        </Form>
+          </Form>
+          :
+          <h2 className="text-xl">Please request set password</h2>
+        }
       </Modal>
     </>
   );

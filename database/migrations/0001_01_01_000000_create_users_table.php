@@ -25,7 +25,18 @@ return new class extends Migration{
        */
       $table->string('password')->nullable();
 
-      $table->string('username')->unique();
+      /**
+       * 15 (base) + 17 (timestamp) = 32 characters
+       * 
+       * or 40
+       * 
+       * Why 40?
+       * - Enough to fit every possible generated username you’ll ever produce.
+       * - Slight extra room for future format changes.
+       * - Short enough for a highly efficient index — small indexes are faster in lookups and comparisons.
+       * - Well under MySQL’s utf8mb4 index limit (191 characters), so safe on all storage engines.
+       */
+      $table->string('username', 32)->unique();
 
       /**
        * User avatar / profile picture

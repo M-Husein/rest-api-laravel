@@ -10,15 +10,20 @@ export default function Page(){
   const message = urlParams.get('message');
   const exp = urlParams.get('exp');
 
-  useDocumentTitle(`Social Auth ${provider} - ${import.meta.env.VITE_APP_NAME}`);
+  useDocumentTitle(`Social Auth ${provider} - ${APP.name}`);
 
   useEffect(() => {
     // Define the channel name. It MUST be the same as in the main window.
-    const LOGIN_CHANNEL_NAME = 'social_login_channel';
-    const loginChannel = new BroadcastChannel(LOGIN_CHANNEL_NAME);
-    const source = 'social-login-broadcast'; // Custom identifier for your message
+    const loginChannel = new BroadcastChannel('social_auth_channel');
+    const source = 'SOCIAL_AUTH_BC'; // Custom identifier for your message
 
-    if (token && user) {
+    const doClose = () => {
+      loginChannel.close();
+      // Small delay to ensure message has time to propagate
+      setTimeout(() => window.close(), 500);
+    }
+
+    if(token && user){
       try {
         loginChannel.postMessage({
           ok: true,
@@ -29,11 +34,8 @@ export default function Page(){
           expiresAt: exp
         });
 
-        loginChannel.close();
-
-        // Small delay to ensure message has time to propagate
-        setTimeout(() => window.close(), 500);
-      } catch (e: any) {
+        doClose();
+      }catch(e: any){
         loginChannel.postMessage({
           ok: false,
           source,
@@ -42,11 +44,10 @@ export default function Page(){
           details: e.message
         });
         
-        loginChannel.close();
-        
-        setTimeout(() => window.close(), 500);
+        doClose();
       }
-    }else if(error){
+    }
+    else if(error){
       loginChannel.postMessage({
         ok: false,
         source,
@@ -54,12 +55,10 @@ export default function Page(){
         message: message || 'Social login failed.'
       });
       
-      loginChannel.close();
-
-      setTimeout(() => window.close(), 500);
-    }else{
-      loginChannel.close();
-      setTimeout(() => window.close(), 500);
+      doClose();
+    }
+    else{
+      doClose();
     }
   }, [token, user]);
 

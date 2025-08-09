@@ -2,13 +2,11 @@ import { Card, Col } from "antd";
 import { Link } from 'react-router-dom';
 import { useDocumentTitle } from "@refinedev/react-router-v6";
 
-const APP_NAME = import.meta.env.VITE_APP_NAME;
-
-export function Layout({
+export const Layout = ({
   title,
   form,
-}: any){
-  useDocumentTitle(title + " • " + APP_NAME);
+}: any) => {
+  useDocumentTitle(title + " • " + APP.name);
 
   return (
     <div className="flex min-h-fullscreen p-4 bg-gray-200 bg-theme">
@@ -20,7 +18,7 @@ export function Layout({
           >
             <img 
               height={45}
-              alt={APP_NAME} 
+              alt={APP.name} 
               src="/logo-36x36.png"
             />
           </Link>

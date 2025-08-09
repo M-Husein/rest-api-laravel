@@ -1,18 +1,16 @@
-import { useGetIdentity } from '@refinedev/core';
 import { Controller } from 'react-hook-form';
 import { Input, Button, Col } from 'antd';
 import { Form } from '@/components/forms/Form';
 
 export const PasswordManagement = ({
   t,
+  user,
   control,
   errors,
   loading,
   onSubmit,
   onClick,
 }: any) => {
-  const { data: currentUser, isLoading }: any = useGetIdentity();
-
   const inputProps: any = {
     disabled: loading,
     className: "mt-1",
@@ -22,18 +20,14 @@ export const PasswordManagement = ({
     autoCapitalize: "off",
   };
 
-  // console.log('currentUser: ', currentUser);
+  // console.log('user: ', user);
 
-  if(isLoading){
-    return null;
-  }
-
-  if(currentUser?.has_password){
+  if(user?.has_password){
     return (
       <Form
         // fieldsetClass="space-y-4"
-        autoComplete="off"
         // method="post"
+        autoComplete="off"
         disabled={loading}
         onSubmit={onSubmit}
       >

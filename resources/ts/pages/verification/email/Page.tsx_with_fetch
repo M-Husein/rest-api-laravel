@@ -9,7 +9,7 @@ const title = "Email Verification";
 // post 'email/verification-notification'
 
 export default function Page(){
-  useDocumentTitle(title + " - " + import.meta.env.VITE_APP_NAME);
+  useDocumentTitle(title + " - " + APP.name);
 
   // params: { current, pageSize, sorters, filters }
   const { id, pathname } = useParsed<any>();

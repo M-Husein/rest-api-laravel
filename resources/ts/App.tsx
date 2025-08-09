@@ -58,7 +58,7 @@ const lazyApp = (component: any) => (
 	</ErrorBoundary>
 );
 
-const customTitleHandler = () => document.title || import.meta.env.VITE_APP_NAME;
+const customTitleHandler = () => document.title || APP.name; // import.meta.env.VITE_APP_NAME
 
 const RefineProvider = () => {
   const { t, i18n } = useTranslation();
@@ -167,13 +167,6 @@ const router = createBrowserRouter([
           // { path: "/menu/:id", element: lazyComponent(Menu, <SplashScreen />) },
         ],
       },
-      // {
-      //   path: "/",
-      //   element: <LayoutPrivate />,
-      //   children: [
-      //     { path: "settings", element: lazyComponent(Settings, <SplashScreen />) },
-      //   ],
-      // },
       {
         path: "app", // /admin
         element: <LayoutAdminApp />,
@@ -284,6 +277,7 @@ const router = createBrowserRouter([
 });
 
 export const App = () => {
+  // return <div />;
 	return (
 		<RouterProvider
 			future={{

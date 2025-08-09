@@ -21,7 +21,7 @@ interface IPost {
 const TITLE_PAGE = "Reset Password";
 
 const ResetPassword: React.FC<any> = () => {
-  useDocumentTitle(TITLE_PAGE + " • " + import.meta.env.VITE_APP_NAME);
+  useDocumentTitle(TITLE_PAGE + " • " + APP.name);
 
   // const { token } = theme.useToken();
   const translate = useTranslate();

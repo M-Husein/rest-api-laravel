@@ -41,7 +41,7 @@ const Content = ({ title }: { title: string }) => {
     queryOptions: {
       enabled: !!current,
     },
-    resource: "city/data-tables",
+    resource: "currency/data-tables",
     pagination: { pageSize, current },
     sorters: { initial: sorters },
     filters: { initial: filters },
@@ -52,7 +52,7 @@ const Content = ({ title }: { title: string }) => {
         start: 0,
         length: pageSize,
         page: current,
-        columns: ["city_code", "city_name", "country_name", "province_name"].map((name) => ({
+        columns: ["currency_code", "currency_name"].map((name) => ({
           data: name,
           name,
           orderable: true,
@@ -94,7 +94,7 @@ const Content = ({ title }: { title: string }) => {
       confirms.delete,
       (updateConfirm) => new Promise((resolve, reject) => {
         mutateDelete({
-          resource: "city/delete",
+          resource: "currency/delete",
           id,
         }, {
           onError: (e) => {
@@ -116,7 +116,7 @@ const Content = ({ title }: { title: string }) => {
       (updateConfirm) => new Promise((resolve, reject) => {
         mutateDeleteMany({
           ids,
-          resource: "city/delete",
+          resource: "currency/delete",
         }, {
           onError: (e) => {
             updateConfirm(false)
@@ -133,48 +133,29 @@ const Content = ({ title }: { title: string }) => {
   }
 
   const toggleFormModal = (val: any) => {
-    // let isNull = val === null;
-    setFormValues(val); // isNull ? undefined : val
+    setFormValues(val);
     val === null && refetch();
   }
 
   const columns: TableColumnsType<any> = [
     {  
-      title: 'Name',
-      dataIndex: 'city_name',
-      key: 'city_name',
-      width: 255,
-      sorter: (a: any, b: any) => a.city_name - b.city_name,
-      sortOrder: getDefaultSortOrder('city_name', sorter),
-      ...getColumnSearchProps('city_name'),
-    },
-    {  
       title: 'Code',
-      dataIndex: 'city_code',
-      key: 'city_code',
-      width: 115,
-      sorter: (a: any, b: any) => a.city_code - b.city_code,
-      sortOrder: getDefaultSortOrder('city_code', sorter),
-      ...getColumnSearchProps('city_code'),
-      // render: (txt: any, row: any) => currentUser?.is_sysadmin ? <Link to={"/city/" + row.id} tabIndex={loadingProcess ? -1 : undefined}>{txt}</Link> : txt,
+      dataIndex: 'currency_code',
+      key: 'currency_code',
+      width: 315,
+      sorter: (a: any, b: any) => a.currency_code - b.currency_code,
+      sortOrder: getDefaultSortOrder('currency_code', sorter),
+      ...getColumnSearchProps('currency_code'),
+      // render: (txt: any, row: any) => currentUser?.is_sysadmin ? <Link to={"/adverts/" + row.id} tabIndex={loadingProcess ? -1 : undefined}>{txt}</Link> : txt,
     },
     {  
-      title: 'Province',
-      dataIndex: 'province_name',
-      key: 'province_name',
-      width: 215,
-      sorter: (a: any, b: any) => a.province_name - b.province_name,
-      sortOrder: getDefaultSortOrder('province_name', sorter),
-      ...getColumnSearchProps('province_name'),
-    },
-    {  
-      title: 'Country',
-      dataIndex: 'country_name',
-      key: 'country_name',
-      width: 225,
-      sorter: (a: any, b: any) => a.country_name - b.country_name,
-      sortOrder: getDefaultSortOrder('country_name', sorter),
-      ...getColumnSearchProps('country_name'),
+      title: 'Name',
+      dataIndex: 'currency_name',
+      key: 'currency_name',
+      width: 325,
+      sorter: (a: any, b: any) => a.currency_name - b.currency_name,
+      sortOrder: getDefaultSortOrder('currency_name', sorter),
+      ...getColumnSearchProps('currency_name'),
     },
     {
       title: '',
@@ -183,7 +164,7 @@ const Content = ({ title }: { title: string }) => {
       align: 'center',
       fixed: 'right',
       width: 75,
-      render: (txt: any, { id, city_code, city_name, province_id, is_sysadmin }: any) => {
+      render: (txt: any, { id, currency_code, currency_name, is_sysadmin }: any) => {
         return currentUser?.is_sysadmin && (
           <>
             <Button
@@ -193,7 +174,7 @@ const Content = ({ title }: { title: string }) => {
               type="primary"
               icon={<EditOutlined />}
               disabled={loadingProcess}
-              onClick={() => toggleFormModal({ id, city_code, city_name, province_id })}
+              onClick={() => toggleFormModal({ id, currency_code, currency_name })} // push('/adverts/' + row.id)
             />
             {' '}
             {!is_sysadmin && (
@@ -234,10 +215,10 @@ const Content = ({ title }: { title: string }) => {
             loading={!isLoading && isRefetching}
             onClick={() => refetch()}
           />
-
+          
           <Button
             type="primary"
-            onClick={() => toggleFormModal({ city_code: '' })} // , city_name: '', province_id: null
+            onClick={() => toggleFormModal({ currency_name: '' })} // show('')
           >
             Create
           </Button>
@@ -277,14 +258,14 @@ const Content = ({ title }: { title: string }) => {
 }
 
 export default function Page() {
-  const TITLE_PAGE = "City";
+  const TITLE_PAGE = "Currencies";
   
-  useDocumentTitle(TITLE_PAGE + " • " + import.meta.env.VITE_APP_NAME);
+  useDocumentTitle(TITLE_PAGE + " • " + APP.name);
 
   const { data: accessControl } = useCan({
-    resource: "city",
+    resource: "currency",
     action: "list", // @ts-ignore
-    params: { resource: { entity_name: "city" } }
+    params: { resource: { entity_name: "currency" } }
   });
 
   if(!accessControl){

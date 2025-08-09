@@ -10,7 +10,7 @@ import { Translations } from './parts/Translations';
 import { UserLogged } from './parts/UserLogged';
 
 export default function Page(){
-  useDocumentTitle("Settings App - " + import.meta.env.VITE_APP_NAME);
+  useDocumentTitle("Settings App - " + APP.name);
 
   const breakpoint = Grid.useBreakpoint();
   const isSmallDevice = typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
@@ -30,11 +30,11 @@ export default function Page(){
       title: "Are you sure to revoke this user tokens?",
       cancelButtonProps: { disabled: false },
       onOk: () => new Promise((resolve, reject) => {
-        const updateConfirm = (disabled: boolean) => confirms.update({
+        const updateConfirms = (disabled: boolean) => confirms.update({
           cancelButtonProps: { disabled }
         });
 
-        updateConfirm(true);
+        updateConfirms(true);
 
         mutateCreate({
           resource: "revoke-tokens",
@@ -48,7 +48,7 @@ export default function Page(){
             resolve(res);
           },
           onError: (e) => {
-            updateConfirm(false);
+            updateConfirms(false);
             reject(e);
           },
         });
@@ -134,7 +134,7 @@ export default function Page(){
                 <div className="p-4">
                   <ClearCache />
 
-                  <h3 className="mt-4">DB</h3>
+                  <h3 className="mt-4">DB (Dev)</h3>
                   <ol>
                     <li>Backup</li>
                     <li>Export / Download</li>

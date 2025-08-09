@@ -4,7 +4,7 @@ import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { Card } from 'antd';
 
 export default function Page(){
-  useDocumentTitle("Home - " + import.meta.env.VITE_APP_NAME);
+  useDocumentTitle("Home - " + APP.name);
 
   return (
     <div className="py-4 px-2 xl_max-w-screen-xl mx-auto">

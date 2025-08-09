@@ -17,10 +17,6 @@ class ProfileController extends Controller{
 
   public function me(Request $req){
     $user = $req->user(); // auth()->user();
-    $user->roles = [
-      'key' => config('roles.keys.' . $user->role),
-      'name' => config('roles.names.' . $user->role)
-    ];
     return jsonSuccess($user);
   }
 
@@ -71,8 +67,8 @@ class ProfileController extends Controller{
         'created_at' => now()
       ]);
 
+      // Send the password set link to the user's email
       Notification::send($user, new ResetPassword($token));
-      // $user->sendPasswordResetNotification($token); // Send the password set link to the user's email
 
       return jsonSuccess(1, __("passwords.sent"));
     }

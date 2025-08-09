@@ -4,10 +4,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Auth\LoginRequest;
 use App\Http\Requests\Api\V1\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Api\V1\Auth\ResetPasswordRequest;
-// use App\Models\User;
 use Illuminate\Http\Request;
 use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Support\Facades\{Auth, Hash, Password};
+// use App\Models\User;
 use App\Traits\RateLimit;
 
 class AuthController extends Controller{
@@ -20,36 +20,35 @@ class AuthController extends Controller{
     $this->limitRequest($req, 'login');
 
     // Check if a user with this email exists and has no password set
-    $user = User::where('email', $req->email)->first();
+    // $user = User::where('email', $req->email)->first();
 
-    if($user && is_null($user->password)){
-      return jsonError('It looks like you registered with a social account and have not set a password yet. Please use social login or set a password for your account.', 403);
-    }
+    // if($user && is_null($user->password)){
+    //   return jsonError('It looks like you registered with a social account and have not set a password yet. Please use social login or set a password for your account.', 403);
+    // }
 
     $remember = $req->boolean('remember');
 
     if(Auth::attempt($req->only('email', 'password'), $remember)){
-      // $user = $req->user(); // Use variable above
-      $expiresAt = $remember ? now()->addWeeks(4) : now()->addHours(2);
+      $user = $req->user(); // Use variable above
+
+      if($req->type === 'spa' && $req->hasSession()){
+        $req->session()->regenerate();
+      }
+
+      $expiresAt = $remember ? now()->addYear()->addMonth() : now()->addHours(2);
 
       // ✅ Create token
       $token = $user->createToken(
         $req->type, // Token name: spa | native
         ['*'],      // Token abilities: *
-        $expiresAt  // Token expiration: 4 weeks | 2 hours
+        $expiresAt  // Token expiration: 1 year 1 month | 2 hours
       );
 
       // $tokenModel = PersonalAccessToken::findToken($token) ?? $user->tokens()->latest()->first();
       $tokenModel = $token->accessToken; // The PersonalAccessToken model instance
-
       $tokenModel->ip_address = $req->ip();
       $tokenModel->user_agent = $req->userAgent();
       $tokenModel->save();
-
-      $user->roles = [
-        'key' => config('roles.keys.' . $user->role),
-        'name' => config('roles.names.' . $user->role)
-      ];
 
       return jsonSuccess([
         'user' => $user,
@@ -68,29 +67,23 @@ class AuthController extends Controller{
     $user = $req->user();
 
     if($user){
+      // Session-based
+      if($req->hasSession()){
+        Auth::guard('web')->logout(); // Auth::logout();
+        $req->session()->invalidate();
+        $req->session()->regenerateToken();
+      }
+
+      // Token-based
       $token = $user->currentAccessToken();
       if($token instanceof PersonalAccessToken){
         $token->delete();
       }
 
-      // if($req->hasSession()){
-        
-      // }
-
-      Auth::guard('web')->logout(); // Auth::logout();
-      $req->session()->invalidate();
-      $req->session()->regenerateToken();
       return jsonSuccess(1);
     }
 
     return jsonError(__('auth.failed'), 401);
-    
-    // Only token-based
-    // $token = $req->user()?->currentAccessToken();
-    // if($token instanceof PersonalAccessToken){
-    //   $token->delete();
-    // }
-    // return jsonSuccess(1);
   }
 
   public function getActiveDevices(Request $req){

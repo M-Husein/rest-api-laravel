@@ -9,8 +9,6 @@ import { Sider } from './Sider';
 import { ThemedLayoutContextProvider } from "@/contexts/themedLayout";
 import '@/style/components/layout_main.scss';
 
-const appName = import.meta.env.VITE_APP_NAME;
-
 export const Layout: React.FC<any> = ({
   children,
   // initialSiderCollapsed,
@@ -59,8 +57,8 @@ export const Layout: React.FC<any> = ({
           Title={({ collapsed }: any) => (
             <Title
               collapsed={collapsed}
-              text={appName}
-              icon={<img width={24} height={24} src="/logo-36x36.png" alt={appName} />}
+              text={APP.name}
+              icon={<img width={24} height={24} src="/logo-36x36.png" alt={APP.name} />}
             />
           )}
         />

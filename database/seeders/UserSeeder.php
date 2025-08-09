@@ -29,6 +29,7 @@ class UserSeeder extends Seeder{
       'username' => 'EditorUser',
       'email' => 'editor@email.com',
       'password' => Hash::make('password'),
+      'email_verified_at' => now(),
       'role' => $editorId,
       'lang' => config('app.locale'),
     ]);

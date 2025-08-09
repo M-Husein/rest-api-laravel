@@ -117,6 +117,6 @@ return [
     base_path('lang'),
     resource_path('lang'),
   ],
-  'frontend_url' => env('FRONTEND_URL', 'http://localhost:8000'),
-  'timeout' => env('TIMEOUT', '3e4')
+  'timeout' => env('TIMEOUT', '3e4'),
+  'frontend_url' => env('FRONTEND_URL', 'http://localhost:8000')
 ];

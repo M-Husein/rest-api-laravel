@@ -24,7 +24,6 @@ type ResetPassworProps = ForgotPasswordPageProps<
   FormProps
 >;
 
-const APP_NAME = import.meta.env.VITE_APP_NAME;
 const centered = "flex justify-center items-center ";
 
 /**
@@ -32,7 +31,7 @@ const centered = "flex justify-center items-center ";
  * @see {@link https://refine.dev/docs/ui-frameworks/antd/components/antd-auth-page/#forgot-password} for more details.
  */
 const ForgotPasswordPage: React.FC<ResetPassworProps> = () => {
-  useDocumentTitle("Forgot Password - " + APP_NAME);
+  useDocumentTitle("Forgot Password - " + APP.name);
 
   // const { token } = theme.useToken();
   const translate = useTranslate();
@@ -51,8 +50,8 @@ const ForgotPasswordPage: React.FC<ResetPassworProps> = () => {
           className="w-full max-w-sm p-7 shadow"
         >
           <h1 className={centered + "mb-6 text-xl font-bold"} translate="no">
-            <img width={29} src="/logo-36x36.png" alt={APP_NAME} className="mr-2" />
-            {APP_NAME}
+            <img width={29} src="/logo-36x36.png" alt={APP.name} className="mr-2" />
+            {APP.name}
           </h1>
           <h2
             className="text-center text-lg mb-4 pb-4"

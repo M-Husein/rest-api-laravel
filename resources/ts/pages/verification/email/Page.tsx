@@ -7,7 +7,7 @@ import { useParsed, useNavigation, useNotification } from "@refinedev/core"; // 
 const title = "Verification"; // Email Verification
 
 export default function Page(){
-  useDocumentTitle(title + " - " + APP.name); // import.meta.env.VITE_APP_NAME
+  useDocumentTitle(title + " - " + APP.name);
 
   const { params: { status } } = useParsed<any>();
   // const { mutate, isPending } = useCreate();

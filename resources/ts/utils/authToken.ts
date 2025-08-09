@@ -15,7 +15,7 @@ export const getToken = (): cookieResult => Cookies.get(TOKEN_KEY);
  * @param token string
  * @param expiresAt string date iso
  */
-export const setToken = (token: string, expiresAt: string): void => {
+export const setToken = (token: string, expiresAt: string | number): void => {
   Cookies.set(
     TOKEN_KEY, 
     token,
@@ -23,7 +23,7 @@ export const setToken = (token: string, expiresAt: string): void => {
       sameSite: "Lax", // Lax | Strict
       secure: window.location.protocol === "https:",
       // expires: +import.meta.env.VITE_TOKEN_EXP, // new Date(new Date().getTime() + 3 * 60 * 1000)
-      expires: new Date(expiresAt || Date.now() + 2 * 60 * 60 * 1000), 
+      expires: typeof expiresAt === 'string' ? new Date(expiresAt || Date.now() + 2 * 60 * 60 * 1000) : expiresAt, 
     }
   );
 }

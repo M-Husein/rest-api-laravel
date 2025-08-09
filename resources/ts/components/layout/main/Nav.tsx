@@ -18,7 +18,7 @@ const MENUS: MenuProps['items'] = [
       <NavLink to="/" className="block">
         <img 
           height={29}
-          alt={import.meta.env.VITE_APP_NAME} 
+          alt={APP.name} 
           src="/logo-32x32.png"
         />
       </NavLink>

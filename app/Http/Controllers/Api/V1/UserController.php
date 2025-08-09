@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Validation\Rule;
-use App\Traits\QueryTools;
+use App\Traits\{QueryTools,ParseUsername};
 
 class UserController extends Controller{
-  use QueryTools;
+  use QueryTools,ParseUsername;
 
   public function index(Request $req){
     $this->authorize('manage-users'); // Gate check: only admins can manage users
@@ -64,8 +64,9 @@ class UserController extends Controller{
     }
 
     // If username is not provided, use email as username
-    if(!isset($validated['username']) || empty($validated['username'])){
-      $validated['username'] = $validated['email'];
+    // !isset($validated['username']) || empty($validated['username'])
+    if(empty($validated['username'])){
+      $validated['username'] = $this->generateUsername($validated['email']); // $validated['email']
     }
 
     /**
@@ -78,7 +79,7 @@ class UserController extends Controller{
      */
 
     $validated['password'] = Hash::make($validated['password']);
-    
+
     $user = User::create($validated);
     
     return jsonSuccess(
@@ -91,10 +92,8 @@ class UserController extends Controller{
   public function update(UpdateUserRequest $req, User $user){
     $this->authorize('update', $user);
 
-    // Validation is now handled by UpdateUserRequest, get the validated data
     $validated = $req->validated();
 
-    // It's validated by the Form Request's 'in' rule.
     if(isset($validated['role'])){
       $user->role = $validated['role'];
     }
@@ -104,15 +103,8 @@ class UserController extends Controller{
       $user->password = Hash::make($validated['password']);
     }
 
-    // Fill other attributes from the validated request data.
-    // `fill()` is safer than `update()` with `$validated` if not all fields are fillable.
-    // `only()` ensures only specified fields are considered from the request.
     $user->fill($req->only(['name', 'email', 'username']));
-    $user->save(); // Save all changes to the user model.
-
-    // Prepare the response user object for frontend consistency
-    // $roleKey = config('roles.keys.' . $user->role);
-    // $roleDisplayName = config('roles.names.' . $user->role);
+    $user->save();
 
     return jsonSuccess($user);
   }
@@ -245,26 +237,22 @@ class UserController extends Controller{
         ],
       ]);
 
+      $lang = $validated['lang'];
+
       // Update only the 'lang' field
-      // This is the fastest way to update a single field:
-      $user->forceFill(['lang' => $validated['lang']])->save();
-      // Or simply: $user->lang = $validated['lang']; $user->save();
-      // forceFill is slightly faster as it bypasses fillable/guarded checks,
-      // but $user->lang = ...; $user->save(); is also very fast for one field.
+      $user->lang = $lang;
+      $user->save();
+      // OR
+      // $user->forceFill(['lang' => $lang])->save();
 
       // Immediately set the application's locale for the current request
       // This ensures subsequent responses in the same request use the new language.
 
-      app()->setLocale($validated['lang']);
+      if(!app()->isLocale($lang)){
+        app()->setLocale($lang);
+      }
 
-      // return jsonSuccess(
-      //   1,
-      //   // Example translated message
-      //   __('api_messages.language_updated_successfully', [], App::getLocale())
-      // );
-
-      return jsonSuccess(1);
-      // return response()->noContent();
+      return jsonSuccess(1); // response()->noContent();
     }
 
     return jsonError('Unauthenticated.', 401);
@@ -284,10 +272,13 @@ class UserController extends Controller{
         ],
       ]);
 
-      $user->forceFill(['theme' => $validated['theme']])->save();
+      
+      $user->theme = $validated['theme'];
+      $user->save();
+      // OR
+      // $user->forceFill(['theme' => $validated['theme']])->save();
 
       return jsonSuccess(1);
-      // return response()->noContent();
     }
 
     return jsonError('Unauthenticated.', 401);

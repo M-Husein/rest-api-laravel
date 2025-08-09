@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDocumentTitle } from "@refinedev/react-router-v6";
-import { HttpError, useTranslate, useCreate } from "@refinedev/core";
+import { Authenticated, HttpError, useGetIdentity, useTranslate, useCreate } from "@refinedev/core";
+import { CatchAllNavigate } from "@refinedev/react-router-v6";
 import { useForm } from "@refinedev/react-hook-form";
 import { Card, Grid, Tabs, Modal } from 'antd';
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,8 +15,9 @@ import { PasswordManagement } from './parts/PasswordManagement';
 const title = "Settings";
 
 export default function Page(){
-  useDocumentTitle(title + " - " + import.meta.env.VITE_APP_NAME);
+  useDocumentTitle(title + " - " + APP.name);
 
+  const { data: currentUser, isLoading: isLoadingCurrentUser }: any = useGetIdentity();
   const [modalApi, modalContextHolder] = Modal.useModal();
   const breakpoint = Grid.useBreakpoint();
   const isSmallDevice = typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
@@ -90,12 +92,13 @@ export default function Page(){
 
   const requestSetPassword = () => {
     const confirms = modalApi.confirm({
+      centered: true,
       keyboard: false,
-      closable: false,
+      // closeIcon: null,
       cancelButtonProps: { disabled: false },
       title: "Are you sure to request set password?",
       // content: "Login on other devices will be logged out automatically",
-      onOk: async () => new Promise((resolve, reject) => {
+      onOk: () => new Promise((resolve, reject) => {
         const updateConfirms = (disabled: boolean) => {
           confirms.update({ cancelButtonProps: { disabled } })
         }
@@ -123,85 +126,93 @@ export default function Page(){
   }
 
   return (
-    <div className="xl_max-w-screen-xl mx-auto p-2">
-      <Card 
-        title={title}
-        className="shadow"
-        styles={{ body: { padding: 0 } }}
-      >
-        <Tabs
-          tabPosition={isSmallDevice ? "top" : "left"}
-          tabBarStyle={
-            isSmallDevice ? {
-              paddingLeft: 16,
-              marginBottom: 0
-            } : {
-              padding: '1rem 0',
-              minWidth: 200
+    <Authenticated
+      key="authenticated-inner"
+      fallback={<CatchAllNavigate to={import.meta.env.VITE_LOGIN_PATH} />}
+    >
+      <div className="xl_max-w-screen-xl mx-auto p-2">
+        <Card 
+          title={title}
+          className="shadow"
+          styles={{ body: { padding: 0 } }}
+        >
+          <Tabs
+            tabPosition={isSmallDevice ? "top" : "left"}
+            tabBarStyle={
+              isSmallDevice ? {
+                paddingLeft: 16,
+                marginBottom: 0
+              } : {
+                padding: '1rem 0',
+                minWidth: 200
+              }
             }
-          }
-          className="tab-full"
-          activeKey={tabActive}
-          onChange={(tab) => {
-            setTabActive(tab);
-            // setSearchParams(prev => ({ ...prev, tab }));
-          }}
-          items={[
-            // {
-            //   key: "0",
-            //   label: <><b className="mr-4">ℹ️</b>Information</>,
-            //   className: "h-full",
-            //   disabled: formLoading,
-            //   children: (
-            //     <Info className="h-full py-2">
-            //       <h2>Information</h2>
-            //     </Info>
-            //   )
-            // },
-            {
-              key: "1",
-              label: <><b className="mr-4">🔑</b>Change Password</>,
-              disabled: formLoading,
-              children: (
-                <div className="py-4 md_pr-4">
-                  <PasswordManagement 
-                    t={translate}
-                    control={control}
-                    errors={errors}
-                    loading={formLoading || isPendinfCreate}
-                    onSubmit={handleSubmit(doSubmit)}
-                    onClick={requestSetPassword}
-                  />
-                </div>
-              ),
-            },
-            {
-              key: "2",
-              label: <><b className="mr-4">💻</b>Logged in device</>,
-              disabled: formLoading,
-              children: (
-                <div className="py-4 md_pr-4">
-                  <LoggedInDevice 
-                    t={translate}
-                  />
-                </div>
-              )
-            },
-            {
-              key: "3",
-              label: "General",
-              disabled: formLoading,
-              children: (
-                <div className="py-4 md_pr-4">
-                  <General />
-                </div>
-              )
-            }
-          ]}
-        />
-      </Card>
+            className="tab-full"
+            activeKey={tabActive}
+            onChange={(tab) => {
+              setTabActive(tab);
+              // setSearchParams(prev => ({ ...prev, tab }));
+            }}
+            items={[
+              // {
+              //   key: "0",
+              //   label: <><b className="mr-4">ℹ️</b>Information</>,
+              //   className: "h-full",
+              //   disabled: formLoading,
+              //   children: (
+              //     <Info className="h-full py-2">
+              //       <h2>Information</h2>
+              //     </Info>
+              //   )
+              // },
+              {
+                key: "1",
+                label: <><b className="mr-4">🔑</b>Change Password</>,
+                disabled: formLoading,
+                children: (
+                  <div className="py-4 md_pr-4">
+                    <PasswordManagement 
+                      t={translate}
+                      user={currentUser}
+                      control={control}
+                      errors={errors}
+                      loading={formLoading || isPendinfCreate || isLoadingCurrentUser}
+                      onSubmit={handleSubmit(doSubmit)}
+                      onClick={requestSetPassword}
+                    />
+                  </div>
+                ),
+              },
+              {
+                key: "2",
+                label: <><b className="mr-4">💻</b>Logged in device</>,
+                disabled: formLoading,
+                children: (
+                  <div className="py-4 md_pr-4">
+                    <LoggedInDevice 
+                      t={translate}
+                      user={currentUser}
+                      onClickSetPassword={requestSetPassword} // () => setTabActive('1')
+                    />
+                  </div>
+                )
+              },
+              {
+                key: "3",
+                label: "General",
+                disabled: formLoading,
+                children: (
+                  <div className="py-4 md_pr-4">
+                    <General />
+                  </div>
+                )
+              }
+            ]}
+          />
+        </Card>
 
-      {modalContextHolder}
-    </div>
+        {modalContextHolder}
+      </div>
+    </Authenticated>
   );
 }

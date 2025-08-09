@@ -15,101 +15,95 @@ class AuthSpaController extends Controller{
   /**
    * Login with session-based
    */
-  public function login(LoginRequest $req){
-    $this->limitRequest($req, 'login-spa');
+  // public function login(LoginRequest $req){
+  //   $this->limitRequest($req, 'login-spa');
 
-    $remember = $req->filled('remember'); // $req->boolean('remember');
+  //   $remember = $req->boolean('remember');
 
-    if(Auth::attempt($req->only('email', 'password'), $remember)){
-      $user = $req->user();
-      $user->roles = [
-        'key' => config('roles.keys.' . $user->role),
-        'name' => config('roles.names.' . $user->role)
-      ];
+  //   if(Auth::attempt($req->only('email', 'password'), $remember)){
+  //     $user = $req->user();
+  //     $expiresAt = $remember ? now()->addYear()->addMonth() : now()->addHours(2);
 
-      $expiresAt = $remember ? now()->addWeeks(4) : now()->addHours(2);
+  //     // ✅ Create token
+  //     $token = $user->createToken(
+  //       $req->type, // Token name: spa | native
+  //       ['*'],      // Token abilities: *
+  //       $expiresAt  // Token expiration: 1 year 1 month | 2 hours
+  //     );
 
-      // ✅ Create token
-      $token = $user->createToken(
-        $req->type, // Token name: spa | native
-        ['*'],      // Token abilities: *
-        $expiresAt  // Token expiration: 4 weeks | 2 hours
-      );
+  //     $tokenModel = $token->accessToken; // The PersonalAccessToken model instance
+  //     $tokenModel->ip_address = $req->ip();
+  //     $tokenModel->user_agent = $req->userAgent();
+  //     $tokenModel->save();
 
-      // $tokenModel = PersonalAccessToken::findToken($token) ?? $user->tokens()->latest()->first();
-      $tokenModel = $token->accessToken; // The PersonalAccessToken model instance
+  //     $req->session()->regenerate();
 
-      $tokenModel->ip_address = $req->ip();
-      $tokenModel->user_agent = $req->userAgent();
-      $tokenModel->save();
+  //     // if($req->type === 'spa' && $req->hasSession()){
+  //     //   $req->session()->regenerate();
+  //     // }
 
-      $req->session()->regenerate();
+  //     return jsonSuccess([
+  //       'user' => $user,
+  //       'token' => $token->plainTextToken,
+  //       'expiresAt' => $expiresAt,
+  //       // 'viaRemember' => Auth::viaRemember(),
+  //       // 'remember_works' => $req->session()->get('auth.via_remember'),
+  //       // 'session' => session()->all(),
+  //     ]);
+  //   }
 
-      // if($req->type === 'spa' && $req->hasSession()){
-      //   $req->session()->regenerate();
-      // }
-
-      return jsonSuccess([
-        'user' => $user,
-        'token' => $token->plainTextToken,
-        'expiresAt' => $expiresAt,
-        // 'viaRemember' => Auth::viaRemember(),
-        // 'remember_works' => $req->session()->get('auth.via_remember'),
-        // 'session' => session()->all(),
-      ]);
-    }
-
-    return jsonError(__('auth.failed'), 401);
-    // return back()->withErrors([
-    //   'email' => 'The provided credentials do not match our records.',
-    // ])->onlyInput('email');
-  }
+  //   return jsonError(__('auth.failed'), 401);
+  //   // return back()->withErrors([
+  //   //   'email' => 'The provided credentials do not match our records.',
+  //   // ])->onlyInput('email');
+  // }
 
   /**
    * Invalidate session (for SPA clients)
    */
-  public function logout(Request $req){
-    $user = $req->user();
+  // public function logout(Request $req){
+  //   $user = $req->user();
 
-    if($user){
-      $token = $user->currentAccessToken();
-      if($token instanceof PersonalAccessToken){
-        $token->delete();
-      }
+  //   if($user){
+  //     // Session-based
+  //     if($req->hasSession()){
+  //       Auth::guard('web')->logout(); // Auth::logout();
+  //       $req->session()->invalidate();
+  //       $req->session()->regenerateToken();
+  //     }
 
-      // if($req->hasSession()){
-        
-      // }
+  //     // Token-based
+  //     $token = $user->currentAccessToken();
+  //     if($token instanceof PersonalAccessToken){
+  //       $token->delete();
+  //     }
 
-      Auth::guard('web')->logout(); // Auth::logout();
-      $req->session()->invalidate();
-      $req->session()->regenerateToken();
-      return jsonSuccess(1);
-    }
+  //     return jsonSuccess(1);
+  //   }
 
-    return jsonError(__('auth.failed'), 401);
-  }
+  //   return jsonError(__('auth.failed'), 401);
+  // }
 
   /**
    * Logs out all other devices for the authenticated user, except the current one.
    * Requires current password for security.
    * Expected Payload: { "email": "user@example.com", "password": "current_password" }
    */
-  public function logoutOthers(Request $req){
-    $user = $req->user();
+  // public function logoutOthers(Request $req){
+  //   $user = $req->user();
 
-    if(Auth::guard('web')->validate([
-      'email' => $user->email,
-      'password' => $req->password
-    ])){
-      // $deletes = $user->tokens()->delete();
-      Auth::logoutOtherDevices($req->password); // $req->input('password')
+  //   if(Auth::guard('web')->validate([
+  //     'email' => $user->email,
+  //     'password' => $req->password
+  //   ])){
+  //     // $deletes = $user->tokens()->delete();
+  //     Auth::logoutOtherDevices($req->password); // $req->input('password')
 
-      return jsonSuccess(1, __("logoutDevice"));
-    }
+  //     return jsonSuccess(1, __("logoutDevice"));
+  //   }
 
-    return jsonError(__('auth.password'), 422);
-  }
+  //   return jsonError(__('auth.password'), 422);
+  // }
 
   /**
    * List all active sessions and tokens for the authenticated user.
@@ -236,7 +230,8 @@ class AuthSpaController extends Controller{
         return jsonError('Session not found or does not belong to the current user.', 404);
       }
 
-      Session::getHandler()->destroy($id); // Destroy the actual session
+      // Session::
+      session()->getHandler()->destroy($id); // Destroy the actual session
       DB::table('sessions')->where('id', $id)->delete(); // Remove from DB for clean list
       // \Log::info('User ' . $userId . ' terminated specific session: ' . $id);
 

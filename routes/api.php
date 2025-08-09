@@ -13,10 +13,6 @@ use App\Http\Controllers\Api\V1\{
   ArticleController
 };
 
-// const ROLE_ADMIN = 'admin';
-// const ROLE_EDITOR = 'editor';
-// const ROLE_VIEWER = 'viewer';
-
 Route::prefix('v'.config('app.version'))->group(function(){
   Route::middleware('guest')->group(function(){
     Route::post('login', [AuthController::class, 'login']);
@@ -55,7 +51,6 @@ Route::prefix('v'.config('app.version'))->group(function(){
     // Route::apiResource('users', UserController::class);
 
     // Admin-only routes
-    // ['auth:sanctum', 'verified']
     Route::middleware(['role:admin','verified'])->group(function(){
       Route::get('users/lazy', [UserController::class, 'lazy']);
       Route::delete('users/deletes', [UserController::class, 'deletes']);

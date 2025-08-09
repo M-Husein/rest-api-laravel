@@ -4,7 +4,7 @@ import { useDocumentTitle } from "@refinedev/react-router-v6";
 import { Card } from 'antd';
 
 export default function Page(){
-  useDocumentTitle("Admin Home - " + import.meta.env.VITE_APP_NAME);
+  useDocumentTitle("Admin Home - " + APP.name);
 
   return (
     <Card 

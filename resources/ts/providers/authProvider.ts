@@ -99,15 +99,15 @@ export const authProvider: AuthProvider = {
         //   : { email, username, password, remember, type: "spa" };
         const json = { email, username, password, remember, type: "spa" };
 
-        // const response: any = await httpRequest.post('login', {
-        //   // credentials: 'same-origin',
-        //   json
-        // }).json();
-
-        const response: any = await httpRequest.post('login-spa', { 
-          json, 
-          // prefixUrl: window.location.origin + '/v1'
+        const response: any = await httpRequest.post('login', {
+          // credentials: 'same-origin',
+          json
         }).json();
+
+        // const response: any = await httpRequest.post('login-spa', { 
+        //   json, 
+        //   // prefixUrl: window.location.origin + '/v1'
+        // }).json();
 
         // console.log('response: ', response);
         // console.log('loginSpa: ', loginSpa);

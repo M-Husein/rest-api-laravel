@@ -6,11 +6,11 @@ import dayjs from 'dayjs';
 // en-GB | id-ID
 // const parseDate = (date: any) => new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long', day: 'numeric' }).format(date);
 
-export function Header({
+export const Header = ({
   data,
   logoHeight,
   minHeight = '23vh',
-}: any){
+}: any) => {
   // const navigate = useNavigate();
   // const [dateNow, setDateNow] = useState<any>(new Date());
 

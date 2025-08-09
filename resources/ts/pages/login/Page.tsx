@@ -29,7 +29,7 @@ const TITLE_PAGE = "Login";
  * @see {@link https://refine.dev/docs/ui-frameworks/antd/components/antd-auth-page/#login} for more details.
  */
 export default function Page(){
-  useDocumentTitle(TITLE_PAGE + " • " + import.meta.env.VITE_APP_NAME);
+  useDocumentTitle(TITLE_PAGE + " • " + APP.name);
 
   // const navigate = useNavigate();
   // const { token } = theme.useToken();

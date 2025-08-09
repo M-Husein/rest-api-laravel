@@ -1,8 +1,11 @@
 User-agent: *
 Disallow: /admin
 Disallow: /admin/*
+Disallow: /app
+Disallow: /app/*
 Disallow: /api
 Disallow: /api/*
 Disallow: email/verify/*
 Disallow: /verification
-Disallow: /verification
+Disallow: /auth/reset-password
+Disallow: /auth/social/*
