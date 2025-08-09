@@ -1,12 +1,10 @@
 <?php
 namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\Auth\LoginRequest;
-use App\Http\Requests\Api\V1\Auth\ForgotPasswordRequest;
-use App\Http\Requests\Api\V1\Auth\ResetPasswordRequest;
 use Illuminate\Http\Request;
 use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Support\Facades\{Auth, Hash, Password};
+use App\Http\Requests\Api\V1\Auth\{LoginRequest,ForgotPasswordRequest,ResetPasswordRequest};
 // use App\Models\User;
 use App\Traits\RateLimit;
 

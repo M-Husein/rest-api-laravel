@@ -3,11 +3,9 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\{Hash,DB,Notification};
 // use Illuminate\Validation\Rules\Password;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Auth\Notifications\ResetPassword;
 use App\Http\Requests\Api\V1\Auth\ChangePasswordRequest;
 use App\Traits\RateLimit;

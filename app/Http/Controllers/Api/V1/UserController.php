@@ -1,14 +1,13 @@
 <?php
 namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\User\StoreUserRequest;
-use App\Http\Requests\Api\V1\User\UpdateUserRequest;
 use Illuminate\Http\Request; // {Request, Response}
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Validation\Rule;
 use App\Traits\{QueryTools,ParseUsername};
+use App\Http\Requests\Api\V1\User\{StoreUserRequest,UpdateUserRequest};
 
 class UserController extends Controller{
   use QueryTools,ParseUsername;

@@ -3,7 +3,10 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 // use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Support\Facades\URL;
+// use Illuminate\Support\Carbon;
+// use Illuminate\Support\Facades\URL;
+// use Illuminate\Auth\Notifications\VerifyEmail;
+// use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Auth\Events\Verified;
 use App\Models\User;
 
@@ -123,5 +126,32 @@ class EmailVerificationController extends Controller{
   //   $request->fulfill(); // marks as verified and fires Verified event
 
   //   return jsonSuccess($request->user(), 'Email verified successfully.');
+  // }
+
+  /**
+   * Override the default email verification notification
+   * to use a custom expiration time and API-friendly link.
+   */
+  // public function sendEmailVerificationNotification(){
+  //   $this->notify(new class($this) extends VerifyEmail{
+  //     public function toMail($notifiable){
+  //       $expiration = config('auth.verification.expire', 60); // minutes
+
+  //       $verificationUrl = URL::temporarySignedRoute(
+  //         'verification.verify',
+  //         Carbon::now()->addMinutes($expiration),
+  //         [
+  //           'id' => $notifiable->getKey(),
+  //           'hash' => sha1($notifiable->getEmailForVerification())
+  //         ]
+  //       );
+
+  //       return (new MailMessage)
+  //         ->subject('Verify Your Email')
+  //         ->line('Click the button below to verify your email address.')
+  //         ->action('Verify Email', $verificationUrl)
+  //         ->line("This link will expire in {$expiration} minutes.");
+  //     }
+  //   });
   // }
 }

@@ -9,7 +9,7 @@ export default {
   content: [
     // "./src/**/*.{js,ts,jsx,tsx}",
     // "./index.html",
-    // "./tailwind_always_compile.html", // For always compile some class
+    // "./tailwind_safelist.html", // For always compile some class
 
     './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
     './storage/framework/views/*.php',
