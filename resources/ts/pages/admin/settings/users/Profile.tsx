@@ -4,8 +4,8 @@ import { useForm } from "@refinedev/react-hook-form";
 import { useNavigate } from 'react-router-dom';
 import { Controller } from 'react-hook-form';
 import { Button, Input, Col, Row, Spin } from 'antd'; // , Checkbox
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 // import isEqual from 'react-fast-compare';
 import { Form } from '@/components/forms/Form';
 import { SelectLazy } from '@/components/forms/SelectLazy';
@@ -55,24 +55,27 @@ export const Profile = ({
     reset,
     // IUser, HttpError, IUser
   } = useForm<any, HttpError>({ // @ts-ignore
-    resolver: yupResolver(
-      yup.object({
-        application_username: yup.string()
-          .required("is required"),
-          // .matches(/^[a-zA-Z0-9_]+$/i, { message: "Only alpha numeric and underscore" }), // , { excludeEmptyString: true }
-        fullname: yup.string().required("is required").trim("No leading and trailing whitespace").strict(),
-        email_address: yup.string().email("Not valid").required("is required"),
-        // primary_team_id: yup.string().required("is required"),
-        // assigned_business_units: yup.array().of(yup.string()).min(1, "is required").required("is required"),
-        // employee_number: yup.string().required("is required"),
-        application_password: yup.string().when('id', {
-          is: (val?: string) => !val,
-          then: (schema) => schema.required("is required"),
-        }),
-        salutation: yup.string().required("is required"),
-        description: yup.string().nullable().trim("No leading and trailing whitespace").strict(),
-        phone_number: yup.string().nullable().trim("No leading and trailing whitespace").strict(),
+    resolver: zodResolver(
+      z.object({
+        id: z.string().optional(), // needed for conditional check
+        application_username: z.string().trim().min(1),
+        fullname: z.string().trim().min(1),
+        email_address: z.email(),
+        application_password: z.string().trim().optional(),
+        salutation: z.string().trim().min(1),
+        description: z.string().trim().nullable(),
+        phone_number: z.string().trim().nullable(),
       })
+      .refine(
+        (data) => {
+          // require password if id is not present
+          return data.id || (data.application_password && data.application_password.length > 0);
+        },
+        {
+          message: "Required when id is not present",
+          path: ["application_password"],
+        }
+      )
     ),
     values, // : initialValues
     refineCoreProps: {

@@ -1,4 +1,4 @@
-import * as z from "zod";
+import { z } from "zod";
 
 // const localeManifest = import.meta.glob('../../../../node_modules/zod/v4/locales/*.js');
 

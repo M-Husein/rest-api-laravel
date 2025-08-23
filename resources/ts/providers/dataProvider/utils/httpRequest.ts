@@ -15,15 +15,15 @@ export const api = ky.create({
   hooks: {
     beforeRequest: [
       request => {
-        let lang = localStorage.getItem('i18nextLng');
-        if(lang){ //  && lang !== APP.defaultLang
-          request.headers.set('Accept-Language', lang);
-        }
-
         /** For csrf token */
         if(request.credentials !== "omit" && MUTATING_METHODS.includes(request.method)){
           let csrfToken = getCsrfToken();
           csrfToken && request.headers.set('X-XSRF-TOKEN', csrfToken); // decodeURIComponent(csrfToken)
+        }
+
+        let lang = localStorage.getItem('i18nextLng');
+        if(lang){ //  && lang !== APP.defaultLang
+          request.headers.set('Accept-Language', lang);
         }
       }
     ],

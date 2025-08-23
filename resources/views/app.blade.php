@@ -11,6 +11,7 @@ $baseUrl = url('');
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1677ff">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="format-detection" content="telephone=no,address=no,email=no">
 <meta name="robots" content="index,follow">{{-- ,max-image-preview:large --}}
@@ -25,7 +26,7 @@ $baseUrl = url('');
 <script>
 const APP=Object.freeze({
   name:"{{$appName}}",
-  version:{{ $ver }},
+  version:{{$ver}},
   api:"{{ $baseUrl }}/api/v{{ $ver }}",
   timeout:{{ config('app.timeout') }},
   defaultLang:"{{ config('app.fallback_locale') }}",

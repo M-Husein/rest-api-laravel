@@ -10,6 +10,8 @@ $baseUrl = url('');
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1677ff">
+{{-- <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)"> --}}
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="format-detection" content="telephone=no,address=no,email=no">
 <meta name="robots" content="none,nosnippet,noarchive,noimageindex">
@@ -18,6 +20,7 @@ $baseUrl = url('');
 <meta name="googlebot-news" content="none,nosnippet,noarchive,noimageindex">
 <meta name="bing" content="none,nosnippet,noarchive,noimageindex">
 <meta name="baidu" content="none,nosnippet,noarchive,noimageindex">
+<meta name="bingbot" content="noarchive">
 <meta property="og:image" content="{{ $baseUrl }}/logo-144x144.png">
 <meta name="twitter:image" content="{{ $baseUrl }}/logo-144x144.png">
 <title>{{ $appName }}</title>

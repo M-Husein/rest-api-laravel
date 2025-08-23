@@ -2,6 +2,7 @@
 // use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\{
+  ErrorReportController,
   AuthController,
   RegisterController,
   EmailVerificationController,
@@ -25,6 +26,9 @@ Route::prefix('v'.config('app.version'))->group(function(){
   // Route::get('/login/{provider}/callback', [SocialLoginController::class, 'callback']);
 
   Route::post('reset-password', [AuthController::class, 'resetPassword']);
+
+  Route::post('errors', [ErrorReportController::class, 'store']);
+  Route::post('errors/bulk', [ErrorReportController::class, 'bulkStore']);
 
   Route::middleware('auth:sanctum')->group(function(){
     // Resend verification email

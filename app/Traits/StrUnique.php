@@ -2,29 +2,26 @@
 namespace App\Traits;
 use Illuminate\Support\Str;
 
-trait ParseUsername{
+trait StrUnique{
   /**
    * Generate a unique username from an email by appending the current datetime
    * @param  string  $email
    * @return string
    */
-  protected function generateUsername(string $email): string{
+  protected function setUsername(string $email): string{
     $base = Str::slug(Str::before($email, '@'), '');
-    if(empty($base)){
-      $base = 'user';
-    }
-    return Str::limit($base, 15, '') . '_' . now()->format('YmdHisv');
+    return (empty($base) ? 'user' : Str::limit($base, 15, '')) . Str::random(8);
   }
 
   // protected function generateUsername(string $email): string{
-  //   // Use only part before @ to avoid showing domain in username
-  //   $base = Str::slug(Str::before($email, '@'), '');
-
+  //   $base = Str::slug(Str::before($email, '@'), ''); // Use only part before @ to avoid showing domain in username
   //   if(empty($base)){
   //     $base = 'user';
   //   }
-
-  //   return Str::limit($base, 15, '') . Str::lower(Str::random(5));
+  //   // return Str::limit($base, 15, '') . Str::lower(Str::random(8)); // 32
+  //   // return Str::limit($base, 15, '') . substr(md5($email), 0, 6);
+  //   // return Str::limit($base, 15, '') . '_' . now()->format('YmdHisv'); // 33
+  //   return Str::limit($base, 15, '') . substr(sha1($email . Str::random()), 0, 8); // 32
   // }
 
 

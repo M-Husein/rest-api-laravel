@@ -9,6 +9,8 @@ export default function Page(){
   const error = urlParams.get('error');
   const message = urlParams.get('message');
   const exp = urlParams.get('exp');
+  // Option for Linkedin
+  // const code = urlParams.get('code');
 
   useDocumentTitle(`Social Auth ${provider} - ${APP.name}`);
 
@@ -31,7 +33,8 @@ export default function Page(){
           provider,
           user: JSON.parse(user),
           token: token,
-          expiresAt: exp
+          expiresAt: exp,
+          // code
         });
 
         doClose();

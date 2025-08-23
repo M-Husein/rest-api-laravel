@@ -5,14 +5,19 @@ import { CatchAllNavigate } from "@refinedev/react-router-v6";
 import { useForm } from "@refinedev/react-hook-form";
 import { Card, Grid, Tabs, Modal } from 'antd';
 import { zodResolver } from "@hookform/resolvers/zod";
-// import { z } from "zod";
-import * as z from "zod";
+import { z } from "zod";
 // import { Info } from '@/components/Info';
 import { General } from './parts/General';
 import { LoggedInDevice } from './parts/LoggedInDevice';
 import { PasswordManagement } from './parts/PasswordManagement';
 
 const title = "Settings";
+
+type IForm = {
+  current_password: string,
+  password: string,
+  password_confirmation: string,
+}
 
 export default function Page(){
   useDocumentTitle(title + " - " + APP.name);
@@ -24,10 +29,9 @@ export default function Page(){
 
   const translate = useTranslate();
   const { mutate: mutateCreate, isPending: isPendinfCreate } = useCreate();
-  // const passwordValidation = z.string(translate("error.required")).min(6, translate("error.minLength", { v: 6 }));
-  const passwordValidation = z.string().min(6);
-
+  
   const [tabActive, setTabActive] = useState("1"); // 0
+  const passwordValidation = z.string().min(6);
 
   const {
     formState: { errors },
@@ -36,7 +40,7 @@ export default function Page(){
     reset,
     clearErrors,
     handleSubmit,
-  } = useForm<any, HttpError, any>({
+  } = useForm<IForm, HttpError, IForm>({
     resolver: zodResolver(
       z.object({
         current_password: passwordValidation,
@@ -58,6 +62,13 @@ export default function Page(){
           path: ["password"],
         }
       )
+      // OR
+      // .refine((data) => 
+      //   data.password !== data.current_password && data.password === data.password_confirmation, 
+      // {
+      //   message: "Passwords don't match or new password is same as current",
+      //   path: ["password"],
+      // })
     ),
     refineCoreProps: {
       queryOptions: { enabled: false },

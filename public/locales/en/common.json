@@ -114,6 +114,7 @@
   },
   "error": {
     "unspecific": "Something went wrong.",
+    "noInternet": "No internet connection",
     "process": "Failed to {{type}}, please try again.",
     "required": "Is required.",
     "invalid": "Invalid value.",
@@ -137,6 +138,7 @@
   "deactivate": "Deactivate",
   "download": "Download",
   "toProcess": "to process",
+  "tryAgain": "Try again",
   "haveAccount": "Have an account?",
   "z": {
     "char": "characters",

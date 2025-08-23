@@ -6,11 +6,11 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Validation\Rule;
-use App\Traits\{QueryTools,ParseUsername};
+use App\Traits\{QueryTools,StrUnique};
 use App\Http\Requests\Api\V1\User\{StoreUserRequest,UpdateUserRequest};
 
 class UserController extends Controller{
-  use QueryTools,ParseUsername;
+  use QueryTools,StrUnique;
 
   public function index(Request $req){
     $this->authorize('manage-users'); // Gate check: only admins can manage users
@@ -65,7 +65,7 @@ class UserController extends Controller{
     // If username is not provided, use email as username
     // !isset($validated['username']) || empty($validated['username'])
     if(empty($validated['username'])){
-      $validated['username'] = $this->generateUsername($validated['email']); // $validated['email']
+      $validated['username'] = $this->setUsername($validated['email']); // $validated['email']
     }
 
     /**

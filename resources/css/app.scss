@@ -82,9 +82,9 @@ html.dark {
 
 // Option to hide next elements when show loader App.
 #loaderApp:not(.hidden) + * {
-  display: none;
+  // display: none;
   // Option
-  // content-visibility: hidden;
+  content-visibility: hidden;
   // pointer-events: none;
 }
 

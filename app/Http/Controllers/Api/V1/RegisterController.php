@@ -6,10 +6,10 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash; // {Auth, Hash}
 // use Laravel\Sanctum\PersonalAccessToken;
 use App\Models\User;
-use App\Traits\{RateLimit,ParseUsername};
+use App\Traits\{RateLimit,StrUnique};
 
 class RegisterController extends Controller{
-  use RateLimit,ParseUsername;
+  use RateLimit,StrUnique;
   
   public function __invoke(RegisterRequest $req){
     $this->limitRequest($req, 'register');
@@ -24,7 +24,7 @@ class RegisterController extends Controller{
 
     // If username is not provided, use email as username
     if(empty($validated['username'])){
-      $validated['username'] = $this->generateUsername($validated['email']); // $validated['email']
+      $validated['username'] = $this->setUsername($validated['email']); // $validated['email']
     }
 
     /**

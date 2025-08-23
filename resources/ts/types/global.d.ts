@@ -6,7 +6,8 @@ interface AppConfig {
   defaultLang: string,
   locales: {
     [key: string]: string
-  }
+  },
+  // socials: string[],
 }
 
 /**
@@ -19,6 +20,8 @@ interface AppConfig {
  * @var locales     : { id:"Indonesia", en:"English" }
  */
 declare const APP: Readonly<AppConfig>;
+
+// * @var socials     : ["google", "linkedin"]
 
 /**
  * @NOTE : For setup or app config in global window object

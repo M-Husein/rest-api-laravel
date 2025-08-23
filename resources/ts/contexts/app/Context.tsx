@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from "react";
-import { createContext, useContext, useState, useEffect, useMemo } from 'react'; // , useDebugValue
+import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react'; // , useDebugValue
 import { useGetLocale } from "@refinedev/core";
 import { ConfigProvider, App as AntdApp, theme as AntdTheme } from "antd";
 import { setDayjsLocale } from '@/utils/locale/setDayjsLocale';
@@ -50,7 +50,6 @@ export const useApp = () => {
   return useContext(AppContext);
 }
 
-// AppLocale
 export const AppContextProvider = ({ children }: PropsWithChildren) => {
   const [antdLocale, setAntdState] = useState<any>();
 
@@ -61,12 +60,15 @@ export const AppContextProvider = ({ children }: PropsWithChildren) => {
   const userData = sessionStorage.getItem(tokenKey);
   const [user, setUser] = useState(userData ? JSON.parse(userData) : null);
 
-  const setupUser = (data: any) => {
+  const setupUser = useCallback((data: any) => {
     setUser(data);
     data && sessionStorage.setItem(tokenKey, JSON.stringify(data));
-  }
+  }, []);
 
-  const value = useMemo(() => ({ user, setUser: setupUser }), [user]);
+  const value = useMemo(() => ({ 
+    user, 
+    setUser: setupUser 
+  }), [user, setupUser]);
 
   useEffect(() => {
     (async () => {
@@ -110,26 +112,24 @@ export const AppTheme: React.FC<PropsWithChildren> = ({
   // const isSystemPreferenceDark = window?.matchMedia("(prefers-color-scheme: dark)").matches;
   const initTheme = JSON.parse(sessionStorage.getItem(import.meta.env.VITE_TOKEN_KEY) as any)?.theme || localStorage.getItem("theme");
   // const systemPreference = isSystemPreferenceDark ? "dark" : "light";
-  const [theme, setTheme] = useState(initTheme || "light"); //  || systemPreference
-
-  const isDark = theme === "dark";
+  const [theme, setTheme] = useState<string>(initTheme || "light"); //  || systemPreference
 
   useEffect(() => {
     localStorage.setItem("theme", theme);
-    toggleTheme(theme); // theme === "dark"
+    toggleTheme(theme);
   }, [theme]);
 
-  const setColorMode = () => {
-    setTheme(isDark ? "light" : "dark");
-  }
+  const changeTheme = useCallback(() => {
+    setTheme(t => t === 'dark' ? 'light' : 'dark');
+  }, []);
 
-  const value = useMemo(() => ({ theme, setTheme: setColorMode }), [theme]);
+  const value = useMemo(() => ({
+    theme, 
+    setTheme: changeTheme 
+  }), [theme, changeTheme]);
 
   return (
-    <AppThemeContext.Provider
-      // value={{ theme, setTheme: setColorMode }}
-      value={value}
-    >
+    <AppThemeContext.Provider value={value}>
       <ConfigProvider 
         wave={{
           disabled: true,
@@ -141,7 +141,7 @@ export const AppTheme: React.FC<PropsWithChildren> = ({
           /** @OPTION : Using color scheme light / dark */
           // ...RefineThemes.Blue,
           // algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
-          algorithm: isDark ? AntdTheme.darkAlgorithm : AntdTheme.defaultAlgorithm,
+          algorithm: theme === "dark" ? AntdTheme.darkAlgorithm : AntdTheme.defaultAlgorithm,
           token: {
             // motion: false,
             // fontFamily: "'Lato',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans',sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','Noto Color Emoji'",

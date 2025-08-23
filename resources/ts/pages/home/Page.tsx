@@ -12,7 +12,8 @@ export default function Page(){
         title="Home"
         className="shadow"
       >
-        
+        {/* @ts-ignore */}
+        {/* {UNDEFINED} */}
       </Card>
     </div>
   );

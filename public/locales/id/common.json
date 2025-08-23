@@ -114,6 +114,7 @@
   },
   "error": {
     "unspecific": "Terjadi Kesalahan.",
+    "noInternet": "Tidak ada koneksi internet",
     "process": "Gagal {{type}}, silahkan coba lagi.",
     "required": "Harus diisi.",
     "invalid": "Tidak valid.",
@@ -138,6 +139,7 @@
   "download": "Unduh",
   "toProcess": "memproses",
   "haveAccount": "Punya akun?",
+  "tryAgain": "Coba lagi",
   "z": {
     "char": "karakter",
     "toHave": "memiliki",

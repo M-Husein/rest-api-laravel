@@ -1,5 +1,5 @@
-import * as z from "zod";
-// import { z } from "zod";
+import { z } from "zod";
+// import * as z from "zod";
 // import i18n from "@/i18n";
 
 const error = (i18n: any) => {

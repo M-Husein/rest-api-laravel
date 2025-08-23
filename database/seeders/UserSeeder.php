@@ -39,6 +39,7 @@ class UserSeeder extends Seeder{
       'username' => 'ViewerUser',
       'email' => 'viewer@email.com',
       'password' => Hash::make('password'),
+      'email_verified_at' => now(),
       'role' => $viewerId,
       'lang' => config('app.locale'),
     ]);

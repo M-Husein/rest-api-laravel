@@ -6,10 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Auth,Storage,Http};
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
-use App\Traits\ParseUsername;
+use App\Traits\StrUnique;
 
 class SocialAuthController extends Controller{
-  use ParseUsername;
+  use StrUnique;
 
   /**
    * Redirect the user to the provider's authentication page.
@@ -17,14 +17,38 @@ class SocialAuthController extends Controller{
    * @return \Illuminate\Http\RedirectResponse
    */
   public function redirectToProvider(string $provider){
-    if(in_array($provider, array_keys(config('services')))){
-      return Socialite::driver($provider)
-        ->scopes(['openid','email','profile'])
-        ->redirect();
+    if(in_array($provider, $this->getServices())){
+      $scopes = [];
+      switch($provider){
+        case 'google':
+          $scopes = ['openid','email','profile'];
+          break;
+        case 'linkedin':
+          $scopes = ['r_emailaddress','r_liteprofile'];
+          break;
+        default:
+          // $scopes = [];
+          break;
+      }
+      return Socialite::driver($provider)->scopes($scopes)->redirect();
+      // return Socialite::driver($provider)->scopes($scopes)->stateless()->redirect();
     }
-    // \Log::warning("Attempted to redirect to unsupported provider: {$provider}");
-    return redirect(config('app.frontend_url').'/api/v1/auth/social/callback/'.$provider.'?error=unsupported_provider');
+    return redirect(config('app.frontend_url') . '/api/v1/auth/social/callback/' . $provider . '?error=unsupported_provider');
   }
+
+  // public function redirectToProvider(string $provider){
+  //   if(in_array($provider, $this->getServices())){
+  //     return Socialite::driver($provider)
+  //       ->scopes([
+  //         'openid','email','profile',
+  //         // linkedin
+  //         'r_emailaddress','r_liteprofile'
+  //       ])
+  //       ->redirect();
+  //   }
+  //   // \Log::warning("Attempted to redirect to unsupported provider: {$provider}");
+  //   return redirect(config('app.frontend_url').'/api/v1/auth/social/callback/'.$provider.'?error=unsupported_provider');
+  // }
 
   /**
    * Handle the provider's authentication callback.
@@ -32,9 +56,11 @@ class SocialAuthController extends Controller{
    * @return \Illuminate\Http\RedirectResponse
    */
 	public function handleProviderCallback(Request $req, string $provider){
-		if(in_array($provider, array_keys(config('services')))){
+		if(in_array($provider, $this->getServices())){
 			try {
 				$socialiteUser = Socialite::driver($provider)->user();
+        // $socialiteUser = Socialite::driver($provider)->stateless()->user();
+
         $userId = $socialiteUser->getId();
 
 				// --- Start: User Fetch/Creation Logic (Existing and New Users) ---
@@ -62,7 +88,7 @@ class SocialAuthController extends Controller{
 						}
 					}else{
 						// Create new user
-						$generatedUsername = $this->generateUsername($userEmail);
+						$generatedUsername = $this->setUsername($userEmail);
 						$user = User::create([
 							'name' => $socialiteUser->getName(),
 							'email' => $userEmail,
@@ -107,10 +133,10 @@ class SocialAuthController extends Controller{
 							}
 						} 
 						// else{
-						// 	\Log::warning('Failed to download avatar from '.$rawAvatarUrl.' Status: '.$response->status());
+						// 	\Log::warning('Failed to download avatar: '.$response->status());
 						// }
 					}catch(\Exception $e){
-						\Log::error('Exception while downloading avatar: '.$e->getMessage());
+						// \Log::error('Exception while downloading avatar: '.$e->getMessage());
 					}
 				}
 				// else if($user && $user->id && $rawAvatarUrl === null && $user->avatar === null){
@@ -152,4 +178,15 @@ class SocialAuthController extends Controller{
 
 		return redirect(config('app.frontend_url').'/auth/social/callback/'.$provider.'?error=unsupported_provider');
 	}
+
+  public function getServices(){
+    // All
+    // array_keys(config('services'))
+
+    // Only custom services
+    return collect(config('services'))
+      ->filter(fn($s) => $s['custom'] ?? false)
+      ->keys()
+      ->toArray();
+  }
 }
